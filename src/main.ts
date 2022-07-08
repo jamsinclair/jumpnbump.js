@@ -9,15 +9,16 @@ import { GET_BAN_MAP_IN_WATER, GET_BAN_MAP_TILE, GET_BAN_MAP_XY, SET_BAN_MAP } f
 import { serverSendAlive, serverSendKillPacket, serverTellEveryoneGoodbye, tellServerGoodbye, tellServerNewPosition, update_players_from_clients, update_players_from_server } from './network';
 import { add_leftovers, add_object, add_pob, draw_flies, draw_leftovers, draw_pobs, position_flies, redraw_flies_background, update_flies } from './renderer';
 import { memset, rnd } from './c';
-import { draw_begin, draw_end, fillpalette, put_text, register_mask, setpalette } from './sdl/gfx';
+import { draw_begin, draw_end, fillpalette, open_screen, put_text, register_mask, setpalette } from './sdl/gfx';
 import { preread_datafile, read_gob, read_level, read_pcx } from './data';
 import { menu } from './menu';
 import ctx from './context';
+import { SDL_Init } from './sdl/sdl';
 
-let rabbit_gobs;
-let font_gobs;
-let object_gobs;
-let number_gobs;
+let rabbit_gobs = ctx.rabbit_gobs;
+let font_gobs = ctx.font_gobs;
+let object_gobs = ctx.object_gobs;
+let number_gobs = ctx.number_gobs;
 
 const main_info = ctx.info;
 const player = ctx.player;
@@ -28,8 +29,8 @@ const mouse = {};
 
 let endscore_reached = 0;
 
-const pal = new Array(256);
-const cur_pal = new Array(256);
+const pal = new Uint8ClampedArray(768);
+const cur_pal = new Uint8ClampedArray(768);
 
 const is_server = false;
 const is_net = false;
@@ -138,7 +139,7 @@ function collision_check () {
 	}
 }
 
-function game_loop () {
+async function game_loop () {
 	let mod_vol, sfx_vol;
 	let update_count = 1;
 	let end_loop_flag = 0;
@@ -159,7 +160,7 @@ function game_loop () {
 	while (1) {
 		while (update_count) {
 
-			if (endscore_reached || (key_pressed(KEY.ESCAPE) == 1)) {
+			if (endscore_reached || (key_pressed(KEY.ESCAPE))) {
 				if (is_net) {
 					if (is_server) {
 						serverTellEveryoneGoodbye();
@@ -270,7 +271,7 @@ function game_loop () {
 
 			if (update_count == 1) {
 				if (update_palette == 1) {
-					setpalette(0, 768, cur_pal);
+					setpalette(0, 256, cur_pal);
 					update_palette = 0;
 				}
 
@@ -300,7 +301,7 @@ function game_loop () {
 			}
 		}
 
-		update_count = intr_sysupdate();
+		update_count = await intr_sysupdate();
 
 		if (is_net) {
 			if ((server_said_bye) || ((fade_flag == 0) && (end_loop_flag == 1)))
@@ -327,7 +328,7 @@ async function menu_loop ()
 	while (break_me) {
         console.log('in first loop');
 		if (!is_net) {
-			if (menu() != 0) {
+			if (await menu() != 0) {
 				deinit_program();
                 break;
                 return;
@@ -344,7 +345,7 @@ async function menu_loop ()
 		}
 
         memset(cur_pal, 0, 768);
-		setpalette(0, 768, cur_pal);
+		setpalette(0, 256, cur_pal);
 
 		if (flies_enabled) {
             position_flies();
@@ -361,7 +362,7 @@ async function menu_loop ()
 		main_info.view_page = 0;
 		main_info.draw_page = 1;
 
-		game_loop();
+		await game_loop();
 
 		if (is_net) {
 			if (is_server) {
@@ -438,7 +439,7 @@ async function menu_loop ()
 		}
 
         memset(cur_pal, 0, 768);
-		setpalette(0, 768, cur_pal);
+		setpalette(0, 256, cur_pal);
 
 		mod_vol = 0;
 		dj_ready_mod(MOD.SCORES);
@@ -456,7 +457,7 @@ async function menu_loop ()
 			}
 			dj_mix();
 			intr_sysupdate();
-			setpalette(0, 768, cur_pal);
+			setpalette(0, 256, cur_pal);
 		}
 		while (key_pressed(KEY.ESCAPE) == 1) {
 			dj_mix();
@@ -473,7 +474,7 @@ async function menu_loop ()
 					cur_pal[c1]--;
 			}
 			dj_mix();
-			setpalette(0, 768, cur_pal);
+			setpalette(0, 256, cur_pal);
 		}
 
 		fillpalette(0, 0, 0);
@@ -1434,23 +1435,18 @@ async function init_level (level: number, pal: number[]): Promise<number> {
 	let c1, c2;
 	let s1, s2;
 
-	// Open the level file
-	// if (read_pcx(handle, background_pic, JNB_WIDTH * JNB_HEIGHT, pal) != 0) {
-	// 	strcpy(main_info.error_str, "Error loading 'level.pcx', aborting...\n");
-	// 	return 1;
-	// }
-    let background_pic = [];
+	let background_pic = read_pcx('level.pcx', pal);
 
 	if (flip)
 		flip_pixels(background_pic);
 	
     // Open Mask File
-    let mask_pic = [];
+    // let mask_pic = new Uint8ClampedArray(background_pic.length);
 
-	if (flip)
-		flip_pixels(mask_pic);
+	// if (flip)
+	// 	flip_pixels(mask_pic);
 
-	register_mask(mask_pic);
+	// register_mask(mask_pic, pal);
 
 	for (c1 = 0; c1 < core.JNB_MAX_PLAYERS; c1++) {
 		if (player[c1].enabled) {
@@ -1521,11 +1517,13 @@ function getDefaultDatFile () {
     return fetch('jumpbump.dat').then(response => response.arrayBuffer());
 }
 
-async function init_program (argc: number, argv: string[], pal: number[]) {
+async function init_program (argc: number, argv: string[], pal: Uint8ClampedArray) {
 	const netarg = null;
 	let c1 = 0, c2 = 0;
 	let load_flag = 0;
 	let fly;
+
+	open_screen();
 
 	// TODO set flags here?
 
@@ -1539,18 +1537,13 @@ all provided the user didn't choose one on the commandline. */
 	}
 
     preread_datafile(await getDefaultDatFile());
-    const background_pic = read_pcx('menu.pcx');
+    read_pcx('menu.pcx', pal);
 
     // Load Gobs
-    ctx.rabbit_gobs = read_gob('rabbit.gob');
-	ctx.object_gobs = read_gob('objects.gob');
-    ctx.font_gobs = read_gob('font.gob');
-    ctx.number_gobs = read_gob('numbers.gob');
-    
-    rabbit_gobs = read_gob('rabbit.gob');
-    object_gobs = read_gob('objects.gob');
-    font_gobs = read_gob('font.gob');
-    number_gobs = read_gob('numbers.gob');
+    ctx.rabbit_gobs.refresh(read_gob('rabbit.gob'));
+	ctx.object_gobs.refresh(read_gob('objects.gob'));
+    ctx.font_gobs.refresh(read_gob('font.gob'));
+    ctx.number_gobs.refresh(read_gob('numbers.gob'));
 
     SET_BAN_MAP(read_level());
 	
@@ -1567,7 +1560,7 @@ all provided the user didn't choose one on the commandline. */
 		pal[(240 + c1) * 3 + 2] = c1 << 2;
 	}
 
-	setpalette(0, 768, pal);
+	setpalette(0, 256, pal);
 
 	// if (is_net) {
 	// 	if (is_server) {

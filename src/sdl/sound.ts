@@ -1,4 +1,4 @@
-import { MOD } from "src/constants";
+import { MOD } from "../constants";
 
 export function dj_set_sfx_channel_volume (channel_num: number, volume: number) {
     return;

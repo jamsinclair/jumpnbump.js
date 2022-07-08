@@ -46,7 +46,7 @@ function create_object_anims() {
 }
 
 function create_player_anims() {
-    var player_anim_data = [
+    const player_anim_data = [
         1, 0, 0, 0x7fff, 0, 0, 0, 0, 0, 0,
         4, 0, 0, 4, 1, 4, 2, 4, 3, 4,
         1, 0, 4, 0x7fff, 0, 0, 0, 0, 0, 0,

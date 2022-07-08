@@ -25,7 +25,14 @@ type GameContext = {
     number_gobs?: Gob;
 }
 
-const defaultContext: GameContext = {
+const fillArray = <Value>(array: Value[], getValue: () => Value ) => {
+    for (let i = 0; i < array.length; i++) {
+        array[i] = getValue();
+    }
+    return array;
+};
+
+const getDefaultContext: () => GameContext = () => ({
     info: {
         joy_enabled: false,
         mouse_enabled: false,
@@ -38,11 +45,16 @@ const defaultContext: GameContext = {
         page_info: [{num_pobs: 0, pobs: []}, {num_pobs: 0, pobs: []}],
         pob_backbuf: [],
     },
-    player: new Array(JNB_MAX_PLAYERS).fill(new Player()),
+    player: fillArray(new Array(JNB_MAX_PLAYERS), () => new Player()),
     ai: new Array(JNB_MAX_PLAYERS),
-    objects: new Array(NUM_OBJECTS).fill(new GameObject()),
-};
+    objects: fillArray(new Array(NUM_OBJECTS), () => new GameObject()),
+    rabbit_gobs: new Gob(),
+    font_gobs: new Gob(),
+    object_gobs: new Gob(),
+    number_gobs: new Gob(),
+});
 
+const defaultContext = getDefaultContext();
 globalThis.ctx = defaultContext;
 
 export default defaultContext;

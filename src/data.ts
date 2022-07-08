@@ -13,6 +13,12 @@ type FileRef = {
     len: number;
 }
 
+function toShort(n) {
+    const int16 = new Int16Array(1);
+    int16[0] = n;
+    return int16[0];
+}
+
 const flip = false;
  
 function read_dat_index(): Record<string, FileRef> {
@@ -67,12 +73,11 @@ export function dat_filelen(requested_file_name: string): number {
     return file_len;
 }
 
-export function read_pcx(filename) {
+export function read_pcx(filename, pal) {
     let handle = dat_open(filename);
     handle += 128; //Assume header says PCX_256_COLORS (8 bits per pixel, 1 plane)
     const buf_len = PIXEL_WIDTH * PIXEL_HEIGHT;
-    const colormap = new Uint8Array(PIXEL_WIDTH * PIXEL_HEIGHT);
-    const palette = new Uint8Array(PALETTE_256_SIZE);
+    const colormap = new Uint8ClampedArray(PIXEL_WIDTH * PIXEL_HEIGHT);
     let ofs = 0;
     while (ofs < buf_len) {
         let a = datafile_buffer[handle++];
@@ -86,11 +91,13 @@ export function read_pcx(filename) {
         }
     }
     handle++;
-    for (let c1 = 0; c1 < PALETTE_256_SIZE; c1++) {
-        palette[c1] = datafile_buffer[handle++];
+    if (pal && pal.length === PALETTE_256_SIZE) {
+        for (let c1 = 0; c1 < PALETTE_256_SIZE; c1++) {
+            pal[c1] = datafile_buffer[handle++];
+        }
     }
 
-    return { palette: palette, colormap: colormap };
+    return colormap;
 }
 
 export function read_gob(filename) {
@@ -99,22 +106,23 @@ export function read_gob(filename) {
     const gob_data = datafile_buffer.subarray(handle, handle + len);
 
     const gob = new Gob();
+    gob.name = filename.replace('.gob', '');
     gob.num_images = (gob_data[0]) + (gob_data[1] << 8);
 
     for (let i = 0; i < gob.num_images; i++) {
         let offset = (gob_data[i * 4 + 2]) + (gob_data[i * 4 + 3] << 8) + (gob_data[i * 4 + 4] << 16) + (gob_data[i * 4 + 5] << 24);
 
-        gob.width[i] = ((gob_data[offset]) + (gob_data[offset + 1] << 8));
+        gob.width[i] = toShort((gob_data[offset]) + (gob_data[offset + 1] << 8));
         offset += 2;
-        gob.height[i] = ((gob_data[offset]) + (gob_data[offset + 1] << 8));
+        gob.height[i] = toShort((gob_data[offset]) + (gob_data[offset + 1] << 8));
         offset += 2;
-        gob.hs_x[i] = ((gob_data[offset]) + (gob_data[offset + 1] << 8));
+        gob.hs_x[i] = toShort((gob_data[offset]) + (gob_data[offset + 1] << 8));
         offset += 2;
-        gob.hs_y[i] = ((gob_data[offset]) + (gob_data[offset + 1] << 8));
+        gob.hs_y[i] = toShort((gob_data[offset]) + (gob_data[offset + 1] << 8));
         offset += 2;
 
         let image_size = gob.width[i] * gob.height[i];
-        gob.orig_data[i] = gob_data.subarray(offset, offset + image_size);
+        gob.orig_data[i] = Uint8ClampedArray.from(gob_data.subarray(offset, offset + image_size));
         gob.data[i] = gob.orig_data[i];
     }
 

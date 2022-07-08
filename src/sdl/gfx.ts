@@ -1,53 +1,32 @@
+import { assert } from "../c";
 import { Gob } from "../core";
+import { SDL_Init } from "./sdl";
+import g_ctx from '../context';
+import { PalettedRenderer } from "./paletted-renderer";
 
-const PIXEL_WIDTH = 400;
-const PIXEL_HEIGHT = 256;
+const screen_width = 400;
+const screen_height = 256;
 const PALETTE_256_SIZE = 768;
 
-let background = null;
+let background;
+let mask;
 let background_drawn = 0;
-let mask = null;
-
-let sdl_palette_colors = [];
 
 let drawing_enable = 0;
 
-export class Offscreen_Canvas {
-    width: number;
-    height: number;
-    offscreenCanvas: HTMLCanvasElement;
-    context: CanvasRenderingContext2D;
+const font_text_chars = "!\"'(),-./0123456789:;@ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz~äâÄÂöÖ";
 
-    constructor (width, height) {
-        this.offscreenCanvas = document.createElement("canvas");
-        this.width = width;
-        this.height = height;
-        this.offscreenCanvas.width = width;
-        this.offscreenCanvas.height = height;
-        this.context = this.offscreenCanvas.getContext("2d");
-    }
+let canvas: HTMLCanvasElement;
+let ctx: CanvasRenderingContext2D;
+let renderer: PalettedRenderer;
 
-    draw_image_data_array(image_data_array) {
-        const img_data = this.context.createImageData(this.width, this.height);
-        img_data.data.set(image_data_array);
-        this.context.putImageData(img_data, 0, 0);
-    }
-
-    draw_masked(image, mask) {
-        this.context.drawImage(image, 0, 0);
-        this.context.globalCompositeOperation = "destination-out";
-        this.context.drawImage(mask, 0, 0);
-        this.context.globalCompositeOperation = 'source-over';
-    }
-
-    to_image(): Promise<HTMLImageElement> {
-        var img = new Image(this.width, this.height);
-        img.src = this.offscreenCanvas.toDataURL();
-        return new Promise((resolve, reject) => {
-            img.onload = () => resolve(img);
-            img.onerror = (err) => reject(err);
-        });
-    }
+export function open_screen() {
+    SDL_Init();
+    canvas = document.getElementById("canvas") as HTMLCanvasElement;
+    ctx = canvas.getContext("2d");
+    canvas.width = screen_width;
+    canvas.height = screen_height;
+    renderer = new PalettedRenderer(screen_width, screen_height);
 }
 
 export function pob_width(image: number, gob: Gob)
@@ -79,94 +58,172 @@ export function set_pixel(page: number, x: number, y: number, color: number) {
 }
 
 export function put_pob(page: number, x: number, y: number, image: number, gob: Gob, use_mask: number, mask_pic: any) {
+	assert(drawing_enable == 1);
+	assert(gob);
+	assert(image >= 0);
+	assert(image < gob.num_images);
+
+    const sprite = {
+        key: `${gob.name}_${image}`,
+        data: gob.data[image],
+        height: gob.height[image],
+        width: gob.width[image],
+        alphaColor: 0,
+    };
+    
+    const hs_x = gob.hs_x[image];
+    const hs_y = gob.hs_y[image];
+    renderer.putObject(x - hs_x, y - hs_y, sprite);
     return;
 }
 
-
-export async function register_background(pixels: number[], pal: number[]) {
-    background_drawn = 0;
-    background = await bitmap_from_pcx_file(pixels, pal, 0);
+export function register_background(pixels: Uint8ClampedArray, pal: Uint8ClampedArray) {
+    renderer.setPalette(pal);
+    background = renderer.registerBackground(pixels);
 }
 
-export function register_mask(pixels: number[]) {
-    
+export function register_mask(pixels: Uint8ClampedArray, pal: Uint8ClampedArray) {
+    renderer.setPalette(pal);
+    background = renderer.registerMask(pixels);
 }
 
 export function register_gob(handle: number, gob: Gob, len: number) {
         
 }    
 
-function image_data_array_to_image(image_data_array, width, height): Promise<HTMLImageElement> {
-    const offscreen = new Offscreen_Canvas(width, height);
-    offscreen.draw_image_data_array(image_data_array);
-    return offscreen.to_image();
-}
+// export async function to_bitmap_image_data(colormap: number[], palette: number[] | Rgba[], width: number, height: number, transparency_sum: number | null = null): Promise<HTMLImageElement> {
+//     const image_data = new Uint8ClampedArray(colormap.length * 4);
+//     //Took some hints from the public domain https://github.com/arcollector/PCX-JS/blob/master/pcx.js#L447
+//     for (let i = 0; i < colormap.length; i++) {
+//         const colorIndex = colormap[i];
+//         let color;
+//         if (typeof palette[colorIndex] === 'number') {
+//             color = rgbFromArray(colorIndex * 3, palette as number[]);
+//         } else {
+//             color = palette[colorIndex];
+//         }
+//         const a = color.r + color.g + color.b === transparency_sum ? 0 : 255;
+//         image_data[i * 4 + 0] = color.r;
+//         image_data[i * 4 + 1] = color.g
+//         image_data[i * 4 + 2] = color.b;
+//         image_data[i * 4 + 3] = a;
+//     }
+//     return image_data_array_to_image(image_data, width, height);
+// }
 
-async function bitmap_from_pcx_file(colormap: number[], palette: number[], transparency_sum: number): Promise<HTMLImageElement> {
-    var image_data = new Uint8ClampedArray(colormap.length * 4);
-    //Took some hints from the public domain https://github.com/arcollector/PCX-JS/blob/master/pcx.js#L447
-    for (var i = 0; i < colormap.length; i++) {
-        var colorIndex = colormap[i] * 3;
-        var r = palette[colorIndex];
-        var g = palette[colorIndex + 1];
-        var b = palette[colorIndex + 2];
-        var a = r + g + b === transparency_sum ? 0 : 255;
-        image_data[i * 4 + 0] = r;
-        image_data[i * 4 + 1] = g
-        image_data[i * 4 + 2] = b;
-        image_data[i * 4 + 3] = a;
+export function setpalette(index: number, count: number, palette: Uint8ClampedArray)
+{
+    const newPal = Uint8ClampedArray.from(renderer.palette);
+	for (let i = 0; i < count; i++) {
+        newPal[(i + index) * 3] = palette[(i) * 3];
+        newPal[(i + index) * 3 + 1] = palette[(i) * 3 + 1];
+        newPal[(i + index) * 3 + 2] = palette[(i) * 3 + 2];
+	}
+    if (count === 16) {
+        console.log('original palette', JSON.stringify(renderer.palette.subarray(index * 3, (index * 3) + (16 * 3))));
+        console.log('fade palette', JSON.stringify(palette.subarray(0, (16 * 3))));
+        console.log('new palette', JSON.stringify(newPal.subarray(index * 3, (index * 3) + (16 * 3))));
     }
 
-    return image_data_array_to_image(image_data, PIXEL_WIDTH, PIXEL_HEIGHT);
-}
-
-export function setpalette(index: number, count: number, palette: number[])
-{
-    const colors = [];
-	for (let i = 0; i < count; i++) {
-        colors[i] = {};
-		colors[i].r = palette[i * 3 + 0] << 2;
-		colors[i].g = palette[i * 3 + 1] << 2;
-		colors[i].b = palette[i * 3 + 2] << 2;
-		colors[i].a = 255;
-	}
-	SDL_SetPaletteColors(colors, index, count);
+	renderer.setPalette(newPal);
 }
 
 export function fillpalette(red: number, green: number, blue: number) {
-	const colors = [];
-
-	for (let i = 0; i < 256; i++) {
-        colors[i] = {};
-		colors[i].r = red << 2;
-		colors[i].g = green << 2;
-		colors[i].b = blue << 2;
-		colors[i].a = 255;
+	const newPal = new Uint8ClampedArray(PALETTE_256_SIZE);
+	for (let i = 0; i < newPal.length; i += 3) {
+        newPal[i] = red;
+        newPal[i] = green;
+        newPal[i] = blue;
 	}
-	SDL_SetPaletteColors(colors, 0, 256);
+	return newPal;
 }
 
-function SDL_SetPaletteColors(colors: number[], start: number, count: number) {
-    sdl_palette_colors.splice(start, count, ...colors);
+function get_color_from_palette(index: number) {
+    return {
+        r: renderer.palette[index * 3],
+        g: renderer.palette[index * 3 + 1],
+        b: renderer.palette[index * 3 + 2],
+        a: 255,
+    };
 }
 
 export function draw_begin () {
+    assert(!drawing_enable);
+
     drawing_enable = 1;
+    if (background) {
+        ctx.drawImage(background, 0, 0);
+    } else {
+        const color = get_color_from_palette(0);
+        ctx.fillStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
+        ctx.fillRect(0, 0, screen_width, screen_height);
+    }
 }
 
 export function draw_end () {
+    ctx.putImageData(renderer.render(), 0, 0);
     drawing_enable = 0;
 }
 
 export function put_text(page: number, x: number, y: number, text: string, align: number) {
+    assert(drawing_enable == 1);
 
+    let width = 0;
+    let cur_x = 0;
+    let letter_array = [...text];
+
+    for (let letter of letter_array) {
+        if (letter === ' ') {
+            width += 5;
+            continue;
+        }
+
+        const image = font_text_chars.indexOf(letter);
+        if (image === - 1) {
+            continue;
+        }
+
+        width += pob_width(image, g_ctx.font_gobs) + 1;
+    }
+
+    switch (align) {
+		case 0:
+			cur_x = x;
+			break;
+		case 1:
+			cur_x = x - width;
+			break;
+		case 2:
+			cur_x = x - width / 2;
+			break;
+		default:
+			cur_x = 0; /* this should cause error? -Chuck */
+			break;
+	}
+
+    for (let letter of letter_array) {
+        if (letter === ' ') {
+            cur_x += 5;
+            continue;
+        }
+
+        const image = font_text_chars.indexOf(letter);
+        if (image === - 1) {
+            continue;
+        }
+
+        put_pob(page, cur_x, y, image, g_ctx.font_gobs, 2, null);
+		cur_x += pob_width(image, g_ctx.font_gobs) + 1;
+    }
 }
 
-export function clear_lines(page: number, y: number, count: number, color: number) {
-    
+export function clear_lines(page: number, y: number, count: number, color_num: number) {
+    // const color = get_color_from_palette(color_num);
+    // ctx.fillStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
+    // ctx.fillRect(0, y, screen_width, count * 8);
 }
 
-export function recalculate_gob(gob: Gob, palette: number[]) {
+export function recalculate_gob(gob: Gob, palette: Uint8ClampedArray) {
 
 }
 

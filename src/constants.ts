@@ -34,6 +34,12 @@ export enum KEY {
     PL4_RIGHT = "Numpad6",
     PL4_JUMP = "Numpad8",
     ESCAPE = "Escape",
+    ONE = "Digit1",
+    TWO = "Digit2",
+    THREE = "Digit3",
+    FOUR = "Digit4",
+    F10 = "F10",
+    
 }
 
 export enum MOVEMENT {

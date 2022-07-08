@@ -103,7 +103,7 @@ export function draw_flies (page: number) {
 	}
 }
 
-export function draw_pobs (page: number) {
+export async function draw_pobs (page: number) {
 	for (let c1 = main_info.page_info[page].num_pobs - 1; c1 >= 0; c1--) {
 		put_pob(page, main_info.page_info[page].pobs[c1].x, main_info.page_info[page].pobs[c1].y, main_info.page_info[page].pobs[c1].image, main_info.page_info[page].pobs[c1].pob_data, 1, mask_pic);
 	}

@@ -16,13 +16,25 @@ export const NUM_LEFTOVERS = 50;
 export const NUM_SFX = 6;
 
 export class Gob {
+    name: string;
     num_images: number;
     width: number[] = [];
     height: number[] = [];
     hs_x: number[] = [];
     hs_y: number[] = [];
-    data: number[] = [];
-    orig_data: number[] = [];
+    data: Uint8ClampedArray[] = [];
+    orig_data: Uint8ClampedArray[] = [];
+
+    refresh (newGob: Gob) {
+        this.name = newGob.name;
+        this.num_images = newGob.num_images;
+        this.width = newGob.width;
+        this.height = newGob.height;
+        this.hs_x = newGob.hs_x;
+        this.hs_y = newGob.hs_y;
+        this.data = newGob.data;
+        this.orig_data = newGob.orig_data;
+    }
 }
 
 export class Pob {

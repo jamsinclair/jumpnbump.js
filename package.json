@@ -14,5 +14,8 @@
   "devDependencies": {
     "typescript": "^4.7.4",
     "vite": "^2.9.13"
+  },
+  "dependencies": {
+    "crc": "^4.1.1"
   }
 }

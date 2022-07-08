@@ -13,15 +13,15 @@ import { player_anims } from './animation';
 let menu_background;
 let menu_mask;
 
-const menu_pal = new Array(256);
-const menu_cur_pal = new Array(256);
+const menu_pal = new Uint8ClampedArray(768);
+const menu_cur_pal = new Uint8ClampedArray(768);
 
 const player = ctx.player;
 const main_info = ctx.info;
 const ai = ctx.ai;
-const rabbit_gobs: any = [];
-const font_gobs: any = [];
-const object_gobs: any = [];
+const rabbit_gobs = ctx.rabbit_gobs;
+const font_gobs = ctx.font_gobs;
+const object_gobs = ctx.object_gobs;
 
 const objects = ctx.objects;
 
@@ -48,19 +48,21 @@ const message = [
 
 const NUM_MESSAGES = message.length;
 
-export function menu() {
+export async function menu() {
 	let c1;
 	let esc_pressed;
 	let end_loop_flag, new_game_flag, fade_flag;
 	let mod_vol = 0, mod_fade_direction = 0;
 	let cur_message;
 	let fade_dir, fade_count;
-	let fade_pal = [];
+	let fade_pal = new Uint8ClampedArray(48);
 	let update_count;
 
-	if (menu_init() != 0)
+	
+	if (await menu_init() != 0)
 		return 1;
-
+	
+	console.log('in menu')
 	/* After a game, we have to release the keys, cause AI player
 	 * can still be using them */
 	addkey(KEY.PL1_LEFT);
@@ -86,6 +88,7 @@ export function menu() {
 	dj_start_mod();
 	dj_set_nosound(0);
 
+	setpalette(0, 256, menu_pal);
 	memset(fade_pal, 0, 48);
 	setpalette(240, 16, fade_pal);
 
@@ -102,21 +105,20 @@ export function menu() {
 	end_loop_flag = new_game_flag = 0;
 
 	update_count = 1;
-	while (1) {
 
+	async function menu_game_loop () {
 		dj_mix();
 
 		for (c1 = 0; c1 < core.JNB_MAX_PLAYERS; c1++) // set AI to false
 			ai[c1] = 0;
 
 		while (update_count) {
-
-			if (key_pressed(KEY.ESCAPE) == 1 && esc_pressed == 0) {
+			if (key_pressed(KEY.ESCAPE) && !esc_pressed) {
 				end_loop_flag = 1;
 				new_game_flag = 0;
 				memset(menu_pal, 0, 768);
 				mod_fade_direction = 0;
-			} else if (key_pressed(KEY.ESCAPE) == 0)
+			} else if (!key_pressed(KEY.ESCAPE))
 				esc_pressed = 0;
 
 			update_player_actions();
@@ -434,10 +436,9 @@ export function menu() {
 
 			update_objects();
 
+			draw_begin();
 			if (update_count == 1) {
-				draw_begin();
-				draw_pobs(main_info.draw_page);
-				draw_end();
+				await draw_pobs(main_info.draw_page);
 
 				dj_mix();
 
@@ -457,9 +458,11 @@ export function menu() {
 			fade_flag = 0;
 			for (c1 = 0; c1 < 720; c1++) {
 				if (menu_cur_pal[c1] < menu_pal[c1]) {
+					// Fades in all the colors from black
 					menu_cur_pal[c1]++;
 					fade_flag = 1;
 				} else if (menu_cur_pal[c1] > menu_pal[c1]) {
+					// Fades out all the colors to black
 					menu_cur_pal[c1]--;
 					fade_flag = 2;
 				}
@@ -480,18 +483,15 @@ export function menu() {
 						}
 						fade_count++;
 					} else {
-						draw_begin();
 						clear_lines(0, 220, 20, 0);
-						clear_lines(1, 220, 20, 0);
 
 						cur_message++;
 						if (cur_message >= NUM_MESSAGES)
 							cur_message -= NUM_MESSAGES;
+
 						put_text(0, 200, 220, message[cur_message], 2);
-						put_text(1, 200, 220, message[cur_message], 2);
 						fade_dir = 1;
 						fade_count = 0;
-						draw_end();
 					}
 					break;
 				case 1:
@@ -508,6 +508,7 @@ export function menu() {
 					break;
 			}
 
+			// Fade out font palette in step with big fade out
 			for (c1 = 0; c1 < 48; c1++) {
 				if (fade_pal[c1] > menu_pal[c1 + 720])
 					fade_pal[c1]--;
@@ -519,38 +520,53 @@ export function menu() {
 			}
 
 			if (fade_flag != 0) {
+				// Update the state of current fade in or fade out palette
 				setpalette(0, 240, menu_cur_pal);
 			}
 
 			if (update_count == 1) {
 				setpalette(240, 16, fade_pal);
-
+				// Update the Font Text fade palette
+				put_text(0, 200, 220, message[cur_message], 2);
 				dj_mix();
 
-				draw_begin();
-				redraw_pob_backgrounds(main_info.draw_page);
-				draw_end();
+				// await draw_pobs(main_info.draw_page);
 			}
+			draw_end();
 
 			update_count--;
 		}
 
-		// update_count = intr_sysupdate();
-		update_count = 0;
-        return 0;
+		update_count = Math.floor(await intr_sysupdate());
+		return -1;
 	}
 
+	function menu_game_loop_promise() {
+		return new Promise((resolve) => {
+			let loop = async () => {
+				let result = await menu_game_loop();
+				if (result !== -1) {
+					resolve(result);
+				} else {
+					requestAnimationFrame(loop);
+				}
+			}
+			loop();
+		});
+	}
+
+	await menu_game_loop_promise();
 	menu_deinit();
-	return 1;
+	return 0;
 }
 
-function menu_init() {
+async function menu_init() {
     let c1;
 
 	fillpalette(0, 0, 0);
 
-    menu_background = read_pcx("menu.pcx");
-    menu_mask = read_pcx("menumask.pcx");
+    menu_background = read_pcx("menu.pcx", menu_pal);
+    menu_mask = read_pcx("menumask.pcx", null);
 	memset(menu_cur_pal, 0, 768);
 
 	/* fix dark font */
@@ -563,8 +579,8 @@ function menu_init() {
 	recalculate_gob(rabbit_gobs, menu_pal);
 	recalculate_gob(font_gobs, menu_pal);
 	recalculate_gob(object_gobs, menu_pal);
-	register_background(menu_background, menu_pal);
-	register_mask(menu_mask);
+	await register_background(menu_background, menu_pal);
+	await register_mask(menu_mask, menu_pal);
 
 	for (c1 = 0; c1 < core.JNB_MAX_PLAYERS; c1++) {
 		player[c1].enabled = false;
