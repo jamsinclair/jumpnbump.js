@@ -188,7 +188,7 @@ export function put_text(page: number, x: number, y: number, text: string, align
 			cur_x = x - width;
 			break;
 		case 2:
-			cur_x = x - width / 2;
+			cur_x = Math.floor(x - width / 2);
 			break;
 		default:
 			cur_x = 0; /* this should cause error? -Chuck */
