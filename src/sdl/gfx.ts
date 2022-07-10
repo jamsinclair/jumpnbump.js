@@ -115,25 +115,19 @@ export function setpalette(index: number, count: number, palette: Uint8ClampedAr
 {
     const newPal = Uint8ClampedArray.from(renderer.palette);
 	for (let i = 0; i < count; i++) {
-        newPal[(i + index) * 3] = palette[(i) * 3];
-        newPal[(i + index) * 3 + 1] = palette[(i) * 3 + 1];
-        newPal[(i + index) * 3 + 2] = palette[(i) * 3 + 2];
+        newPal[(i + index) * 3] = palette[(i) * 3] << 2;
+        newPal[(i + index) * 3 + 1] = palette[(i) * 3 + 1] << 2;
+        newPal[(i + index) * 3 + 2] = palette[(i) * 3 + 2] << 2;
 	}
-    if (count === 16) {
-        console.log('original palette', JSON.stringify(renderer.palette.subarray(index * 3, (index * 3) + (16 * 3))));
-        console.log('fade palette', JSON.stringify(palette.subarray(0, (16 * 3))));
-        console.log('new palette', JSON.stringify(newPal.subarray(index * 3, (index * 3) + (16 * 3))));
-    }
-
 	renderer.setPalette(newPal);
 }
 
 export function fillpalette(red: number, green: number, blue: number) {
 	const newPal = new Uint8ClampedArray(PALETTE_256_SIZE);
 	for (let i = 0; i < newPal.length; i += 3) {
-        newPal[i] = red;
-        newPal[i] = green;
-        newPal[i] = blue;
+        newPal[(i * 3)] = red << 2;
+        newPal[(i * 3) + 1] = green << 2;
+        newPal[(i * 3) + 2] = blue << 2;
 	}
 	return newPal;
 }

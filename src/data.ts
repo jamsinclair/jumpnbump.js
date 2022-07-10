@@ -93,7 +93,7 @@ export function read_pcx(filename, pal) {
     handle++;
     if (pal && pal.length === PALETTE_256_SIZE) {
         for (let c1 = 0; c1 < PALETTE_256_SIZE; c1++) {
-            pal[c1] = datafile_buffer[handle++];
+            pal[c1] = datafile_buffer[handle++] >> 2;
         }
     }
 
