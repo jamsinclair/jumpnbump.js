@@ -22,8 +22,15 @@ const ai = ctx.ai;
 const rabbit_gobs = ctx.rabbit_gobs;
 const font_gobs = ctx.font_gobs;
 const object_gobs = ctx.object_gobs;
+let _pause = false;
 
 const objects = ctx.objects;
+
+function togglePause() {
+	_pause = !_pause;
+}
+
+globalThis.togglePause = togglePause;
 
 function update_objects () {
 
@@ -544,6 +551,11 @@ export async function menu() {
 	function menu_game_loop_promise() {
 		return new Promise((resolve) => {
 			let loop = async () => {
+				if (_pause) {
+					// no-op
+					setTimeout(loop, 1000);
+					return;
+				}
 				let result = await menu_game_loop();
 				if (result !== -1) {
 					resolve(result);
