@@ -89,7 +89,7 @@ export function register_background(pixels: Uint8ClampedArray, pal: Uint8Clamped
 }
 
 export function register_mask(pixels: Uint8ClampedArray, pal: Uint8ClampedArray) {
-    renderer.setPalette(pal);
+    // renderer.setPalette(pal);
     background = renderer.registerMask(pixels);
 }
 
@@ -135,7 +135,7 @@ export function fillpalette(red: number, green: number, blue: number) {
         newPal[(i * 3) + 1] = green << 2;
         newPal[(i * 3) + 2] = blue << 2;
 	}
-	return newPal;
+	renderer.setPalette(newPal);
 }
 
 function get_color_from_palette(index: number) {

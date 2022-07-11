@@ -30,7 +30,8 @@
       "noImplicitReturns": false,
       "noUncheckedIndexedAccess": false, // accessing index must always check for undefined
       "noUnusedLocals": false, // Report errors on unused local variables.
-      "noUnusedParameters": false // Report errors on unused parameters in functions
+      "noUnusedParameters": false, // Report errors on unused parameters in functions
+      "skipLibCheck": true
     },
     "include": ["./**/*.ts"],
     "exclude": [

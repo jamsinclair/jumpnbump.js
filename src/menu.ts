@@ -64,12 +64,10 @@ export async function menu() {
 	let fade_dir, fade_count;
 	let fade_pal = new Uint8ClampedArray(48);
 	let update_count;
-
 	
 	if (await menu_init() != 0)
 		return 1;
 	
-	console.log('in menu')
 	/* After a game, we have to release the keys, cause AI player
 	 * can still be using them */
 	addkey(KEY.PL1_LEFT);

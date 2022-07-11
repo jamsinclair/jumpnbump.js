@@ -9,6 +9,7 @@ import ctx from './context';
 const player = ctx.player;
 const is_server = true;
 const is_net = false;
+const sock = null;
 
 enum NETCMD {
     NACK = 0,
@@ -39,11 +40,9 @@ export function serverSendKillPacket(killer: number, victim: number) {
         arg4: player[victim].y,
     };
 
-    console.log('sending kill packet', {killer, victim, pkt});
-
 	processKillPacket(pkt);
 	if (is_net) {
-		// sendPacketToAll(&pkt);
+		sendPacketToAll(pkt);
     }
 }
 
@@ -110,8 +109,7 @@ export function processMovePacket(pkt: NetPacket) {
 
 export function tellServerPlayerMoved(player_id: number, movement_type: MOVEMENT, new_val: boolean) {
     const pkt: NetPacket = {
-        // pkt.cmd = NETCMD_MOVE;
-        cmd: 4,
+        cmd: NETCMD.MOVE,
         arg: player_id,
         arg2: {
             movement_type,
@@ -123,11 +121,11 @@ export function tellServerPlayerMoved(player_id: number, movement_type: MOVEMENT
 
 	if (is_server) {
 		processMovePacket(pkt);
-		// if (is_net) {
-		// 	sendPacketToAll(pkt);
-        // }
+		if (is_net) {
+			sendPacketToAll(pkt);
+        }
 	} else {
-		// sendPacketToSock(sock, pkt);
+		sendPacketToSock(sock, pkt);
 	}
 }
 
@@ -153,4 +151,10 @@ export function update_players_from_server (): boolean {
 
 export function tellServerNewPosition () {
     
+}
+
+function sendPacketToAll (pkt: NetPacket) {
+}
+
+function sendPacketToSock (sock: any, pkt: NetPacket) {
 }

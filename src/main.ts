@@ -339,6 +339,8 @@ async function game_loop () {
 	return 0;
 }
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 async function menu_loop ()
 {
 	let mod_vol;
@@ -416,42 +418,48 @@ async function menu_loop ()
 			add_pob(main_info.view_page, x[c1] - 5, 30, 17 + c1 * 18, rabbit_gobs);
 		}
 
-		draw_begin();
+		read_pcx('level.pcx', pal);
+		register_background(new Uint8ClampedArray(400 * 256 * 4), pal);
+		register_mask(new Uint8ClampedArray(400 * 256 * 4), null);
 
-		draw_pobs();
-
-		put_text(main_info.view_page, 100, 50, "DOTT", 2);
-		put_text(main_info.view_page, 160, 50, "JIFFY", 2);
-		put_text(main_info.view_page, 220, 50, "FIZZ", 2);
-		put_text(main_info.view_page, 280, 50, "MIJJI", 2);
-		put_text(main_info.view_page, 40, 80, "DOTT", 2);
-		put_text(main_info.view_page, 40, 110, "JIFFY", 2);
-		put_text(main_info.view_page, 40, 140, "FIZZ", 2);
-		put_text(main_info.view_page, 40, 170, "MIJJI", 2);
-
-		for (c1 = 0; c1 < core.JNB_MAX_PLAYERS; c1++) {
-			if (!player[c1].enabled) {
-				continue;
-			}
-
-			for (c2 = 0; c2 < core.JNB_MAX_PLAYERS; c2++) {
-				if (!player[c2].enabled) {
+		function draw_final_scores () {
+			draw_begin();
+	
+			draw_pobs();
+	
+			put_text(main_info.view_page, 100, 50, "DOTT", 2);
+			put_text(main_info.view_page, 160, 50, "JIFFY", 2);
+			put_text(main_info.view_page, 220, 50, "FIZZ", 2);
+			put_text(main_info.view_page, 280, 50, "MIJJI", 2);
+			put_text(main_info.view_page, 40, 80, "DOTT", 2);
+			put_text(main_info.view_page, 40, 110, "JIFFY", 2);
+			put_text(main_info.view_page, 40, 140, "FIZZ", 2);
+			put_text(main_info.view_page, 40, 170, "MIJJI", 2);
+	
+			for (c1 = 0; c1 < core.JNB_MAX_PLAYERS; c1++) {
+				if (!player[c1].enabled) {
 					continue;
 				}
-				if (c2 != c1) {
-					const bumped = player[c1].bumped[c2];
-					put_text(main_info.view_page, 100 + c2 * 60, 80 + c1 * 30, bumped.toString(), 2);
-				} else {
-					put_text(main_info.view_page, 100 + c2 * 60, 80 + c1 * 30, "-", 2);
-                }
+	
+				for (c2 = 0; c2 < core.JNB_MAX_PLAYERS; c2++) {
+					if (!player[c2].enabled) {
+						continue;
+					}
+					if (c2 != c1) {
+						const bumped = player[c1].bumped[c2];
+						put_text(main_info.view_page, 100 + c2 * 60, 80 + c1 * 30, bumped.toString(), 2);
+					} else {
+						put_text(main_info.view_page, 100 + c2 * 60, 80 + c1 * 30, "-", 2);
+					}
+				}
+				const bumps = player[c1].bumps
+				put_text(main_info.view_page, 350, 80 + c1 * 30, bumps.toString(), 2);
 			}
-			const bumps = player[c1].bumps
-			put_text(main_info.view_page, 350, 80 + c1 * 30, bumps.toString(), 2);
+	
+			put_text(main_info.view_page, 200, 230, "Press ESC to continue", 2);
+	
+			draw_end();
 		}
-
-		put_text(main_info.view_page, 200, 230, "Press ESC to continue", 2);
-
-		draw_end();
 
 		// loads menu into memory again
 
@@ -480,17 +488,19 @@ async function menu_loop ()
 					cur_pal[c1]++;
 			}
 			dj_mix();
-			intr_sysupdate();
+			await intr_sysupdate();
 			setpalette(0, 256, cur_pal);
+			draw_final_scores();
 		}
 		while (key_pressed(KEY.ESCAPE)) {
 			dj_mix();
-			intr_sysupdate();
+			await intr_sysupdate();
 		}
 
         memset(pal, 0, 768);
 
 		while (mod_vol > 0) {
+			draw_final_scores();
 			mod_vol--;
 			dj_set_mod_volume(mod_vol);
 			for (c1 = 0; c1 < 768; c1++) {
@@ -499,12 +509,17 @@ async function menu_loop ()
 			}
 			dj_mix();
 			setpalette(0, 256, cur_pal);
+			await sleep(16);
 		}
 
 		fillpalette(0, 0, 0);
+		draw_final_scores();
 
 		dj_set_nosound(1);
 		dj_stop_mod();
+		
+		console.log('end of game');
+		break;
 
 		if (is_net)
 			return 0; /* don't go back to menu if in net game. */
