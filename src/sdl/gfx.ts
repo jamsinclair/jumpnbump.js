@@ -148,16 +148,8 @@ function get_color_from_palette(index: number) {
 }
 
 export function draw_begin () {
-    assert(!drawing_enable);
-
+    // assert(!drawing_enable);
     drawing_enable = 1;
-    if (background) {
-        ctx.drawImage(background, 0, 0);
-    } else {
-        const color = get_color_from_palette(0);
-        ctx.fillStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
-        ctx.fillRect(0, 0, screen_width, screen_height);
-    }
 }
 
 export function draw_end () {
