@@ -7,6 +7,17 @@
     <title>Vite + TS</title>
   </head>
   <body>
+    <style>
+      canvas {
+        width: 1200px;
+        image-rendering: optimizeSpeed;
+        image-rendering: -moz-crisp-edges;
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: -o-crisp-edges;
+        image-rendering: pixelated;
+        -ms-interpolation-mode: nearest-neighbor;
+      }
+    </style>
     <canvas id="canvas"></canvas>
     <button onclick="javascript:togglePause()">Pause</button>
     <script type="module" src="/src/game.ts"></script>
