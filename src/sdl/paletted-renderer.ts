@@ -95,7 +95,6 @@ export class PalettedRenderer {
     registerMask (mask: Uint8ClampedArray): void {
         this.imageCache.purgeForKey(this.mask.key);
         this.mask.data = extractMaskFromBackground(this.background.data, mask);
-        console.log(this.mask.data.filter(i => i !== 0));
         const image = this.#renderPixels(this.mask.data, this.width, this.height, this.mask.alphaColor);
         this.imageCache.set(this.mask.key, image);
     }

@@ -9,7 +9,7 @@ import { GET_BAN_MAP_IN_WATER, GET_BAN_MAP_TILE, GET_BAN_MAP_XY, SET_BAN_MAP } f
 import { serverSendAlive, serverSendKillPacket, serverTellEveryoneGoodbye, tellServerGoodbye, tellServerNewPosition, update_players_from_clients, update_players_from_server } from './network';
 import { add_leftovers, add_object, add_pob, draw_flies, draw_leftovers, draw_pobs, position_flies, redraw_flies_background, update_flies } from './renderer';
 import { memset, rnd } from './c';
-import { draw_begin, draw_end, fillpalette, open_screen, put_text, register_mask, setpalette } from './sdl/gfx';
+import { draw_begin, draw_end, fillpalette, open_screen, put_text, register_background, register_mask, setpalette } from './sdl/gfx';
 import { preread_datafile, read_gob, read_level, read_pcx } from './data';
 import { menu } from './menu';
 import ctx from './context';
@@ -157,7 +157,7 @@ async function game_loop () {
 	intr_sysupdate();
 
 	endscore_reached = 0;
-	while (1) {
+	async function inner_game_loop() {
 		while (update_count) {
 
 			if (endscore_reached || (key_pressed(KEY.ESCAPE))) {
@@ -193,10 +193,10 @@ async function game_loop () {
 
 			dj_mix();
 
-			main_info.page_info[main_info.draw_page].num_pobs = 0;
+			main_info.page_info.num_pobs = 0;
 			for (let i = 0; i < core.JNB_MAX_PLAYERS; i++) {
 				if (player[i].enabled)
-					main_info.page_info[main_info.draw_page].num_pobs++;
+					main_info.page_info.num_pobs++;
 			}
 
 			update_objects();
@@ -214,24 +214,25 @@ async function game_loop () {
 
 				for (let i = 0, c2 = 0; i < core.JNB_MAX_PLAYERS; i++) {
 					if (player[i].enabled) {
-						main_info.page_info[main_info.draw_page].pobs[c2].x = player[i].x >> 16;
-						main_info.page_info[main_info.draw_page].pobs[c2].y = player[i].y >> 16;
-						main_info.page_info[main_info.draw_page].pobs[c2].image = player[i].image + i * 18;
-						main_info.page_info[main_info.draw_page].pobs[c2].pob_data = rabbit_gobs;
+						if (!main_info.page_info.pobs[c2]) {
+							main_info.page_info.pobs[c2] = new core.Pob();
+						}
+						main_info.page_info.pobs[c2].x = player[i].x >> 16;
+						main_info.page_info.pobs[c2].y = player[i].y >> 16;
+						main_info.page_info.pobs[c2].image = player[i].image + i * 18;
+						main_info.page_info.pobs[c2].pob_data = rabbit_gobs;
 						c2++;
 					}
 				}
 
 				draw_begin();
 
-				draw_pobs(main_info.draw_page);
+				draw_pobs();
 
 				dj_mix();
 
 				if (flies_enabled)
 					draw_flies(main_info.draw_page);
-
-				draw_end();
 			}
 
 			if (mod_fade_direction == 1) {
@@ -285,9 +286,8 @@ async function game_loop () {
 
 				draw_leftovers(main_info.draw_page);
 
-				draw_end();
 			}
-
+			draw_end();
 			update_count--;
 		}
 
@@ -305,12 +305,36 @@ async function game_loop () {
 
 		if (is_net) {
 			if ((server_said_bye) || ((fade_flag == 0) && (end_loop_flag == 1)))
-				break;
+				return 0;
 		} else {
 			if ((fade_flag == 0) && (end_loop_flag == 1))
-			break;
+				return 0;
         }
+		return -1;
 	}
+
+	function inner_game_loop_promise() {
+		return new Promise((resolve) => {
+			let loop = async () => {
+				// if (_pause) {
+				// 	// no-op
+				// 	setTimeout(loop, 1000);
+				// 	return;
+				// }
+				let result = await inner_game_loop();
+				if (result !== -1) {
+					resolve(result);
+				} else {
+					requestAnimationFrame(loop);
+				}
+			}
+			loop();
+		});
+	}
+
+	await inner_game_loop_promise();
+
+	return 0;
 }
 
 async function menu_loop ()
@@ -334,9 +358,7 @@ async function menu_loop ()
                 return;
             }
         }
-        console.log('after menu');
-        return;
-		if (key_pressed(KEY.ESCAPE) == 1) {
+		if (key_pressed(KEY.ESCAPE)) {
 			return 0;
 		}
 		if (await init_level(0, pal) != 0) {
@@ -357,8 +379,8 @@ async function menu_loop ()
 
 		dj_set_nosound(0);
 
-		main_info.page_info[0].num_pobs = 0;
-		main_info.page_info[1].num_pobs = 0;
+		main_info.page_info.num_pobs = 0;
+		main_info.page_info.num_pobs = 0;
 		main_info.view_page = 0;
 		main_info.draw_page = 1;
 
@@ -381,7 +403,7 @@ async function menu_loop ()
 
 		deinit_level();
 
-		main_info.page_info[main_info.view_page].num_pobs = 0;
+		main_info.page_info.num_pobs = 0;
 
 		for (c1 = 0; c1 < core.JNB_MAX_PLAYERS; c1++) {
 			const x = [100, 160, 220, 280]
@@ -394,7 +416,7 @@ async function menu_loop ()
 
 		draw_begin();
 
-		draw_pobs(main_info.view_page);
+		draw_pobs();
 
 		put_text(main_info.view_page, 100, 50, "DOTT", 2);
 		put_text(main_info.view_page, 160, 50, "JIFFY", 2);
@@ -447,7 +469,7 @@ async function menu_loop ()
 		dj_start_mod();
 		dj_set_nosound(0);
 
-		while (key_pressed(KEY.ESCAPE) == 0) {
+		while (!key_pressed(KEY.ESCAPE)) {
 			if (mod_vol < 35)
 				mod_vol++;
 			dj_set_mod_volume(mod_vol);
@@ -459,7 +481,7 @@ async function menu_loop ()
 			intr_sysupdate();
 			setpalette(0, 256, cur_pal);
 		}
-		while (key_pressed(KEY.ESCAPE) == 1) {
+		while (key_pressed(KEY.ESCAPE)) {
 			dj_mix();
 			intr_sysupdate();
 		}
@@ -489,8 +511,10 @@ async function menu_loop ()
 
 
 export async function main(argc: number, argv: string[]): Promise<number> {
-	if (await init_program(argc, argv, pal) != 0)
+	if (await init_program(argc, argv, pal) != 0) {
 		deinit_program();
+		return;
+	}
 
 	let result = await menu_loop();
 
@@ -1431,24 +1455,24 @@ function update_objects () {
 	}
 }
 
-async function init_level (level: number, pal: number[]): Promise<number> {
+async function init_level (level: number, pal: Uint8ClampedArray): Promise<number> {
 	let c1, c2;
 	let s1, s2;
 
 	let background_pic = read_pcx('level.pcx', pal);
-
-	if (flip)
-		flip_pixels(background_pic);
-	
-    // Open Mask File
-    // let mask_pic = new Uint8ClampedArray(background_pic.length);
+    let mask_pic = read_pcx('mask.pcx', null);
 
 	// if (flip)
 	// 	flip_pixels(mask_pic);
 
-	// register_mask(mask_pic, pal);
+	register_background(background_pic, pal);
+	register_mask(mask_pic, pal);
 
 	for (c1 = 0; c1 < core.JNB_MAX_PLAYERS; c1++) {
+		if (c1 === 0 || c1 === 1) {
+			player[c1].enabled = true;	
+		}
+
 		if (player[c1].enabled) {
 			player[c1].bumps = 0;
 			for (c2 = 0; c2 < core.JNB_MAX_PLAYERS; c2++)
@@ -1466,8 +1490,9 @@ async function init_level (level: number, pal: number[]): Promise<number> {
 
 	for (c1 = 0; c1 < 16; c1++) {
 		for (c2 = 0; c2 < 22; c2++) {
-			if (GET_BAN_MAP_TILE(c1, c2) == BAN.SPRING)
+			if (GET_BAN_MAP_TILE(c1, c2) == BAN.SPRING) {
 				add_object(OBJ.SPRING, c2 << 4, c1 << 4, 0, 0, OBJ_ANIM.SPRING, 5);
+			}
 		}
 	}
 

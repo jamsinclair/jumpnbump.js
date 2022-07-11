@@ -58,7 +58,7 @@ export class MainInfo {
     error_str: string;
     draw_page: number;
     view_page: number;
-    page_info: [PageInfo, PageInfo];
+    page_info: PageInfo;
     pob_backbuf: number[];
 }
 
@@ -69,7 +69,7 @@ export class Player {
     enabled: boolean;
     dead_flag: boolean;
     bumps: number;
-    bumped: number[];
+    bumped: number[] = [];
     // Movement State,
     x: number;
     y: number;

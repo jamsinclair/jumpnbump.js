@@ -28,7 +28,11 @@ export function SET_BAN_MAP (map: number[][]) {
 
 export function GET_BAN_MAP_XY(x: number, y: number) {
     if (y < 0) y = 0;
-    return ban_map[(x >> LEVEL_SCALE_FACTOR)][(y >> LEVEL_SCALE_FACTOR)];
+    try {
+        return ban_map[(y >> LEVEL_SCALE_FACTOR)][(x >> LEVEL_SCALE_FACTOR)];
+    } catch (e) {
+        throw new Error('GET_BAN_MAP_XY failed: ' + x + ',' + y);
+    }
 }
 
 export function GET_BAN_MAP_TILE(pos_x, pos_y) {

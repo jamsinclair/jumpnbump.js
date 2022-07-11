@@ -25,7 +25,7 @@ type Leftovers = {
         }[],
     }[]
 };
-const leftovers: Leftovers = { page: [] };
+const leftovers: Leftovers = { page: [{ num_pobs: 0, pobs: [] }, { num_pobs: 0, pobs: [] }] };
 
 type Fly = {
     x: number,
@@ -38,6 +38,18 @@ type Fly = {
     back_defined: number[],
 }
 const flies: Fly[] = [];
+for (let i = 0; i < core.NUM_FLIES; i++) {
+	flies[i] = {
+		x: 0,
+		y: 0,
+		old_x: 0,
+		old_y: 0,
+		old_draw_x: 0,
+		old_draw_y: 0,
+		back: [],
+		back_defined: [],
+	};
+}
 
 export function add_object (type: number, x: number, y: number, x_add: number, y_add: number, anim: number, frame: number) {
 	for (let c1 = 0; c1 < core.NUM_OBJECTS; c1++) {
@@ -63,7 +75,7 @@ export function add_object (type: number, x: number, y: number, x_add: number, y
 }
 
 export function add_pob (page: number, x: number, y: number, image: number, pob_data: core.Gob): number {
-	if (main_info.page_info[page].num_pobs >= core.NUM_POBS)
+	if (main_info.page_info.num_pobs >= core.NUM_POBS)
         return 1;
 
     const pob = {
@@ -72,8 +84,8 @@ export function add_pob (page: number, x: number, y: number, image: number, pob_
         image: image,
         pob_data: pob_data,
     };
-    main_info.page_info[page].pobs[main_info.page_info[page].num_pobs] = pob;
-    main_info.page_info[page].num_pobs++;
+    main_info.page_info.pobs[main_info.page_info.num_pobs] = pob;
+    main_info.page_info.num_pobs++;
 
     return 0;
 }
@@ -98,14 +110,13 @@ export function draw_flies (page: number) {
 	for (let c2 = 0; c2 < core.NUM_FLIES; c2++) {
 		flies[c2].back[main_info.draw_page] = get_pixel(main_info.draw_page, flies[c2].x, flies[c2].y);
 		flies[c2].back_defined[main_info.draw_page] = 1;
-		if (mask_pic[(flies[c2].y * core.JNB_WIDTH) + flies[c2].x] == 0)
-			set_pixel(main_info.draw_page, flies[c2].x, flies[c2].y, 0);
+		set_pixel(main_info.draw_page, flies[c2].x, flies[c2].y, 0);
 	}
 }
 
-export async function draw_pobs (page: number) {
-	for (let c1 = main_info.page_info[page].num_pobs - 1; c1 >= 0; c1--) {
-		put_pob(page, main_info.page_info[page].pobs[c1].x, main_info.page_info[page].pobs[c1].y, main_info.page_info[page].pobs[c1].image, main_info.page_info[page].pobs[c1].pob_data, 1, mask_pic);
+export async function draw_pobs () {
+	for (let c1 = main_info.page_info.num_pobs - 1; c1 >= 0; c1--) {
+		put_pob(0, main_info.page_info.pobs[c1].x, main_info.page_info.pobs[c1].y, main_info.page_info.pobs[c1].image, main_info.page_info.pobs[c1].pob_data, 1, mask_pic);
 	}
 }
 
@@ -120,7 +131,7 @@ export function redraw_flies_background (page: number) {
 
 export function draw_leftovers (page: number) {
 	for (let c1 = leftovers.page[page].num_pobs - 1; c1 >= 0; c1--)
-		put_pob(page, leftovers.page[page].pobs[c1].x, leftovers.page[page].pobs[c1].y, leftovers.page[page].pobs[c1].image, leftovers.page[page].pobs[c1].pob_data, 1, mask_pic);
+		put_pob(0, leftovers.page[page].pobs[c1].x, leftovers.page[page].pobs[c1].y, leftovers.page[page].pobs[c1].image, leftovers.page[page].pobs[c1].pob_data, 1, mask_pic);
 
 	leftovers.page[page].num_pobs = 0;
 }

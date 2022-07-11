@@ -103,8 +103,7 @@ export async function menu() {
 	fade_count = 0;
 	cur_message = NUM_MESSAGES - 1;
 
-	main_info.page_info[0].num_pobs = 0;
-	main_info.page_info[1].num_pobs = 0;
+	main_info.page_info.num_pobs = 0;
 	main_info.view_page = 0;
 	main_info.draw_page = 1;
 
@@ -436,7 +435,7 @@ export async function menu() {
 
 			dj_mix();
 
-			main_info.page_info[main_info.draw_page].num_pobs = 0;
+			main_info.page_info.num_pobs = 0;
 
 			for (c1 = 3; c1 >= 0; c1--)
 				add_pob(main_info.draw_page, player[c1].x >> 16, player[c1].y >> 16, player[c1].image + c1 * 18, rabbit_gobs);
@@ -445,7 +444,7 @@ export async function menu() {
 
 			draw_begin();
 			if (update_count == 1) {
-				await draw_pobs(main_info.draw_page);
+				await draw_pobs();
 
 				dj_mix();
 
@@ -612,8 +611,7 @@ async function menu_init() {
 		objects[c1].used = 0;
     }
 
-	main_info.page_info[0].num_pobs = 0;
-	main_info.page_info[1].num_pobs = 0;
+	main_info.page_info.num_pobs = 0;
 
 	return 0;
 }

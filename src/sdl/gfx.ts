@@ -54,6 +54,12 @@ export function get_pixel (page: number, x: number, y: number): number {
 }
 
 export function set_pixel(page: number, x: number, y: number, color: number) {
+    renderer.putObject(x, y, {
+        key: 'fly',
+        data: Uint8ClampedArray.from([color, color, color]),
+        height: 1,
+        width: 1,
+    });
     return;
 }
 

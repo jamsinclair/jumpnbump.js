@@ -13,7 +13,7 @@ type GameContext = {
         page_info: {
             num_pobs: number;
             pobs: Pob[];
-        }[];
+        };
         pob_backbuf: number[];
     },
     player: Player[];
@@ -42,7 +42,7 @@ const getDefaultContext: () => GameContext = () => ({
         error_str: "",
         draw_page: 0,
         view_page: 0,
-        page_info: [{num_pobs: 0, pobs: []}, {num_pobs: 0, pobs: []}],
+        page_info: {num_pobs: 0, pobs: []},
         pob_backbuf: [],
     },
     player: fillArray(new Array(JNB_MAX_PLAYERS), () => new Player()),
