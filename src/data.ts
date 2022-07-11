@@ -131,25 +131,31 @@ export function read_gob(filename) {
 
 export function read_level() {
 	let handle = dat_open("levelmap.txt");
-    let chr: number;
-    const ban_map: number[][] = new Array(17).fill([]);
+    let fileEndIndex = dat_filelen("levelmap.txt") + handle;
+    const new_map: number[][] = new Array(17);
 
 	for (let c1 = 0; c1 < 16; c1++) {
-		for (let c2 = 0; c2 < 22; c2++) {
-			while (1) {
-				const chr = datafile_buffer[handle++] - ("0".charCodeAt(0));
+        for (let c2 = 0; c2 < 22; c2++) {
+            let chr: number = 1;
+            if (!new_map[c1]) {
+                new_map[c1] = new Array(22);
+            }
+
+			while (handle < fileEndIndex) {
+				chr = datafile_buffer[handle++] - ("0".charCodeAt(0));
 				if (chr >= 0 && chr <= 4)
 					break;
 			}
+
 			if (flip)
-				ban_map[c1][21 - c2] = chr;
+				new_map[c1][21 - c2] = chr;
 			else
-				ban_map[c1][c2] = chr;
+				new_map[c1][c2] = chr;
 		}
 	}
 
 	for (let c2 = 0; c2 < 22; c2++)
-		ban_map[16][c2] = BAN.SOLID;
+		new_map[16][c2] = BAN.SOLID;
 
-	return ban_map;
+	return new_map;
 }
