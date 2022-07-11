@@ -14,6 +14,16 @@ const objects = ctx.objects;
 const mask_pic = [];
 const player = ctx.player;
 
+type Scores = {
+	num_pobs: number;
+	pobs: {
+		x: number,
+		y: number,
+		image: number,
+		pob_data: core.Gob,
+	}[],
+}
+
 type Leftovers = {
     page: {
         num_pobs: number,
@@ -23,9 +33,10 @@ type Leftovers = {
             image: number,
             pob_data: core.Gob,
         }[],
-    }[]
+    }
 };
-const leftovers: Leftovers = { page: [{ num_pobs: 0, pobs: [] }, { num_pobs: 0, pobs: [] }] };
+const leftovers: Leftovers = { page: { num_pobs: 0, pobs: [] } };
+const scores: Scores = { num_pobs: 0, pobs: [] };
 
 type Fly = {
     x: number,
@@ -54,21 +65,28 @@ for (let i = 0; i < core.NUM_FLIES; i++) {
 export function add_object (type: number, x: number, y: number, x_add: number, y_add: number, anim: number, frame: number) {
 	for (let c1 = 0; c1 < core.NUM_OBJECTS; c1++) {
 		if (!objects[c1] || objects[c1].used === 0) {
-            const newObject = {
-                used: 1,
-                type: type,
-                x: x << 16,
-                y: y << 16,
-                x_add: x_add,
-                y_add: y_add,
-                x_acc: 0,
-                y_acc: 0,
-                anim: anim,
-                frame: frame,
-                ticks: object_anims[anim].frame[frame].ticks,
-                image: object_anims[anim].frame[frame].image,
-            };
-            objects[c1] = newObject;
+			const resolved_anim = frame > 10 ? Math.floor(anim / 10) : anim;
+			const resolved_frame = frame > 10 ? frame % 10 : frame;
+			try {
+				const newObject = {
+					used: 1,
+					type: type,
+					x: x << 16,
+					y: y << 16,
+					x_add: x_add,
+					y_add: y_add,
+					x_acc: 0,
+					y_acc: 0,
+					anim: anim,
+					frame: frame,
+					ticks: object_anims[resolved_anim].frame[resolved_frame].ticks,
+					image: object_anims[resolved_anim].frame[resolved_frame].image,
+				};
+				objects[c1] = newObject;
+			} catch (err) {
+				console.warn('ERROR with add_object:', type, x, y, x_add, y_add, anim, frame);
+			}
+			return c1;
             break;
 		}
 	}
@@ -90,8 +108,19 @@ export function add_pob (page: number, x: number, y: number, image: number, pob_
     return 0;
 }
 
-export function add_leftovers (page: number, x: number, y: number, image: number, pob_data: core.Gob) {
-    if (leftovers.page[page].num_pobs >= core.NUM_LEFTOVERS)
+export function add_score (player: number, position: number, x: number, y: number, image: number, pob_data: core.Gob) {
+	const pob = {
+		x: x,
+		y: y,
+		image: image,
+		pob_data: pob_data,
+	};
+	const index = (player * 2) + position;
+	scores.pobs[index] = pob;
+}
+
+export function add_leftovers (player: number, x: number, y: number, image: number, pob_data: core.Gob) {
+    if (leftovers.page.num_pobs >= core.NUM_LEFTOVERS)
 		return 1;
 
     const leftover = {
@@ -100,8 +129,8 @@ export function add_leftovers (page: number, x: number, y: number, image: number
         image: image,
         pob_data: pob_data,
     };
-    leftovers.page[page].pobs[leftovers.page[page].num_pobs] = leftover;
-	leftovers.page[page].num_pobs++;
+    leftovers.page.pobs[leftovers.page.num_pobs] = leftover;
+	leftovers.page.num_pobs++;
 
 	return 0;
 }
@@ -130,10 +159,13 @@ export function redraw_flies_background (page: number) {
 }
 
 export function draw_leftovers (page: number) {
-	for (let c1 = leftovers.page[page].num_pobs - 1; c1 >= 0; c1--)
-		put_pob(0, leftovers.page[page].pobs[c1].x, leftovers.page[page].pobs[c1].y, leftovers.page[page].pobs[c1].image, leftovers.page[page].pobs[c1].pob_data, 1, mask_pic);
+	for (let c1 = leftovers.page.num_pobs - 1; c1 >= 0; c1--)
+		put_pob(0, leftovers.page.pobs[c1].x, leftovers.page.pobs[c1].y, leftovers.page.pobs[c1].image, leftovers.page.pobs[c1].pob_data, 1, mask_pic);
+}
 
-	leftovers.page[page].num_pobs = 0;
+export function draw_score () {
+	for (let c1 = 0; c1 < scores.pobs.length; c1++)
+		put_pob(0, scores.pobs[c1].x, scores.pobs[c1].y, scores.pobs[c1].image, scores.pobs[c1].pob_data, 1, mask_pic);
 }
 
 function get_closest_player_to_point(x: number, y: number) {

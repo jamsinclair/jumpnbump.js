@@ -7,7 +7,7 @@ import { update_player_actions } from './sdl/input';
 import { addkey, intr_sysupdate, key_pressed } from './sdl/interrpt';
 import { GET_BAN_MAP_IN_WATER, GET_BAN_MAP_TILE, GET_BAN_MAP_XY, SET_BAN_MAP } from './level';
 import { serverSendAlive, serverSendKillPacket, serverTellEveryoneGoodbye, tellServerGoodbye, tellServerNewPosition, update_players_from_clients, update_players_from_server } from './network';
-import { add_leftovers, add_object, add_pob, draw_flies, draw_leftovers, draw_pobs, position_flies, redraw_flies_background, update_flies } from './renderer';
+import { add_leftovers, add_object, add_pob, add_score, draw_flies, draw_leftovers, draw_pobs, draw_score, position_flies, redraw_flies_background, update_flies } from './renderer';
 import { memset, rnd } from './c';
 import { draw_begin, draw_end, fillpalette, open_screen, put_text, register_background, register_mask, setpalette } from './sdl/gfx';
 import { preread_datafile, read_gob, read_level, read_pcx } from './data';
@@ -32,7 +32,7 @@ let endscore_reached = 0;
 const pal = new Uint8ClampedArray(768);
 const cur_pal = new Uint8ClampedArray(768);
 
-const is_server = false;
+const is_server = true;
 const is_net = false;
 
 const flip = false;
@@ -57,7 +57,7 @@ function flip_pixels(pixels)
 
 function player_kill (c1: number, c2: number) {
     if (player[c1].y_add >= 0) {
-		if (/* is_server */ false)
+		if (is_server)
 			serverSendKillPacket(c1, c2);
 	} else {
 		if (player[c2].y_add < 0)
@@ -285,9 +285,10 @@ async function game_loop () {
 				// if (flies_enabled)
 					// redraw_flies_background(main_info.draw_page);
 
-				draw_leftovers(main_info.draw_page);
-
-			}
+					
+				}
+			draw_leftovers(main_info.draw_page);
+			draw_score();
 			draw_end();
 			update_count--;
 		}
@@ -1344,13 +1345,17 @@ function update_objects () {
 					if (objects[c1].x_add > 0 && objects[c1].x_add < 16384)
 						objects[c1].x_add = 16384;
 					if (objects[c1].used == 1) {
-						s1 = (Math.atan2(objects[c1].y_add, objects[c1].x_add) * 4 / Math.PI);
+						s1 = Math.floor(Math.atan2(objects[c1].y_add, objects[c1].x_add) * 4 / Math.PI);
 						if (s1 < 0)
-							s1 += 8;
+							s1 = s1 + 8;
 						if (s1 < 0)
 							s1 = 0;
 						if (s1 > 7)
 							s1 = 7;
+
+						if (!Number.isInteger(objects[c1].frame + s1)) {
+							throw new Error("Invalid image: " + objects[c1].frame + " + " + s1);
+						}
 						add_pob(main_info.draw_page, objects[c1].x >> 16, objects[c1].y >> 16, objects[c1].frame + s1, object_gobs);
 					}
 					break;
@@ -1417,7 +1422,6 @@ function update_objects () {
 									if (rnd(100) < 10) {
 										s1 = rnd(4) - 2;
 										add_leftovers(0, objects[c1].x >> 16, (objects[c1].y >> 16) + s1, objects[c1].frame, object_gobs);
-										add_leftovers(1, objects[c1].x >> 16, (objects[c1].y >> 16) + s1, objects[c1].frame, object_gobs);
 									}
 									objects[c1].used = 0;
 								}
@@ -1479,10 +1483,8 @@ async function init_level (level: number, pal: Uint8ClampedArray): Promise<numbe
 			for (c2 = 0; c2 < core.JNB_MAX_PLAYERS; c2++)
 				player[c1].bumped[c2] = 0;
 			position_player(c1);
-			add_leftovers(0, 360, 34 + c1 * 64, 0, number_gobs);
-			add_leftovers(1, 360, 34 + c1 * 64, 0, number_gobs);
-			add_leftovers(0, 376, 34 + c1 * 64, 0, number_gobs);
-			add_leftovers(1, 376, 34 + c1 * 64, 0, number_gobs);
+			add_score(c1, 0, 360, 34 + c1 * 64, 0, number_gobs);
+			add_score(c1, 1, 376, 34 + c1 * 64, 0, number_gobs);
 		}
 	}
 

@@ -1,3 +1,4 @@
+import { toShort } from "./c";
 import { BAN } from "./constants";
 import { Gob } from "./core";
 
@@ -11,12 +12,6 @@ const PALETTE_256_SIZE = 768;
 type FileRef = {
     offset: number;
     len: number;
-}
-
-function toShort(n) {
-    const int16 = new Int16Array(1);
-    int16[0] = n;
-    return int16[0];
 }
 
 const flip = false;

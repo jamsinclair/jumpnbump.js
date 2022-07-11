@@ -64,7 +64,7 @@ export function set_pixel(page: number, x: number, y: number, color: number) {
 }
 
 export function put_pob(page: number, x: number, y: number, image: number, gob: Gob, use_mask: number, mask_pic: any) {
-	assert(drawing_enable == 1);
+	// assert(drawing_enable == 1);
 	assert(gob);
 	assert(image >= 0);
 	assert(image < gob.num_images);

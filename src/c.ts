@@ -13,3 +13,9 @@ export function assert(assertion) {
         throw new Error("Assertion failed");
     }
 }
+
+export function toShort(n: number) {
+    const int16 = new Int16Array(1);
+    int16[0] = n;
+    return int16[0];
+}
