@@ -154,8 +154,11 @@ export function read_level() {
 		}
 	}
 
-	for (let c2 = 0; c2 < 22; c2++)
+	for (let c2 = 0; c2 < 22; c2++) {
+        if (!new_map[16])
+            new_map[16] = [];
 		new_map[16][c2] = BAN.SOLID;
+    }
 
 	return new_map;
 }

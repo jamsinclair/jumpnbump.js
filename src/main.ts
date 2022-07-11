@@ -281,8 +281,9 @@ async function game_loop () {
 
 				draw_begin();
 
-				if (flies_enabled)
-					redraw_flies_background(main_info.draw_page);
+				// Do we need this?
+				// if (flies_enabled)
+					// redraw_flies_background(main_info.draw_page);
 
 				draw_leftovers(main_info.draw_page);
 
