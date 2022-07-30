@@ -1,8 +1,10 @@
 import { KEY } from "../constants";
-import { SDL_Delay, SDL_GetTicks, SDL_PollEvent } from "./sdl";
+import { SDL_GetTicks, SDL_PollEvent } from "./sdl";
+
+let lastTick = 0;
+const TICK_LENGTH = 1000 / 60;
 
 const keyb: Record<string, boolean> = {};
-let last_time = 0;
 
 export function key_pressed(key: string) {
 	return keyb[key];
@@ -12,9 +14,10 @@ export function addkey (key: string, pressed: boolean = false) {
     return keyb[key] = pressed;
 }
 
-export async function intr_sysupdate(): Promise<number> {
-    let i = 0;
-    let now, time_diff;
+export function intr_sysupdate(): number {
+    if (lastTick === 0) {
+        lastTick = SDL_GetTicks();
+    }
 
     for (const event of SDL_PollEvent()) {
         switch (event.type) {
@@ -58,23 +61,19 @@ export async function intr_sysupdate(): Promise<number> {
                 break;
             default:
                 break;
-        }        
-        i++;
+        }
     }
 
-    await SDL_Delay(16);
-	now = SDL_GetTicks();
-	time_diff = now - last_time;
-	if (time_diff > 0) {
-		i = Math.floor(time_diff / (1000 / 60));
-		if (i) {
-			last_time = now;
-		} else {
-			let tmp = (1000 / 60) - i - 10;
-			if (tmp > 0)
-				await SDL_Delay(tmp);
-		}
-	}
+    const nextTick = lastTick + TICK_LENGTH;
+    const now = SDL_GetTicks();
+    let numOfTicks = 0;
 
-	return i;
+    if (now > nextTick) {
+        const timeSinceTick = now - lastTick;
+        numOfTicks = Math.floor(timeSinceTick / TICK_LENGTH);
+
+        lastTick = lastTick + (numOfTicks * TICK_LENGTH);
+    }
+
+	return numOfTicks;
 }

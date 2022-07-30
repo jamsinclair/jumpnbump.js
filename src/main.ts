@@ -303,7 +303,7 @@ async function game_loop () {
 			}
 		}
 
-		update_count = await intr_sysupdate();
+		update_count = intr_sysupdate();
 
 		if (is_net) {
 			if ((server_said_bye) || ((fade_flag == 0) && (end_loop_flag == 1)))

@@ -541,7 +541,7 @@ export async function menu() {
 			update_count--;
 		}
 
-		update_count = Math.floor(await intr_sysupdate());
+		update_count = Math.floor(intr_sysupdate());
 		return -1;
 	}
 
