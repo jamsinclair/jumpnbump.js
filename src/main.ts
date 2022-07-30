@@ -14,6 +14,7 @@ import { preread_datafile, read_gob, read_level, read_pcx } from './data';
 import { menu } from './menu';
 import ctx from './context';
 import { SDL_Init } from './sdl/sdl';
+import { run_in_frame_loop } from './loop';
 
 let rabbit_gobs = ctx.rabbit_gobs;
 let font_gobs = ctx.font_gobs;
@@ -315,31 +316,10 @@ async function game_loop () {
 		return -1;
 	}
 
-	function inner_game_loop_promise() {
-		return new Promise((resolve) => {
-			let loop = async () => {
-				// if (_pause) {
-				// 	// no-op
-				// 	setTimeout(loop, 1000);
-				// 	return;
-				// }
-				let result = await inner_game_loop();
-				if (result !== -1) {
-					resolve(result);
-				} else {
-					requestAnimationFrame(loop);
-				}
-			}
-			loop();
-		});
-	}
-
-	await inner_game_loop_promise();
+	await run_in_frame_loop(inner_game_loop);
 
 	return 0;
 }
-
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function menu_loop ()
 {
@@ -479,38 +459,47 @@ async function menu_loop ()
 		dj_start_mod();
 		dj_set_nosound(0);
 
-		while (!key_pressed(KEY.ESCAPE)) {
-			if (mod_vol < 35)
-				mod_vol++;
-			dj_set_mod_volume(mod_vol);
-			for (c1 = 0; c1 < 768; c1++) {
-				if (cur_pal[c1] < pal[c1])
-					cur_pal[c1]++;
+		let has_escape_been_pressed = false;
+
+		async function scores_loop () {
+			if (!has_escape_been_pressed) {
+				has_escape_been_pressed = key_pressed(KEY.ESCAPE);
 			}
-			dj_mix();
-			await intr_sysupdate();
-			setpalette(0, 256, cur_pal);
-			draw_final_scores();
-		}
-		while (key_pressed(KEY.ESCAPE)) {
-			dj_mix();
-			await intr_sysupdate();
+
+			if (!has_escape_been_pressed) {
+				if (mod_vol < 35)
+					mod_vol++;
+				dj_set_mod_volume(mod_vol);
+				for (c1 = 0; c1 < 768; c1++) {
+					if (cur_pal[c1] < pal[c1])
+						cur_pal[c1]++;
+				}
+				dj_mix();
+				intr_sysupdate();
+				setpalette(0, 256, cur_pal);
+				draw_final_scores();
+				return -1;
+			}
+	
+			memset(pal, 0, 768);
+	
+			if (mod_vol > 0) {
+				draw_final_scores();
+				mod_vol--;
+				dj_set_mod_volume(mod_vol);
+				for (c1 = 0; c1 < 768; c1++) {
+					if (cur_pal[c1] > pal[c1])
+						cur_pal[c1]--;
+				}
+				dj_mix();
+				setpalette(0, 256, cur_pal);
+				return -1;
+			}
+
+			return 0;
 		}
 
-        memset(pal, 0, 768);
-
-		while (mod_vol > 0) {
-			draw_final_scores();
-			mod_vol--;
-			dj_set_mod_volume(mod_vol);
-			for (c1 = 0; c1 < 768; c1++) {
-				if (cur_pal[c1] > pal[c1])
-					cur_pal[c1]--;
-			}
-			dj_mix();
-			setpalette(0, 256, cur_pal);
-			await sleep(16);
-		}
+		await run_in_frame_loop(scores_loop);
 
 		fillpalette(0, 0, 0);
 		draw_final_scores();

@@ -9,6 +9,7 @@ import { addkey, intr_sysupdate, key_pressed } from './sdl/interrpt';
 import { dj_mix, dj_play_sfx, dj_ready_mod, dj_set_mod_volume, dj_set_nosound, dj_set_sfx_volume, dj_start_mod } from './sdl/sound';
 import ctx from './context';
 import { player_anims } from './animation';
+import { run_in_frame_loop } from './loop';
 
 let menu_background;
 let menu_mask;
@@ -545,26 +546,7 @@ export async function menu() {
 		return -1;
 	}
 
-	function menu_game_loop_promise() {
-		return new Promise((resolve) => {
-			let loop = async () => {
-				if (_pause) {
-					// no-op
-					setTimeout(loop, 1000);
-					return;
-				}
-				let result = await menu_game_loop();
-				if (result !== -1) {
-					resolve(result);
-				} else {
-					requestAnimationFrame(loop);
-				}
-			}
-			loop();
-		});
-	}
-
-	await menu_game_loop_promise();
+	await run_in_frame_loop(menu_game_loop);
 	menu_deinit();
 	return 0;
 }
