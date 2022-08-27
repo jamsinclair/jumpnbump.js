@@ -1,15 +1,15 @@
-import { KEY, MOD, OBJ, OBJ_ANIM, SFX, SFX_FREQ } from './constants';
-import * as core from './core';
+import { JNB_MAX_PLAYERS, JNB_VERSION, KEY, MOD, NUM, OBJ, OBJ_ANIM, SCREEN_WIDTH, SFX, SFX_FREQ } from './constants';
 import { read_pcx } from './data';
 import { add_object, add_pob, draw_pobs } from './renderer';
 import { memset, rnd } from './c';
-import { clear_lines, draw_begin, draw_end, fillpalette, put_text, recalculate_gob, redraw_pob_backgrounds, register_background, register_mask, setpalette } from './sdl/gfx';
+import { draw_begin, draw_end, fillpalette, put_text, register_background, register_mask, setpalette } from './sdl/gfx';
 import { update_player_actions } from './sdl/input';
 import { addkey, intr_sysupdate, key_pressed } from './sdl/interrpt';
 import { dj_mix, dj_play_sfx, dj_ready_mod, dj_set_mod_volume, dj_set_nosound, dj_set_sfx_volume, dj_start_mod } from './sdl/sound';
 import ctx from './context';
 import { player_anims } from './animation';
 import { run_in_frame_loop } from './loop';
+import { get_gob } from './assets';
 
 let menu_background;
 let menu_mask;
@@ -20,25 +20,15 @@ const menu_cur_pal = new Uint8ClampedArray(768);
 const player = ctx.player;
 const main_info = ctx.info;
 const ai = ctx.ai;
-const rabbit_gobs = ctx.rabbit_gobs;
-const font_gobs = ctx.font_gobs;
-const object_gobs = ctx.object_gobs;
-let _pause = false;
 
 const objects = ctx.objects;
-
-function togglePause() {
-	_pause = !_pause;
-}
-
-globalThis.togglePause = togglePause;
 
 function update_objects () {
 
 }
 
 const message = [
-	`Jump 'n Bump ${core.JNB_VERSION}`,
+	`Jump 'n Bump ${JNB_VERSION}`,
 	"by Brainchild Design in 1998.",
 	"Code by Mattias Brynervall.",
 	"Graphics by Martin Magnusson",
@@ -65,6 +55,7 @@ export async function menu() {
 	let fade_dir, fade_count;
 	let fade_pal = new Uint8ClampedArray(48);
 	let update_count;
+	const rabbit_gobs = get_gob('rabbit');
 	
 	if (await menu_init() != 0)
 		return 1;
@@ -114,7 +105,7 @@ export async function menu() {
 	async function menu_game_loop () {
 		dj_mix();
 
-		for (c1 = 0; c1 < core.JNB_MAX_PLAYERS; c1++) // set AI to false
+		for (c1 = 0; c1 < JNB_MAX_PLAYERS; c1++) // set AI to false
 			ai[c1] = 0;
 
 		while (update_count) {
@@ -127,7 +118,7 @@ export async function menu() {
 				esc_pressed = 0;
 
 			update_player_actions();
-			for (c1 = 0; c1 < core.JNB_MAX_PLAYERS; c1++) {
+			for (c1 = 0; c1 < JNB_MAX_PLAYERS; c1++) {
 				if (end_loop_flag == 1 && new_game_flag == 1) {
 					if ((player[c1].x >> 16) > (165 + c1 * 2)) {
 						if (player[c1].x_add < 0)
@@ -405,7 +396,7 @@ export async function menu() {
 						player[c1].x = 0;
 						player[c1].x_add = 0;
 					}
-					if ((player[c1].x >> 16) > core.JNB_WIDTH) {
+					if ((player[c1].x >> 16) > SCREEN_WIDTH) {
 						end_loop_flag = 1;
 						new_game_flag = 1;
 						memset(menu_pal, 0, 768);
@@ -488,8 +479,6 @@ export async function menu() {
 						}
 						fade_count++;
 					} else {
-						clear_lines(0, 220, 20, 0);
-
 						cur_message++;
 						if (cur_message >= NUM_MESSAGES)
 							cur_message -= NUM_MESSAGES;
@@ -567,13 +556,10 @@ async function menu_init() {
 		menu_pal[(240 + c1) * 3 + 2] = c1 << 2;
 	}
 
-	recalculate_gob(rabbit_gobs, menu_pal);
-	recalculate_gob(font_gobs, menu_pal);
-	recalculate_gob(object_gobs, menu_pal);
 	await register_background(menu_background, menu_pal);
 	await register_mask(menu_mask, menu_pal);
 
-	for (c1 = 0; c1 < core.JNB_MAX_PLAYERS; c1++) {
+	for (c1 = 0; c1 < JNB_MAX_PLAYERS; c1++) {
 		player[c1].enabled = false;
 		player[c1].x = rnd(150) << 16;
 		player[c1].y = (160 + c1 * 2) << 16;
@@ -587,7 +573,7 @@ async function menu_init() {
 		player[c1].image = player_anims[player[c1].anim].frame[player[c1].frame].image;
 	}
 
-	for (c1 = 0; c1 < core.NUM_OBJECTS; c1++) {
+	for (c1 = 0; c1 < NUM.OBJECTS; c1++) {
 		objects[c1].used = 0;
     }
 

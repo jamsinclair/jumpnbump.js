@@ -1,4 +1,12 @@
-import { main } from "./main";
+import { Engine } from "./engine";
 
+const engine = new Engine(document.getElementById("canvas") as HTMLCanvasElement);
 
-main(0, []);
+globalThis.togglePause = () => {
+    engine.togglePause();
+}
+
+fetch('./jumpbump.dat').then(res => res.arrayBuffer()).then(data => {
+    engine.init({ datafile: data });
+    engine.run();
+});

@@ -39,7 +39,6 @@ export enum KEY {
     THREE = "Digit3",
     FOUR = "Digit4",
     F10 = "F10",
-    
 }
 
 export enum MOVEMENT {
@@ -78,4 +77,24 @@ export enum MOD {
     MENU = 0,
     GAME = 1,
     SCORES = 2,
+};
+
+export const SCREEN_WIDTH = 400;
+export const SCREEN_HEIGHT = 256;
+export const PALETTE_256_SIZE = 768;
+
+export const JNB_MAX_PLAYERS = 4;
+export const JNB_END_SCORE = 100;
+export const JNB_VERSION = "2.0-dev";
+
+export const NUM_POBS = 200;
+export const NUM_OBJECTS = 200;
+export const NUM_FLIES = 20;
+export const NUM_LEFTOVERS = 50;
+
+export enum NUM {
+    POBS = 200,
+    OBJECTS = 200,
+    FLIES = 20,
+    LEFTOVERS = 50,
 };

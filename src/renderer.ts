@@ -1,12 +1,12 @@
 import { object_anims } from './animation';
 import { cheats } from './cheats';
-import { BAN } from './constants';
-import * as core from './core';
+import { BAN, JNB_MAX_PLAYERS, NUM } from './constants';
 import { dj_set_sfx_channel_volume } from './sdl/sound';
 import { GET_BAN_MAP_XY } from './level';
 import { rnd } from './c';
 import { get_pixel, put_pob, set_pixel } from './sdl/gfx';
 import ctx from './context';
+import { Gob } from './assets';
 
 // Probably move elsewhere
 const main_info =  ctx.info;
@@ -20,7 +20,7 @@ type Scores = {
 		x: number,
 		y: number,
 		image: number,
-		pob_data: core.Gob,
+		pob_data: Gob,
 	}[],
 }
 
@@ -31,7 +31,7 @@ type Leftovers = {
             x: number,
             y: number,
             image: number,
-            pob_data: core.Gob,
+            pob_data: Gob,
         }[],
     }
 };
@@ -49,7 +49,7 @@ type Fly = {
     back_defined: number[],
 }
 const flies: Fly[] = [];
-for (let i = 0; i < core.NUM_FLIES; i++) {
+for (let i = 0; i < NUM.FLIES; i++) {
 	flies[i] = {
 		x: 0,
 		y: 0,
@@ -63,7 +63,7 @@ for (let i = 0; i < core.NUM_FLIES; i++) {
 }
 
 export function add_object (type: number, x: number, y: number, x_add: number, y_add: number, anim: number, frame: number) {
-	for (let c1 = 0; c1 < core.NUM_OBJECTS; c1++) {
+	for (let c1 = 0; c1 < NUM.OBJECTS; c1++) {
 		if (!objects[c1] || objects[c1].used === 0) {
 			const resolved_anim = frame > 10 ? Math.floor(anim / 10) : anim;
 			const resolved_frame = frame > 10 ? frame % 10 : frame;
@@ -87,13 +87,12 @@ export function add_object (type: number, x: number, y: number, x_add: number, y
 				console.warn('ERROR with add_object:', type, x, y, x_add, y_add, anim, frame);
 			}
 			return c1;
-            break;
 		}
 	}
 }
 
-export function add_pob (page: number, x: number, y: number, image: number, pob_data: core.Gob): number {
-	if (main_info.page_info.num_pobs >= core.NUM_POBS)
+export function add_pob (page: number, x: number, y: number, image: number, pob_data: Gob): number {
+	if (main_info.page_info.num_pobs >= NUM.POBS)
         return 1;
 
     const pob = {
@@ -108,7 +107,7 @@ export function add_pob (page: number, x: number, y: number, image: number, pob_
     return 0;
 }
 
-export function add_score (player: number, position: number, x: number, y: number, image: number, pob_data: core.Gob) {
+export function add_score (player: number, position: number, x: number, y: number, image: number, pob_data: Gob) {
 	const pob = {
 		x: x,
 		y: y,
@@ -119,8 +118,8 @@ export function add_score (player: number, position: number, x: number, y: numbe
 	scores.pobs[index] = pob;
 }
 
-export function add_leftovers (player: number, x: number, y: number, image: number, pob_data: core.Gob) {
-    if (leftovers.page.num_pobs >= core.NUM_LEFTOVERS)
+export function add_leftovers (player: number, x: number, y: number, image: number, pob_data: Gob) {
+    if (leftovers.page.num_pobs >= NUM.LEFTOVERS)
 		return 1;
 
     const leftover = {
@@ -135,8 +134,8 @@ export function add_leftovers (player: number, x: number, y: number, image: numb
 	return 0;
 }
 
-export function draw_flies (page: number) {
-	for (let c2 = 0; c2 < core.NUM_FLIES; c2++) {
+export function draw_flies () {
+	for (let c2 = 0; c2 < NUM.FLIES; c2++) {
 		flies[c2].back[main_info.draw_page] = get_pixel(main_info.draw_page, flies[c2].x, flies[c2].y);
 		flies[c2].back_defined[main_info.draw_page] = 1;
 		set_pixel(main_info.draw_page, flies[c2].x, flies[c2].y, 0);
@@ -150,7 +149,7 @@ export async function draw_pobs () {
 }
 
 export function redraw_flies_background (page: number) {
-	for (let c2 = core.NUM_FLIES - 1; c2 >= 0; c2--) {
+	for (let c2 = NUM.FLIES - 1; c2 >= 0; c2--) {
 		if (flies[c2].back_defined[page] == 1)
 			set_pixel(page, flies[c2].old_draw_x, flies[c2].old_draw_y, flies[c2].back[page]);
 		flies[c2].old_draw_x = flies[c2].x;
@@ -173,7 +172,7 @@ function get_closest_player_to_point(x: number, y: number) {
 	let dist = 0x7fff;
     let closest_player = 0;
 
-	for (let c1 = 0; c1 < core.JNB_MAX_PLAYERS; c1++) {
+	for (let c1 = 0; c1 < JNB_MAX_PLAYERS; c1++) {
 		if (player[c1].enabled) {
 			cur_dist = Math.sqrt((x - ((player[c1].x >> 16) + 8)) * (x - ((player[c1].x >> 16) + 8)) + (y - ((player[c1].y >> 16) + 8)) * (y - ((player[c1].y >> 16) + 8)));
 			if (cur_dist < dist) {
@@ -194,12 +193,12 @@ export function update_flies(update_count: number) {
 
 	/* get center of fly swarm */
 	s1 = s2 = 0;
-	for (let c1 = 0; c1 < core.NUM_FLIES; c1++) {
+	for (let c1 = 0; c1 < NUM.FLIES; c1++) {
 		s1 += flies[c1].x;
 		s2 += flies[c1].y;
 	}
-	s1 /= core.NUM_FLIES;
-	s2 /= core.NUM_FLIES;
+	s1 /= NUM.FLIES;
+	s2 /= NUM.FLIES;
 
 	if (update_count == 1) {
 		/* get closest player to fly swarm */
@@ -213,7 +212,7 @@ export function update_flies(update_count: number) {
 		dj_set_sfx_channel_volume(4, s3);
 	}
 
-	for (let c1 = 0; c1 < core.NUM_FLIES; c1++) {
+	for (let c1 = 0; c1 < NUM.FLIES; c1++) {
 		/* get closest player to fly */
 		let { dist, closest_player } = get_closest_player_to_point(flies[c1].x, flies[c1].y);
 		flies[c1].old_x = flies[c1].x;
@@ -277,7 +276,7 @@ export function position_flies () {
     const s1 = rnd(250) + 50;
     const s2 = rnd(150) + 50;
 
-    for (let c1 = 0; c1 < core.NUM_FLIES; c1++) {
+    for (let c1 = 0; c1 < NUM.FLIES; c1++) {
         while (1) {
             flies[c1].x = s1 + rnd(101) - 50;
             flies[c1].y = s2 + rnd(101) - 50;

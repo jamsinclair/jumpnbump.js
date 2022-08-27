@@ -1,32 +1,18 @@
 import { assert } from "../c";
-import { Gob } from "../core";
-import { SDL_Init } from "./sdl";
-import g_ctx from '../context';
+import { get_gob, Gob } from "../assets";
 import { PalettedRenderer } from "./paletted-renderer";
-
-const screen_width = 400;
-const screen_height = 256;
-const PALETTE_256_SIZE = 768;
-
-let background;
-let mask;
-let background_drawn = 0;
+import { PALETTE_256_SIZE, SCREEN_HEIGHT, SCREEN_WIDTH } from "../constants";
 
 let drawing_enable = 0;
 
 const font_text_chars = "!\"'(),-./0123456789:;@ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz~äâÄÂöÖ";
 
-let canvas: HTMLCanvasElement;
 let ctx: CanvasRenderingContext2D;
 let renderer: PalettedRenderer;
 
-export function open_screen() {
-    SDL_Init();
-    canvas = document.getElementById("canvas") as HTMLCanvasElement;
+export function gfx_init(canvas: HTMLCanvasElement) {
     ctx = canvas.getContext("2d");
-    canvas.width = screen_width;
-    canvas.height = screen_height;
-    renderer = new PalettedRenderer(screen_width, screen_height);
+    renderer = new PalettedRenderer(SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
 export function pob_width(image: number, gob: Gob)
@@ -85,37 +71,12 @@ export function put_pob(page: number, x: number, y: number, image: number, gob: 
 
 export function register_background(pixels: Uint8ClampedArray, pal: Uint8ClampedArray) {
     renderer.setPalette(pal);
-    background = renderer.registerBackground(pixels);
+    renderer.registerBackground(pixels);
 }
 
 export function register_mask(pixels: Uint8ClampedArray, pal: Uint8ClampedArray) {
-    // renderer.setPalette(pal);
-    background = renderer.registerMask(pixels);
+    renderer.registerMask(pixels);
 }
-
-export function register_gob(handle: number, gob: Gob, len: number) {
-        
-}    
-
-// export async function to_bitmap_image_data(colormap: number[], palette: number[] | Rgba[], width: number, height: number, transparency_sum: number | null = null): Promise<HTMLImageElement> {
-//     const image_data = new Uint8ClampedArray(colormap.length * 4);
-//     //Took some hints from the public domain https://github.com/arcollector/PCX-JS/blob/master/pcx.js#L447
-//     for (let i = 0; i < colormap.length; i++) {
-//         const colorIndex = colormap[i];
-//         let color;
-//         if (typeof palette[colorIndex] === 'number') {
-//             color = rgbFromArray(colorIndex * 3, palette as number[]);
-//         } else {
-//             color = palette[colorIndex];
-//         }
-//         const a = color.r + color.g + color.b === transparency_sum ? 0 : 255;
-//         image_data[i * 4 + 0] = color.r;
-//         image_data[i * 4 + 1] = color.g
-//         image_data[i * 4 + 2] = color.b;
-//         image_data[i * 4 + 3] = a;
-//     }
-//     return image_data_array_to_image(image_data, width, height);
-// }
 
 export function setpalette(index: number, count: number, palette: Uint8ClampedArray)
 {
@@ -138,17 +99,7 @@ export function fillpalette(red: number, green: number, blue: number) {
 	renderer.setPalette(newPal);
 }
 
-function get_color_from_palette(index: number) {
-    return {
-        r: renderer.palette[index * 3],
-        g: renderer.palette[index * 3 + 1],
-        b: renderer.palette[index * 3 + 2],
-        a: 255,
-    };
-}
-
 export function draw_begin () {
-    // assert(!drawing_enable);
     drawing_enable = 1;
 }
 
@@ -159,6 +110,7 @@ export function draw_end () {
 
 export function put_text(page: number, x: number, y: number, text: string, align: number) {
     assert(drawing_enable == 1);
+    const font_gobs = get_gob('font');
 
     let width = 0;
     let cur_x = 0;
@@ -175,7 +127,7 @@ export function put_text(page: number, x: number, y: number, text: string, align
             continue;
         }
 
-        width += pob_width(image, g_ctx.font_gobs) + 1;
+        width += pob_width(image, font_gobs) + 1;
     }
 
     switch (align) {
@@ -204,21 +156,7 @@ export function put_text(page: number, x: number, y: number, text: string, align
             continue;
         }
 
-        put_pob(page, cur_x, y, image, g_ctx.font_gobs, 2, null);
-		cur_x += pob_width(image, g_ctx.font_gobs) + 1;
+        put_pob(page, cur_x, y, image, font_gobs, 2, null);
+		cur_x += pob_width(image, font_gobs) + 1;
     }
-}
-
-export function clear_lines(page: number, y: number, count: number, color_num: number) {
-    // const color = get_color_from_palette(color_num);
-    // ctx.fillStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
-    // ctx.fillRect(0, y, screen_width, count * 8);
-}
-
-export function recalculate_gob(gob: Gob, palette: Uint8ClampedArray) {
-
-}
-
-export function redraw_pob_backgrounds(page: number) {
-
 }

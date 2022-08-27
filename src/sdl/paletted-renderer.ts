@@ -82,7 +82,6 @@ export class PalettedRenderer {
     setPalette (palette: Uint8ClampedArray): void {
         this.palette = palette;
         this.imageCache.updatePaletteKey(crc32(palette as any).toString(16));
-        // console.log('new cache key', this.imageCache.paletteKey);
     }
 
     registerBackground (background: Uint8ClampedArray): void {

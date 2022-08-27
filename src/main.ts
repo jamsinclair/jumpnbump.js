@@ -1,32 +1,25 @@
 import { object_anims, player_anims } from './animation';
 import { cheats, check_cheats } from './cheats';
-import { BAN, KEY, MOD, OBJ, OBJ_ANIM, SFX, SFX_FREQ } from './constants';
-import * as core from './core';
+import { BAN, JNB_MAX_PLAYERS, KEY, MOD, NUM, OBJ, OBJ_ANIM, SCREEN_HEIGHT, SCREEN_WIDTH, SFX, SFX_FREQ } from './constants';
 import { dj_deinit, dj_init, dj_mix, dj_play_sfx, dj_ready_mod, dj_set_mod_volume, dj_set_nosound, dj_set_sfx_volume, dj_start_mod, dj_stop, dj_stop_mod, dj_stop_sfx_channel } from './sdl/sound';
 import { update_player_actions } from './sdl/input';
 import { addkey, intr_sysupdate, key_pressed } from './sdl/interrpt';
 import { GET_BAN_MAP_IN_WATER, GET_BAN_MAP_TILE, GET_BAN_MAP_XY, SET_BAN_MAP } from './level';
 import { serverSendAlive, serverSendKillPacket, serverTellEveryoneGoodbye, tellServerGoodbye, tellServerNewPosition, update_players_from_clients, update_players_from_server } from './network';
-import { add_leftovers, add_object, add_pob, add_score, draw_flies, draw_leftovers, draw_pobs, draw_score, position_flies, redraw_flies_background, update_flies } from './renderer';
+import { add_leftovers, add_object, add_pob, add_score, draw_flies, draw_leftovers, draw_pobs, draw_score, position_flies, update_flies } from './renderer';
 import { memset, rnd } from './c';
-import { draw_begin, draw_end, fillpalette, open_screen, put_text, register_background, register_mask, setpalette } from './sdl/gfx';
+import { draw_begin, draw_end, fillpalette, gfx_init, put_text, register_background, register_mask, setpalette } from './sdl/gfx';
 import { preread_datafile, read_gob, read_level, read_pcx } from './data';
 import { menu } from './menu';
 import ctx from './context';
-import { SDL_Init } from './sdl/sdl';
 import { run_in_frame_loop } from './loop';
-
-let rabbit_gobs = ctx.rabbit_gobs;
-let font_gobs = ctx.font_gobs;
-let object_gobs = ctx.object_gobs;
-let number_gobs = ctx.number_gobs;
+import { init_controls_listener } from './sdl/events';
+import { Pob, register_gob, get_gob } from './assets';
 
 const main_info = ctx.info;
 const player = ctx.player;
 const ai = ctx.ai;
 const objects = ctx.objects;
-const joy = {};
-const mouse = {};
 
 let endscore_reached = 0;
 
@@ -47,11 +40,11 @@ function flip_pixels(pixels)
 {
 	let temp: number = 0;
 
-	for (let y = 0; y < core.JNB_HEIGHT; y++) {
+	for (let y = 0; y < SCREEN_HEIGHT; y++) {
 		for (let x = 0; x < (352 / 2); x++) {
-			temp = pixels[y * core.JNB_WIDTH + x];
-			pixels[y * core.JNB_WIDTH + x] = pixels[y * core.JNB_WIDTH + (352 - x) - 1];
-			pixels[y * core.JNB_WIDTH + (352 - x) - 1] = temp;
+			temp = pixels[y * SCREEN_WIDTH + x];
+			pixels[y * SCREEN_WIDTH + x] = pixels[y * SCREEN_WIDTH + (352 - x) - 1];
+			pixels[y * SCREEN_WIDTH + (352 - x) - 1] = temp;
 		}
 	}
 }
@@ -148,6 +141,8 @@ async function game_loop () {
 	let update_palette = 0;
 	let mod_fade_direction;
 
+	const rabbit_gobs = get_gob('rabbit');
+
 	mod_vol = sfx_vol = 0;
 	mod_fade_direction = 1;
 	dj_ready_mod(MOD.GAME);
@@ -195,7 +190,7 @@ async function game_loop () {
 			dj_mix();
 
 			main_info.page_info.num_pobs = 0;
-			for (let i = 0; i < core.JNB_MAX_PLAYERS; i++) {
+			for (let i = 0; i < JNB_MAX_PLAYERS; i++) {
 				if (player[i].enabled)
 					main_info.page_info.num_pobs++;
 			}
@@ -213,10 +208,10 @@ async function game_loop () {
 			if (update_count == 1) {
 				let c2;
 
-				for (let i = 0, c2 = 0; i < core.JNB_MAX_PLAYERS; i++) {
+				for (let i = 0, c2 = 0; i < JNB_MAX_PLAYERS; i++) {
 					if (player[i].enabled) {
 						if (!main_info.page_info.pobs[c2]) {
-							main_info.page_info.pobs[c2] = new core.Pob();
+							main_info.page_info.pobs[c2] = new Pob();
 						}
 						main_info.page_info.pobs[c2].x = player[i].x >> 16;
 						main_info.page_info.pobs[c2].y = player[i].y >> 16;
@@ -233,7 +228,7 @@ async function game_loop () {
 				dj_mix();
 
 				if (flies_enabled)
-					draw_flies(main_info.draw_page);
+					draw_flies();
 			}
 
 			if (mod_fade_direction == 1) {
@@ -325,21 +320,19 @@ async function menu_loop ()
 {
 	let mod_vol;
 	let c1, c2;
-    console.log('start of menu_loop');
 
-	for (c1 = 0; c1 < core.JNB_MAX_PLAYERS; c1++) // reset player values
+	for (c1 = 0; c1 < JNB_MAX_PLAYERS; c1++) // reset player values
 	{
 		ai[c1] = 0;
 	}
 
-    let break_me = 1;
-	while (break_me) {
-        console.log('in first loop');
+	while (1) {
+		const rabbit_gobs = get_gob('rabbit');
+
 		if (!is_net) {
 			if (await menu() != 0) {
 				deinit_program();
                 break;
-                return;
             }
         }
 		if (key_pressed(KEY.ESCAPE)) {
@@ -389,7 +382,7 @@ async function menu_loop ()
 
 		main_info.page_info.num_pobs = 0;
 
-		for (c1 = 0; c1 < core.JNB_MAX_PLAYERS; c1++) {
+		for (c1 = 0; c1 < JNB_MAX_PLAYERS; c1++) {
 			const x = [100, 160, 220, 280]
             const y = [80, 110, 140, 170];
 
@@ -416,12 +409,12 @@ async function menu_loop ()
 			put_text(main_info.view_page, 40, 140, "FIZZ", 2);
 			put_text(main_info.view_page, 40, 170, "MIJJI", 2);
 	
-			for (c1 = 0; c1 < core.JNB_MAX_PLAYERS; c1++) {
+			for (c1 = 0; c1 < JNB_MAX_PLAYERS; c1++) {
 				if (!player[c1].enabled) {
 					continue;
 				}
 	
-				for (c2 = 0; c2 < core.JNB_MAX_PLAYERS; c2++) {
+				for (c2 = 0; c2 < JNB_MAX_PLAYERS; c2++) {
 					if (!player[c2].enabled) {
 						continue;
 					}
@@ -500,15 +493,15 @@ async function menu_loop ()
 		}
 
 		await run_in_frame_loop(scores_loop);
+		if (ctx.state === 'stopped') {
+			return 0;
+		}
 
 		fillpalette(0, 0, 0);
 		draw_final_scores();
 
 		dj_set_nosound(1);
 		dj_stop_mod();
-		
-		console.log('end of game');
-		break;
 
 		if (is_net)
 			return 0; /* don't go back to menu if in net game. */
@@ -516,8 +509,8 @@ async function menu_loop ()
 }
 
 
-export async function main(argc: number, argv: string[]): Promise<number> {
-	if (await init_program(argc, argv, pal) != 0) {
+export async function main(canvas: HTMLCanvasElement, datafile: ArrayBuffer): Promise<number> {
+	if (await init_program(canvas, datafile, pal) != 0) {
 		deinit_program();
 		return;
 	}
@@ -628,11 +621,11 @@ function cpu_move() {
     let target = null;
 	let nearest_distance = -1;
 
-	for (i = 0; i < core.JNB_MAX_PLAYERS; i++) {
+	for (i = 0; i < JNB_MAX_PLAYERS; i++) {
 		nearest_distance = -1;
 		if (ai[i] && player[i].enabled) // this player is a computer
 		{                               // get nearest target
-			for (j = 0; j < core.JNB_MAX_PLAYERS; j++) {
+			for (j = 0; j < JNB_MAX_PLAYERS; j++) {
 				let deltax, deltay;
 
 				if (i == j || !player[j].enabled)
@@ -804,7 +797,7 @@ function steer_players() {
 	cpu_move();
 	update_player_actions();
 
-	for (c1 = 0; c1 < core.JNB_MAX_PLAYERS; c1++) {
+	for (c1 = 0; c1 < JNB_MAX_PLAYERS; c1++) {
 
 		if (player[c1].enabled) {
 
@@ -965,7 +958,7 @@ function steer_players() {
 					player[c1].image = player_anims[player[c1].anim].frame[player[c1].frame].image + player[c1].direction * 9;
 					player[c1].jump_ready = 0;
 					player[c1].jump_abort = 0;
-					for (c2 = 0; c2 < core.NUM_OBJECTS; c2++) {
+					for (c2 = 0; c2 < NUM.OBJECTS; c2++) {
 						if (objects[c2].used == 1 && objects[c2].type == OBJ.SPRING) {
 							if (GET_BAN_MAP_XY((s1 + 8), (s2 + 15)) == BAN.SPRING) {
 								if ((objects[c2].x >> 20) == ((s1 + 8) >> 4) && (objects[c2].y >> 20) == ((s2 + 15) >> 4)) {
@@ -1102,13 +1095,13 @@ function position_player (player_num: number) {
 			if (GET_BAN_MAP_TILE(s2, s1) == BAN.VOID && (GET_BAN_MAP_TILE(s2 + 1, s1) == BAN.SOLID || GET_BAN_MAP_TILE(s2 + 1, s1) == BAN.ICE))
 				break;
 		}
-		for (c1 = 0; c1 < core.JNB_MAX_PLAYERS; c1++) {
+		for (c1 = 0; c1 < JNB_MAX_PLAYERS; c1++) {
 			if (c1 != player_num && player[c1].enabled) {
 				if (Math.abs((s1 << 4) - (player[c1].x >> 16)) < 32 && Math.abs((s2 << 4) - (player[c1].y >> 16)) < 32)
 					break;
 			}
 		}
-		if (c1 == core.JNB_MAX_PLAYERS) {
+		if (c1 == JNB_MAX_PLAYERS) {
 			player[player_num].x = s1 << 20;
 			player[player_num].y = s2 << 20;
 			player[player_num].x_add = player[player_num].y_add = 0;
@@ -1132,9 +1125,10 @@ function position_player (player_num: number) {
 }
 
 function update_objects () {
+	const object_gobs = get_gob('objects');
 	let s1 = 0;
 
-	for (let c1 = 0; c1 < core.NUM_OBJECTS; c1++) {
+	for (let c1 = 0; c1 < NUM.OBJECTS; c1++) {
 		if (objects[c1].used == 1) {
 			switch (objects[c1].type) {
 				case OBJ.SPRING:
@@ -1470,6 +1464,7 @@ async function init_level (level: number, pal: Uint8ClampedArray): Promise<numbe
 
 	let background_pic = read_pcx('level.pcx', pal);
     let mask_pic = read_pcx('mask.pcx', null);
+	const number_gobs = get_gob('numbers');
 
 	// if (flip)
 	// 	flip_pixels(mask_pic);
@@ -1477,14 +1472,14 @@ async function init_level (level: number, pal: Uint8ClampedArray): Promise<numbe
 	register_background(background_pic, pal);
 	register_mask(mask_pic, pal);
 
-	for (c1 = 0; c1 < core.JNB_MAX_PLAYERS; c1++) {
+	for (c1 = 0; c1 < JNB_MAX_PLAYERS; c1++) {
 		if (c1 === 0 || c1 === 1) {
 			player[c1].enabled = true;	
 		}
 
 		if (player[c1].enabled) {
 			player[c1].bumps = 0;
-			for (c2 = 0; c2 < core.JNB_MAX_PLAYERS; c2++)
+			for (c2 = 0; c2 < JNB_MAX_PLAYERS; c2++)
 				player[c1].bumped[c2] = 0;
 			position_player(c1);
 			add_score(c1, 0, 360, 34 + c1 * 64, 0, number_gobs);
@@ -1492,7 +1487,7 @@ async function init_level (level: number, pal: Uint8ClampedArray): Promise<numbe
 		}
 	}
 
-	for (c1 = 0; c1 < core.NUM_OBJECTS; c1++)
+	for (c1 = 0; c1 < NUM.OBJECTS; c1++)
 		objects[c1].used = 0;
 
 	for (c1 = 0; c1 < 16; c1++) {
@@ -1545,37 +1540,30 @@ function deinit_level () {
 	dj_stop_mod();
 }
 
-function getDefaultDatFile () {
-    return fetch('jumpbump.dat').then(response => response.arrayBuffer());
-}
+function init_program (canvas: HTMLCanvasElement, datafile:ArrayBuffer, pal: Uint8ClampedArray) {
+	let c1 = 0;
 
-async function init_program (argc: number, argv: string[], pal: Uint8ClampedArray) {
-	const netarg = null;
-	let c1 = 0, c2 = 0;
-	let load_flag = 0;
-	let fly;
-
-	open_screen();
+	gfx_init(canvas);
 
 	// TODO set flags here?
 
-/** It should not be necessary to assign a default player number here. The
-server assigns one in init_server, the client gets one assigned by the server,
-all provided the user didn't choose one on the commandline. */
+	/** It should not be necessary to assign a default player number here. The
+	server assigns one in init_server, the client gets one assigned by the server,
+	all provided the user didn't choose one on the commandline. */
 	if (is_net) {
 		if (client_player_num < 0)
 		        client_player_num = 0;
 		player[client_player_num].enabled = true;
 	}
 
-    preread_datafile(await getDefaultDatFile());
+    preread_datafile(datafile);
     read_pcx('menu.pcx', pal);
 
     // Load Gobs
-    ctx.rabbit_gobs.refresh(read_gob('rabbit.gob'));
-	ctx.object_gobs.refresh(read_gob('objects.gob'));
-    ctx.font_gobs.refresh(read_gob('font.gob'));
-    ctx.number_gobs.refresh(read_gob('numbers.gob'));
+	register_gob(read_gob('rabbit.gob'));
+	register_gob(read_gob('objects.gob'));
+    register_gob(read_gob('font.gob'));
+    register_gob(read_gob('numbers.gob'));
 
     SET_BAN_MAP(read_level());
 	
@@ -1601,6 +1589,8 @@ all provided the user didn't choose one on the commandline. */
 	// 		connect_to_server(netarg);
 	// 	}
 	// }
+
+	init_controls_listener();
 
 	return 0;
 }

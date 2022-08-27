@@ -1,10 +1,10 @@
 import { player_anims } from './animation';
 import { rnd, toShort } from './c';
-import { JNB_END_SCORE } from './core';
-import { add_leftovers, add_object, add_score } from './renderer';
+import { add_object, add_score } from './renderer';
 import { dj_play_sfx } from './sdl/sound';
-import { MOVEMENT, OBJ, SFX, SFX_FREQ } from './constants';
+import { JNB_END_SCORE, MOVEMENT, OBJ, SFX, SFX_FREQ } from './constants';
 import ctx from './context';
+import { get_gob } from './assets';
 
 const player = ctx.player;
 const is_server = true;
@@ -54,6 +54,8 @@ function processKillPacket(pkt: NetPacket) {
 	let c4 = 0;
 	let s1 = 0;
 
+	const number_gobs = get_gob('numbers');
+
 	player[c1].y_add = -player[c1].y_add;
 	if (player[c1].y_add > -262144)
 		player[c1].y_add = -262144;
@@ -83,8 +85,8 @@ function processKillPacket(pkt: NetPacket) {
 		}
 		player[c1].bumped[c2]++;
 		s1 = player[c1].bumps % 100;
-		add_score(c1, 0, 360, 34 + c1 * 64, Math.floor(s1 / 10), ctx.number_gobs);
-		add_score(c1, 1, 376, 34 + c1 * 64, s1 % 10, ctx.number_gobs);
+		add_score(c1, 0, 360, 34 + c1 * 64, Math.floor(s1 / 10), number_gobs);
+		add_score(c1, 1, 376, 34 + c1 * 64, s1 % 10, number_gobs);
 	}
 }
 

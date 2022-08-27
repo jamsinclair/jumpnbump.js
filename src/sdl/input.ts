@@ -60,7 +60,3 @@ export function update_player_actions() {
 			tellServerPlayerMoved(client_player_num, MOVEMENT.UP, tmp);
 	}
 }
-
-export function init_inputs() {
-
-}

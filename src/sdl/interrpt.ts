@@ -1,10 +1,14 @@
 import { KEY } from "../constants";
-import { SDL_GetTicks, SDL_PollEvent } from "./sdl";
+import { poll_events } from "./events";
 
 let lastTick = 0;
 const TICK_LENGTH = 1000 / 60;
 
 const keyb: Record<string, boolean> = {};
+
+function getTicks () {
+    return performance.now();
+};
 
 export function key_pressed(key: string) {
 	return keyb[key];
@@ -16,10 +20,10 @@ export function addkey (key: string, pressed: boolean = false) {
 
 export function intr_sysupdate(): number {
     if (lastTick === 0) {
-        lastTick = SDL_GetTicks();
+        lastTick = getTicks();
     }
 
-    for (const event of SDL_PollEvent()) {
+    for (const event of poll_events()) {
         switch (event.type) {
             case "keydown":
             case "keyup":
@@ -65,7 +69,7 @@ export function intr_sysupdate(): number {
     }
 
     const nextTick = lastTick + TICK_LENGTH;
-    const now = SDL_GetTicks();
+    const now = getTicks();
     let numOfTicks = 0;
 
     if (now > nextTick) {

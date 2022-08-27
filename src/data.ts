@@ -1,6 +1,6 @@
 import { toShort } from "./c";
 import { BAN } from "./constants";
-import { Gob } from "./core";
+import { Gob } from "./assets";
 
 let datafile_buffer;
 let datafile_index;
@@ -49,7 +49,6 @@ function read_four_byte_int(ptr: number): number {
 export function preread_datafile (file: ArrayBuffer) {
     datafile_buffer = new Uint8Array(file);
     datafile_index = read_dat_index();
-    return;
 }
 
 export function dat_open(requested_file_name: string): number {
