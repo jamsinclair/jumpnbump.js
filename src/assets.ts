@@ -1,7 +1,7 @@
-type GobNames = 'rabbit' | 'font' | 'objects' | 'numbers';
+export type GobName = 'rabbit' | 'font' | 'objects' | 'numbers';
 
 export class Gob {
-    name: GobNames;
+    name: GobName;
     num_images: number;
     width: number[] = [];
     height: number[] = [];
@@ -18,12 +18,12 @@ export class Pob {
     pob_data: Gob;
 }
 
-const gobs = new Map<GobNames, Gob>();
+const gobs = new Map<GobName, Gob>();
 
 export const register_gob = (gob: Gob) => {
     gobs.set(gob.name, gob);
 }
 
-export const get_gob = (name: GobNames) => {
+export const get_gob = (name: GobName) => {
     return gobs.get(name);
 }

@@ -1,6 +1,6 @@
 import { toShort } from "./c";
 import { BAN } from "./constants";
-import { Gob } from "./assets";
+import { Gob, GobName } from "./assets";
 
 let datafile_buffer;
 let datafile_index;
@@ -94,13 +94,19 @@ export function read_pcx(filename, pal) {
     return colormap;
 }
 
-export function read_gob(filename) {
+export function read_data(filename: string): Uint8Array {
+    const handle = dat_open(filename);
+    const len = dat_filelen(filename);
+    return datafile_buffer.subarray(handle, handle + len);
+}
+
+export function read_gob(filename: string): Gob {
     const handle = dat_open(filename);
     const len = dat_filelen(filename);
     const gob_data = datafile_buffer.subarray(handle, handle + len);
 
     const gob = new Gob();
-    gob.name = filename.replace('.gob', '');
+    gob.name = filename.replace('.gob', '') as GobName;
     gob.num_images = (gob_data[0]) + (gob_data[1] << 8);
 
     for (let i = 0; i < gob.num_images; i++) {

@@ -1,7 +1,7 @@
 import { object_anims, player_anims } from './animation';
 import { cheats, check_cheats } from './cheats';
 import { BAN, JNB_MAX_PLAYERS, KEY, MOD, NUM, OBJ, OBJ_ANIM, SCREEN_HEIGHT, SCREEN_WIDTH, SFX, SFX_FREQ } from './constants';
-import { dj_deinit, dj_init, dj_mix, dj_play_sfx, dj_ready_mod, dj_set_mod_volume, dj_set_nosound, dj_set_sfx_volume, dj_start_mod, dj_stop, dj_stop_mod, dj_stop_sfx_channel } from './sdl/sound';
+import { dj_deinit, dj_get_sfx_settings, dj_init, dj_load_sfx, dj_mix, dj_play_sfx, dj_ready_mod, dj_set_mod_volume, dj_set_nosound, dj_set_sfx_settings, dj_set_sfx_volume, dj_start_mod, dj_stop, dj_stop_mod, dj_stop_sfx_channel } from './sdl/sound';
 import { update_player_actions } from './sdl/input';
 import { addkey, intr_sysupdate, key_pressed } from './sdl/interrpt';
 import { GET_BAN_MAP_IN_WATER, GET_BAN_MAP_TILE, GET_BAN_MAP_XY, SET_BAN_MAP } from './level';
@@ -1570,7 +1570,16 @@ function init_program (canvas: HTMLCanvasElement, datafile:ArrayBuffer, pal: Uin
 	dj_init();
 
 	if (!main_info.no_sound) {
-		// load sfx and music
+		dj_load_sfx('death.smp', SFX.DEATH);
+		dj_load_sfx('fly.smp', SFX.FLY);
+		dj_load_sfx('jump.smp', SFX.JUMP);
+		dj_load_sfx('spring.smp', SFX.SPRING);
+		dj_load_sfx('splash.smp', SFX.SPLASH);
+
+		dj_set_sfx_settings(SFX.FLY, {
+			loop: true,
+			default_freq: SFX_FREQ.FLY,
+		});
 	}
 
 	/* fix dark font */

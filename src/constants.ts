@@ -92,6 +92,8 @@ export const NUM_OBJECTS = 200;
 export const NUM_FLIES = 20;
 export const NUM_LEFTOVERS = 50;
 
+export const MAX_VOLUME = 64;
+
 export enum NUM {
     POBS = 200,
     OBJECTS = 200,
