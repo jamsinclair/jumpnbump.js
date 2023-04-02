@@ -609,7 +609,7 @@ function map_tile (pos_x: number, pos_y: number) {
 	if (pos_x < 0 || pos_x >= 17 || pos_y < 0 || pos_y >= 22)
 		return BAN.VOID;
 
-	tile = GET_BAN_MAP_TILE(pos_x, pos_y);
+	tile = GET_BAN_MAP_TILE(pos_y, pos_x);
 	return tile;
 }
 

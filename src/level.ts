@@ -35,9 +35,9 @@ export function GET_BAN_MAP_XY(x: number, y: number) {
     }
 }
 
-export function GET_BAN_MAP_TILE(pos_x, pos_y) {
+export function GET_BAN_MAP_TILE(pos_y, pos_x) {
     if (pos_y < 0) pos_y = 0;
-    return ban_map[pos_x][pos_y];
+    return ban_map[pos_y][pos_x];
 }
 
 export function GET_BAN_MAP_IN_WATER (s1: number, s2: number) {
