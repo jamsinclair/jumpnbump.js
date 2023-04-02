@@ -10,6 +10,11 @@ let captured_events: Event[] = [];
 globalThis.ce = captured_events;
 
 function capture_sdl_event (type: Event_Type, event: KeyboardEvent) {
+    if (event.metaKey || event.ctrlKey || event.altKey) {
+        // Ignore key events with modifiers
+        return;
+    }
+
     event.preventDefault();
     captured_events.push({
         type,
