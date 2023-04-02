@@ -108,8 +108,14 @@ export function dj_mix () {
 
 }
 
-export function dj_stop_sfx_channel (volume: number) {
+export function dj_stop_sfx_channel (channel_num: number) {
+    if (!channels[channel_num]) {
+        return;
+    }
 
+    for (const sfx of channels[channel_num]) {
+        sfx.stop();
+    }
 }
 
 export function dj_load_sfx (filename: string, sfx_num: SFX) {
