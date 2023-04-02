@@ -1,11 +1,19 @@
 import { read_data } from "../data";
 import { MAX_VOLUME, MOD, SFX } from "../constants";
 import { Smp } from '@webtrack/smp';
+import { Mod } from '@webtrack/mod';
+/* @ts-ignore - Special static import with Vite */
+import audioWorkletUrl from '@webtrack/mod/dist/mod-processor.js?url';
+/* @ts-ignore - Special static import with Vite */
+import wasmUrl from '@webtrack/mod/dist/hxcmod_player.wasm?url';
 
 type SoundConfig = { loop: boolean, default_freq: number };
 const soundSettings: SoundConfig[] = [];
 const sounds: ArrayBuffer[] = [];
 const channels: Smp[][] = [];
+const tracks: Mod[] = [];
+let currentTrack: MOD | null = null;
+const getCurrentTrack = () => tracks[currentTrack] ?? null;
 
 export function dj_set_sfx_channel_volume (channel_num: number, volume: number) {
     if (!channels[channel_num]) {
@@ -53,7 +61,11 @@ export function dj_set_nosound (enable: number) {
 }
 
 export function dj_start_mod () {
-    return;
+    const track = getCurrentTrack();
+    if (track === null) {
+        return;
+    }
+    track.play();
 }
 
 export function dj_stop_mod () {
@@ -69,15 +81,23 @@ export function dj_deinit () {
 }
 
 export function dj_stop () {
-    
+    const track = getCurrentTrack();
+    if (track === null) {
+        return;
+    }
+    track.stop();
 }
 
 export function dj_ready_mod (mod_type: MOD) {
-
+    currentTrack = mod_type;
 }
 
 export function dj_set_mod_volume (volume: number) {
-
+    const track = getCurrentTrack();
+    if (track === null) {
+        return;
+    }
+    track.setVolume(volume / MAX_VOLUME);
 }
 
 export function dj_set_sfx_volume (volume: number) {
@@ -101,3 +121,30 @@ export function dj_load_sfx (filename: string, sfx_num: SFX) {
     }
     sounds[sfx_num] = dest.buffer;
 }
+
+export function dj_load_mod (filename: string, mod_num: MOD) {
+    const src = read_data(filename);
+    const mod = new Mod({ src, audioWorkletUrl, wasmUrl });
+    tracks[mod_num] = mod;
+}
+
+function handleUserGesture(event: Event) {
+    if (event.isTrusted) {
+        dj_start_mod();
+        window.removeEventListener(event.type, handleUserGesture);
+    }
+}
+
+function handleKeyboardUserGesture(event: KeyboardEvent) {
+    dj_start_mod();
+    const isArrowKeys = event.key === 'ArrowUp' || event.key === 'ArrowDown' || event.key === 'ArrowLeft' || event.key === 'ArrowRight';
+
+    // Ignore arrow keys, as they are not considered user gestures in Firefox
+    if (!isArrowKeys && event.isTrusted) {
+        window.removeEventListener(event.type, handleKeyboardUserGesture);
+    }
+}
+
+window.addEventListener('touchstart', handleUserGesture);
+window.addEventListener('mousedown', handleUserGesture);
+window.addEventListener('keydown', handleKeyboardUserGesture);
