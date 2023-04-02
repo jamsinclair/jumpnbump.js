@@ -114,8 +114,7 @@ export function add_score (player: number, position: number, x: number, y: numbe
 		image: image,
 		pob_data: pob_data,
 	};
-	const index = (player * 2) + position;
-	scores.pobs[index] = pob;
+	scores.pobs.push(pob);
 }
 
 export function add_leftovers (player: number, x: number, y: number, image: number, pob_data: Gob) {
