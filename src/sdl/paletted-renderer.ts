@@ -41,7 +41,7 @@ class PalettedCache {
 function extractMaskFromBackground(background: Uint8ClampedArray, mask: Uint8ClampedArray): Uint8ClampedArray {
     const maskData = Uint8ClampedArray.from(mask);
     for (let i = 0; i < mask.length; i++) {
-        if (maskData[i] === 1) {
+        if (maskData[i] > 0) {
             maskData[i] = background[i];
         }
     }
