@@ -6,6 +6,15 @@ const TICK_LENGTH = 1000 / 60;
 
 const keyb: Record<string, boolean> = {};
 
+export const last_keys: string[] = new Array(50);
+
+function add_last_key (key: string) {
+    for (let i = 49; i > 0; i--) {
+        last_keys[i] = last_keys[i - 1];
+    }
+    last_keys[0] = key;
+}
+
 function getTicks () {
     return performance.now();
 };
@@ -59,6 +68,9 @@ export function intr_sysupdate(): number {
                         addkey(KEY.PL4_RIGHT, false);
                         addkey(KEY.PL4_JUMP, false);
                     default:
+                        if (event.type === 'keyup') {
+                            add_last_key(event.key);
+                        }
                         addkey(event.scancode, event.type === 'keydown');
                         break;
                 }

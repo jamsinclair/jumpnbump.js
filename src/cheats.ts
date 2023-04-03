@@ -1,3 +1,4 @@
+import { last_keys } from "./sdl/interrpt";
 import { setpalette } from "./sdl/gfx";
 
 export const cheats = {
@@ -8,24 +9,29 @@ export const cheats = {
     blood_is_thicker_than_water: false,
 };
 
-export function check_cheats (last_keys: string, clear: () => void) {
-    if (last_keys == "kcitsogop") {
+const clear = () => {
+	last_keys.fill(undefined);
+};
+
+export function check_cheats () {
+	const last_keys_str = last_keys.join("");
+    if (last_keys_str.includes("kcitsogop")) {
 		cheats.pogostick = !cheats.pogostick;
 		clear();
 	}
-	if (last_keys === "ecapsniseinnub") {
+	if (last_keys_str.includes("ecapsniseinnub")) {
 		cheats.bunnies_in_space = !cheats.bunnies_in_space;
 		clear();
 	}
-	if (last_keys === "kcaptej") {
+	if (last_keys_str.includes("kcaptej")) {
 		cheats.jetpack = !cheats.jetpack;
 		clear();
 	}
-	if (last_keys === "seilfehtfodrol") {
+	if (last_keys_str.includes("seilfehtfodrol")) {
 		cheats.lord_of_the_flies = !cheats.lord_of_the_flies;
 		clear();
 	}
-	if (last_keys === "retawnahtrekcihtsidoolb") {
+	if (last_keys_str.includes("retawnahtrekcihtsidoolb")) {
 		const blood = [
 			63, 32, 32, 53, 17, 17, 42, 7,
 			7, 28, 0, 0, 24, 0, 0, 19,

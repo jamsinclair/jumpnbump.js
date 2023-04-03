@@ -4,6 +4,7 @@ type Event = {
     type: Event_Type,
     repeat: boolean,
     scancode: string,
+    key: string,
 }
 let captured_events: Event[] = [];
 
@@ -20,6 +21,7 @@ function capture_sdl_event (type: Event_Type, event: KeyboardEvent) {
         type,
         repeat: event.repeat,
         scancode: event.code,
+        key: event.key,
     });
 }
 
