@@ -1,6 +1,5 @@
-import { KEY, SFX } from "../constants";
+import { KEY } from "../constants";
 import { poll_events } from "./events";
-import { dj_load_sfx } from "./sound";
 
 let lastTick = 0;
 const TICK_LENGTH = 1000 / 60;
