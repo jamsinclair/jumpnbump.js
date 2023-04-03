@@ -38,15 +38,41 @@ class PalettedCache {
     }
 }
 
-function extractMaskFromBackground(background: Uint8ClampedArray, mask: Uint8ClampedArray): Uint8ClampedArray {
+const findBestAlphaColor = (data: Uint8ClampedArray): number => {
+    const colorUsed: Record<number, number> = {};
+    for (let i = 0; i < data.length; i++) {
+        const color = data[i];
+        colorUsed[color] = 1;
+    }
+    for (let i = 0; i < 256; i++) {
+        if (!colorUsed[i]) {
+            return i;
+        }
+    }
+    // fallback to 0
+    return 0;
+}
+
+type MaskExtractData = {
+    data: Uint8ClampedArray;
+    alphaColor: number;
+}
+
+function extractMaskFromBackground(background: Uint8ClampedArray, mask: Uint8ClampedArray): MaskExtractData {
     const maskData = Uint8ClampedArray.from(mask);
+    const alphaColor = findBestAlphaColor(background);
     for (let i = 0; i < mask.length; i++) {
         if (maskData[i] > 0) {
             maskData[i] = background[i];
+        } else {
+            maskData[i] = alphaColor;
         }
     }
 
-    return maskData;
+    return {
+        data: maskData,
+        alphaColor,
+    };
 }
 
 export class PalettedRenderer {
@@ -93,7 +119,9 @@ export class PalettedRenderer {
 
     registerMask (mask: Uint8ClampedArray): void {
         this.imageCache.purgeForKey(this.mask.key);
-        this.mask.data = extractMaskFromBackground(this.background.data, mask);
+        const extractData = extractMaskFromBackground(this.background.data, mask);
+        this.mask.data = extractData.data;
+        this.mask.alphaColor = extractData.alphaColor;
         const image = this.#renderPixels(this.mask.data, this.width, this.height, this.mask.alphaColor);
         this.imageCache.set(this.mask.key, image);
     }
@@ -121,7 +149,7 @@ export class PalettedRenderer {
             data[i * 4] = this.palette[colorIndex];
             data[i * 4 + 1] = this.palette[colorIndex + 1];
             data[i * 4 + 2] = this.palette[colorIndex + 2];
-            data[i * 4 + 3] = alphaColor === colorIndex ? 0 : 255;
+            data[i * 4 + 3] = alphaColor === pixels[i] ? 0 : 255;
         }
         return new ImageData(data, width, height);
     }
