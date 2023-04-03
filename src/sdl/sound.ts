@@ -15,6 +15,13 @@ const tracks: Mod[] = [];
 let currentTrack: MOD | null = null;
 const getCurrentTrack = () => tracks[currentTrack] ?? null;
 
+const SAFE_MIN_SAMPLE_RATE = 8000;
+const SAFE_MAX_SAMPLE_RATE = 96000;
+// MDN says that the AudioContext implementation should at least support PCM sample rates from 8000-96000Hz
+// FireFox throws an error for sample rates below 8000Hz
+// https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/AudioContext
+const limitToWebSafeSampleRate = (sampleRate: number) => Math.min(Math.max(sampleRate, SAFE_MIN_SAMPLE_RATE), SAFE_MAX_SAMPLE_RATE);
+
 export function dj_set_sfx_channel_volume (channel_num: number, volume: number) {
     if (!channels[channel_num]) {
         return;
@@ -31,7 +38,7 @@ export function dj_play_sfx(sfx_num: number, freq: number, volume: number, panni
         return;
     }
 
-    const sfx = new Smp({ src: sounds[sfx_num], bitDepth: '8', sampleRate: freq });
+    const sfx = new Smp({ src: sounds[sfx_num], bitDepth: '8', sampleRate: limitToWebSafeSampleRate(freq) });
     const settings = dj_get_sfx_settings(sfx_num);
     sfx.setLoop(settings.loop);
     sfx.setVolume(volume / MAX_VOLUME);
