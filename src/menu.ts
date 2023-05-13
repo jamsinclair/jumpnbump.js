@@ -535,7 +535,10 @@ export async function menu() {
 		return -1;
 	}
 
-	await run_in_frame_loop(menu_game_loop);
+	const result = await run_in_frame_loop(menu_game_loop);
+	if (result != -1) {
+		return result;
+	}
 	menu_deinit();
 	return 0;
 }

@@ -169,7 +169,7 @@ async function game_loop () {
 				mod_fade_direction = 0;
 			}
 
-			check_cheats('', () => {});
+			check_cheats();
 
 			if (is_net) {
 				if (is_server) {
@@ -493,9 +493,6 @@ async function menu_loop ()
 		}
 
 		await run_in_frame_loop(scores_loop);
-		if (ctx.state === 'stopped') {
-			return 0;
-		}
 
 		fillpalette(0, 0, 0);
 		draw_final_scores();
