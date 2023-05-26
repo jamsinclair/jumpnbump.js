@@ -1,11 +1,11 @@
 import { PalettedRenderer } from "sdl/paletted-renderer";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "./constants";
-import { main } from "./main";
+import { MainOptions, main } from "./main";
 import ctx, { resetContext } from './context'
 
 export class Engine {
     canvas: HTMLCanvasElement;
-    datafile: ArrayBuffer;
+    options: MainOptions;
     renderer: PalettedRenderer;
 
     constructor(canvas: HTMLCanvasElement) {
@@ -14,14 +14,14 @@ export class Engine {
         canvas.height = SCREEN_HEIGHT;
     }
 
-    init (options: { datafile: ArrayBuffer }) {
-        this.datafile = options.datafile;
+    init (options: MainOptions) {
+        this.options = options;
         resetContext();
     }
 
     async run () {
         ctx.state = 'running';
-        return main(this.canvas, this.datafile);
+        return main(this.canvas, this.options);
     }
 
     togglePause () {

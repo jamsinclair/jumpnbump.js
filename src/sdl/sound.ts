@@ -6,6 +6,7 @@ import { Mod } from '@webtrack/mod';
 import audioWorkletUrl from '@webtrack/mod/dist/mod-processor.js?url';
 /* @ts-ignore - Special static import with Vite */
 import wasmUrl from '@webtrack/mod/dist/hxcmod_player.wasm?url';
+import context from '../context';
 
 type SoundConfig = { loop: boolean, default_freq: number };
 const soundSettings: SoundConfig[] = [];
@@ -13,6 +14,7 @@ const sounds: ArrayBuffer[] = [];
 const channels: Smp[][] = [];
 const tracks: Mod[] = [];
 let currentTrack: MOD | null = null;
+const main_info = context.info;
 const getCurrentTrack = () => tracks[currentTrack] ?? null;
 
 const SAFE_MIN_SAMPLE_RATE = 8000;
@@ -33,6 +35,10 @@ export function dj_set_sfx_channel_volume (channel_num: number, volume: number) 
 }
 
 export function dj_play_sfx(sfx_num: number, freq: number, volume: number, panning: number, delay: number, channel: number) {
+    if (main_info.music_no_sound || main_info.no_sound) {
+		return;
+    }
+
     if (!sounds[sfx_num]) {
         console.warn(`Sound ${sfx_num} not loaded`);
         return;

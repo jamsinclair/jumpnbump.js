@@ -1,7 +1,7 @@
 import { object_anims, player_anims } from './animation';
 import { cheats, check_cheats } from './cheats';
 import { BAN, JNB_MAX_PLAYERS, KEY, MOD, NUM, OBJ, OBJ_ANIM, SCREEN_HEIGHT, SCREEN_WIDTH, SFX, SFX_FREQ } from './constants';
-import { dj_deinit, dj_get_sfx_settings, dj_init, dj_load_mod, dj_load_sfx, dj_mix, dj_play_sfx, dj_ready_mod, dj_set_mod_volume, dj_set_nosound, dj_set_sfx_settings, dj_set_sfx_volume, dj_start_mod, dj_stop, dj_stop_mod, dj_stop_sfx_channel } from './sdl/sound';
+import { dj_deinit, dj_init, dj_load_mod, dj_load_sfx, dj_mix, dj_play_sfx, dj_ready_mod, dj_set_mod_volume, dj_set_nosound, dj_set_sfx_settings, dj_set_sfx_volume, dj_start_mod, dj_stop, dj_stop_mod, dj_stop_sfx_channel } from './sdl/sound';
 import { update_player_actions } from './sdl/input';
 import { addkey, intr_sysupdate, key_pressed } from './sdl/interrpt';
 import { GET_BAN_MAP_IN_WATER, GET_BAN_MAP_TILE, GET_BAN_MAP_XY, SET_BAN_MAP } from './level';
@@ -34,7 +34,7 @@ const flip = false;
 let client_player_num = -1;
 let server_said_bye = 0;
 
-const flies_enabled = true;
+let flies_enabled = true;
 
 function flip_pixels(pixels)
 {
@@ -505,9 +505,21 @@ async function menu_loop ()
 	}
 }
 
+export type MainOptions = {
+    dat: ArrayBuffer
+    nosound?: boolean
+    musicnosound?: boolean
+    nogore?: boolean
+    noflies?: boolean
+}
 
-export async function main(canvas: HTMLCanvasElement, datafile: ArrayBuffer): Promise<number> {
-	if (await init_program(canvas, datafile, pal) != 0) {
+export async function main(canvas: HTMLCanvasElement, options: MainOptions): Promise<number> {
+	main_info.no_gore = options.nogore || false;
+	main_info.no_sound = options.nosound || false;
+	main_info.music_no_sound = options.musicnosound || false;
+	flies_enabled = options.noflies ? false : true;
+
+	if (await init_program(canvas, options.dat, pal) != 0) {
 		deinit_program();
 		return;
 	}

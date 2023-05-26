@@ -7,6 +7,6 @@ globalThis.togglePause = () => {
 }
 
 fetch('./jumpbump.dat').then(res => res.arrayBuffer()).then(data => {
-    engine.init({ datafile: data });
+    engine.init({ dat: data });
     engine.run();
 });
