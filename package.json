@@ -14,7 +14,7 @@
   "license": "GPL-2.0-or-later",
   "devDependencies": {
     "typescript": "^4.7.4",
-    "vite": "^2.9.13"
+    "vite": "^4.3.9"
   },
   "dependencies": {
     "@webtrack/mod": "^0.3.1",
