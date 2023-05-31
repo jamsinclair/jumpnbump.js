@@ -25,9 +25,17 @@ function capture_sdl_event (type: Event_Type, event: KeyboardEvent) {
     });
 }
 
+const capture_sdl_event_keydown = (e: KeyboardEvent) => capture_sdl_event("keydown", e);
+const capture_sdl_event_keyup = (e: KeyboardEvent) => capture_sdl_event("keyup", e);
+
 export function init_controls_listener () {
-    window.addEventListener("keydown", (e) => capture_sdl_event("keydown", e));
-    window.addEventListener("keyup", (e) => capture_sdl_event("keyup", e));
+    window.addEventListener("keydown", capture_sdl_event_keydown);
+    window.addEventListener("keyup", capture_sdl_event_keyup);
+}
+
+export function deinit_controls_listener () {
+    window.addEventListener("keydown", capture_sdl_event_keydown);
+    window.addEventListener("keyup", capture_sdl_event_keyup);
 }
 
 export function poll_events() {

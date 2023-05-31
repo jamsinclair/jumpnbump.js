@@ -13,7 +13,7 @@ import { preread_datafile, read_gob, read_level, read_pcx } from './data';
 import { menu } from './menu';
 import ctx from './context';
 import { run_in_frame_loop } from './loop';
-import { init_controls_listener } from './sdl/events';
+import { deinit_controls_listener, init_controls_listener } from './sdl/events';
 import { Pob, register_gob, get_gob } from './assets';
 
 const main_info = ctx.info;
@@ -1622,4 +1622,5 @@ function init_program (canvas: HTMLCanvasElement, datafile:ArrayBuffer, pal: Uin
 function deinit_program () {
     dj_stop();
 	dj_deinit();
+	deinit_controls_listener();
 }
