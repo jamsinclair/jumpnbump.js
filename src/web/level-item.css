@@ -1,0 +1,33 @@
+.level-item {
+    background: none;
+    border: none;
+    padding: 1rem;
+    cursor: pointer;
+    outline: inherit;
+    color: #fff;
+    font-weight: 700;
+    transition: outline-width 200ms ease, outline-offset 200ms ease;
+    outline: 1px solid transparent;
+    border: 1px solid transparent;
+    outline-offset: -1px;
+}
+
+.level-item img {
+    display: block;
+    width: 200px;
+    height: 128px;
+    margin-bottom: 0.25rem;
+}
+
+.level-item:hover,
+.level-item:focus {
+    outline-color: #fff;
+    border-color: #fff;
+}
+
+.level-item.selected {
+    outline-color: #fff;
+    border-color: #fff;
+    outline-width: 6px;
+    outline-offset: -6px;
+}
