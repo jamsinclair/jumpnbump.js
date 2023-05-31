@@ -7,6 +7,7 @@ import './menu.css';
 
 function Header() {
     const parallaxLayerRef = useRef<HTMLDivElement>(null);
+    const parallaxIntensity = 8;
 
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
@@ -16,8 +17,8 @@ function Header() {
             const { clientX, clientY } = e;
             const { left, top, width, height } =
                 parallaxLayerRef.current.getBoundingClientRect();
-            const x = ((clientX - left) / width) * 8;
-            const y = ((clientY - top) / height) * 8;
+            const x = ((clientX - left) / width) * parallaxIntensity;
+            const y = ((clientY - top) / height) * parallaxIntensity;
             parallaxLayerRef.current.style.setProperty('--x', x.toString());
             parallaxLayerRef.current.style.setProperty('--y', y.toString());
         };

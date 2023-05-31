@@ -88,7 +88,7 @@
 }
 
 .menu-logo-parallax-layer {
-    background-image: url('logo/transparent-logo.png');
+    background-image: url('/logo/transparent-logo.png');
     background-attachment: center;
     background-position: center;
     background-repeat: no-repeat;
@@ -105,7 +105,7 @@
 
 .menu-logo-parallax-layer:before {
     content: '';
-    background-image: url('logo/clouds.jpeg');
+    background-image: url('/logo/clouds.jpeg');
     background-attachment: center;
     background-position: center;
     background-repeat: repeat;
@@ -117,6 +117,6 @@
     right: 0;
     bottom: 0;
     z-index: -1;
-    transform: translate(calc(var(--x, 1px) * 1px), calc(var(--y, 1px) * 1px))
+    transform: translate(calc(var(--x, -1) * 1px), calc(var(--y, 5) * 1px))
         translateZ(-1px) scale(2);
 }
