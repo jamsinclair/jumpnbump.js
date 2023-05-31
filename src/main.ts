@@ -1,5 +1,5 @@
 import { object_anims, player_anims } from './animation';
-import { cheats, check_cheats } from './cheats';
+import { cheats, check_cheats, reset_cheats } from './cheats';
 import { BAN, JNB_MAX_PLAYERS, KEY, MOD, NUM, OBJ, OBJ_ANIM, SCREEN_HEIGHT, SCREEN_WIDTH, SFX, SFX_FREQ } from './constants';
 import { dj_deinit, dj_init, dj_load_mod, dj_load_sfx, dj_mix, dj_play_sfx, dj_ready_mod, dj_set_mod_volume, dj_set_nosound, dj_set_sfx_settings, dj_set_sfx_volume, dj_start_mod, dj_stop, dj_stop_mod, dj_stop_sfx_channel } from './sdl/sound';
 import { update_player_actions } from './sdl/input';
@@ -1612,6 +1612,7 @@ function init_program (canvas: HTMLCanvasElement, datafile:ArrayBuffer, pal: Uin
 	// 	}
 	// }
 
+	reset_cheats();
 	init_controls_listener();
 
 	return 0;

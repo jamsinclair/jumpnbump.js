@@ -13,6 +13,14 @@ const clear = () => {
 	last_keys.fill(undefined);
 };
 
+export function reset_cheats () {
+	cheats.pogostick = false;
+	cheats.bunnies_in_space = false;
+	cheats.jetpack = false;
+	cheats.lord_of_the_flies = false;
+	cheats.blood_is_thicker_than_water = false;
+}
+
 export function check_cheats () {
 	const last_keys_str = last_keys.join("");
     if (last_keys_str.includes("kcitsogop")) {
