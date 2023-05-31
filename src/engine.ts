@@ -1,12 +1,16 @@
 import { PalettedRenderer } from "sdl/paletted-renderer";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "./constants";
-import { MainOptions, main } from "./main";
+import { main } from "./main";
+import type { MainOptions } from "./main";
 import ctx, { resetContext } from './context'
+
+export type OptionalGameOptions = Partial<MainOptions>;
 
 export class Engine {
     canvas: HTMLCanvasElement;
     options: MainOptions;
     renderer: PalettedRenderer;
+    _onExit: (exitCode: number) => void = () => {};
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
@@ -21,7 +25,7 @@ export class Engine {
 
     async run () {
         ctx.state = 'running';
-        return main(this.canvas, this.options);
+        return main(this.canvas, this.options).then((num) => this._onExit(num));
     }
 
     togglePause () {
@@ -43,5 +47,9 @@ export class Engine {
 
     getState () {
         return ctx.state;
+    }
+
+    onExit (callback: (exitCode: number) => void) {
+        this._onExit = callback;
     }
 }
