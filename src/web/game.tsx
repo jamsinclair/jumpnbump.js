@@ -40,7 +40,6 @@ export function Game({
         engine.init({ ...gameOptions, dat: datFile });
         engine.run();
         engine.onExit(() => {
-            console.log('exiting game');
             setEngine(null);
             setDatFile(null);
             onExit();

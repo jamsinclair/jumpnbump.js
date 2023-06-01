@@ -102,7 +102,11 @@ export function dj_stop () {
     if (track === null) {
         return;
     }
-    track.stop();
+    track.stop().catch((e: unknown) => {
+        if (e instanceof Error && e.message.includes('AudioNode.disconnect')) {
+            // Ignore this error, the node is already disconnected, nothing to do
+        }
+    });
 }
 
 export function dj_ready_mod (mod_type: MOD) {
