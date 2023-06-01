@@ -3,5 +3,3 @@ lib
 public
 node_modules
 package-lock.json
-src/*
-!src/web
