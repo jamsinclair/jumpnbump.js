@@ -83,7 +83,6 @@ export async function menu() {
 	dj_set_mod_volume(mod_vol);
 	dj_set_sfx_volume(64);
 	dj_start_mod();
-	dj_set_nosound(0);
 
 	setpalette(0, 256, menu_pal);
 	memset(fade_pal, 0, 48);

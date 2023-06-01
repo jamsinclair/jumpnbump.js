@@ -74,6 +74,10 @@ export function dj_set_nosound (enable: number) {
 }
 
 export function dj_start_mod () {
+    if (main_info.no_sound) {
+        return;
+    }
+
     const track = getCurrentTrack();
     if (track === null) {
         return;
@@ -106,6 +110,10 @@ export function dj_ready_mod (mod_type: MOD) {
 }
 
 export function dj_set_mod_volume (volume: number) {
+    if (main_info.no_sound) {
+        return;
+    }
+
     const track = getCurrentTrack();
     if (track === null) {
         return;
