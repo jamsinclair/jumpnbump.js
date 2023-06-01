@@ -37,9 +37,9 @@ const message = [
 	"Linux port by Chuck Mason.",
 	"SDL port by Florian Schulze.",
 	"SDL2 port by Come Chilliet.",
-	"Maintained by the Libre Games community.",
-	"Visit our homepage at:",
-	"libregames.gitlab.io/jumpnbump",
+	"JavaScript port by James Sinclair.",
+	"Visit the source code at:",
+	"github.com/jamsinclair/jumpnbumpjs",
 	"Jump 'n Bump is free software",
 	"licensed under GPL 2.0 or later.",
 	""];
