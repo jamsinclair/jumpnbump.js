@@ -21,24 +21,24 @@ export enum OBJ_ANIM {
 }
 
 export enum KEY {
-    PL1_LEFT = "ArrowLeft",
-    PL1_RIGHT = "ArrowRight",
-    PL1_JUMP = "ArrowUp",
-    PL2_LEFT = "KeyA",
-    PL2_RIGHT = "KeyD",
-    PL2_JUMP = "KeyW",
-    PL3_LEFT = "KeyJ",
-    PL3_RIGHT = "KeyL",
-    PL3_JUMP = "KeyI",
-    PL4_LEFT = "Numpad4",
-    PL4_RIGHT = "Numpad6",
-    PL4_JUMP = "Numpad8",
-    ESCAPE = "Escape",
-    ONE = "Digit1",
-    TWO = "Digit2",
-    THREE = "Digit3",
-    FOUR = "Digit4",
-    F10 = "F10",
+    PL1_LEFT = 'ArrowLeft',
+    PL1_RIGHT = 'ArrowRight',
+    PL1_JUMP = 'ArrowUp',
+    PL2_LEFT = 'KeyA',
+    PL2_RIGHT = 'KeyD',
+    PL2_JUMP = 'KeyW',
+    PL3_LEFT = 'KeyJ',
+    PL3_RIGHT = 'KeyL',
+    PL3_JUMP = 'KeyI',
+    PL4_LEFT = 'Numpad4',
+    PL4_RIGHT = 'Numpad6',
+    PL4_JUMP = 'Numpad8',
+    ESCAPE = 'Escape',
+    ONE = 'Digit1',
+    TWO = 'Digit2',
+    THREE = 'Digit3',
+    FOUR = 'Digit4',
+    F10 = 'F10',
 }
 
 export enum MOVEMENT {
@@ -71,13 +71,13 @@ export enum BAN {
     WATER = 2,
     ICE = 3,
     SPRING = 4,
-};
+}
 
 export enum MOD {
     MENU = 0,
     GAME = 1,
     SCORES = 2,
-};
+}
 
 export const SCREEN_WIDTH = 400;
 export const SCREEN_HEIGHT = 256;
@@ -85,7 +85,7 @@ export const PALETTE_256_SIZE = 768;
 
 export const JNB_MAX_PLAYERS = 4;
 export const JNB_END_SCORE = 100;
-export const JNB_VERSION = "2.0-dev";
+export const JNB_VERSION = '2.0-dev';
 
 export const NUM_POBS = 200;
 export const NUM_OBJECTS = 200;
@@ -99,4 +99,4 @@ export enum NUM {
     OBJECTS = 200,
     FLIES = 20,
     LEFTOVERS = 50,
-};
+}

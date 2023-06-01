@@ -15,8 +15,7 @@ function Header() {
                 return;
             }
             const { clientX, clientY } = e;
-            const { left, top, width, height } =
-                parallaxLayerRef.current.getBoundingClientRect();
+            const { left, top, width, height } = parallaxLayerRef.current.getBoundingClientRect();
             const x = ((clientX - left) / width) * parallaxIntensity;
             const y = ((clientY - top) / height) * parallaxIntensity;
             parallaxLayerRef.current.style.setProperty('--x', x.toString());
@@ -33,10 +32,7 @@ function Header() {
     return (
         <header className="menu-header">
             <div className="menu-logo-container">
-                <div
-                    ref={parallaxLayerRef}
-                    className="menu-logo-parallax-layer"
-                >
+                <div ref={parallaxLayerRef} className="menu-logo-parallax-layer">
                     <h1>Jump 'n Bump</h1>
                 </div>
             </div>
@@ -47,10 +43,7 @@ function Header() {
 function LevelPreview({ level }: { level: string }) {
     return (
         <div className="menu-level-preview">
-            <img
-                src={`/levels/${level}.jpg`}
-                alt={`Preview of the level ${level}`}
-            />
+            <img src={`/levels/${level}.jpg`} alt={`Preview of the level ${level}`} />
             <p>Level: {getLevelName(level)}</p>
         </div>
     );
@@ -75,12 +68,7 @@ function GameOptions({
         <ul className="menu-game-options">
             <li>
                 <label>
-                    <input
-                        type="checkbox"
-                        name="noflies"
-                        onChange={onChange}
-                        checked={gameOptions['noflies']}
-                    />
+                    <input type="checkbox" name="noflies" onChange={onChange} checked={gameOptions['noflies']} />
                     <span>No Flies</span>
                 </label>
             </li>
@@ -97,12 +85,7 @@ function GameOptions({
             </li>
             <li>
                 <label>
-                    <input
-                        type="checkbox"
-                        name="nosound"
-                        onChange={onChange}
-                        checked={gameOptions['nosound']}
-                    />
+                    <input type="checkbox" name="nosound" onChange={onChange} checked={gameOptions['nosound']} />
                     <span>No Music and Sound Effects</span>
                 </label>
             </li>
@@ -128,13 +111,7 @@ export function Menu() {
     });
 
     if (isGameRunning) {
-        return (
-            <Game
-                level={selectedLevel}
-                gameOptions={gameOptions}
-                onExit={() => setIsGameRunning(false)}
-            />
-        );
+        return <Game level={selectedLevel} gameOptions={gameOptions} onExit={() => setIsGameRunning(false)} />;
     }
 
     const onSetSelectedLevel = (name: string) => {
@@ -166,18 +143,12 @@ export function Menu() {
                 <LevelPreview level={selectedLevel} />
                 <ul>
                     <li>
-                        <button
-                            className="menu-button"
-                            onClick={() => setIsGameRunning(true)}
-                        >
+                        <button className="menu-button" onClick={() => setIsGameRunning(true)}>
                             Start Game
                         </button>
                     </li>
                     <li>
-                        <button
-                            className="menu-button"
-                            onClick={() => setShowLevelSelector(true)}
-                        >
+                        <button className="menu-button" onClick={() => setShowLevelSelector(true)}>
                             Change Level
                         </button>
                     </li>
@@ -197,10 +168,7 @@ export function Menu() {
                         </label>
                     </li>
                 </ul>
-                <GameOptions
-                    gameOptions={gameOptions}
-                    setGameOptions={setGameOptions}
-                />
+                <GameOptions gameOptions={gameOptions} setGameOptions={setGameOptions} />
             </main>
             {showLevelSelector ? (
                 <LevelSelector

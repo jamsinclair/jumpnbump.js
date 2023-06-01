@@ -1,11 +1,4 @@
-export const RECOMMENDED_LEVELS = [
-    'acidb',
-    'industri',
-    'jumpbump',
-    'multi',
-    'stilts',
-    'terra',
-];
+export const RECOMMENDED_LEVELS = ['acidb', 'industri', 'jumpbump', 'multi', 'stilts', 'terra'];
 
 export const LEVELS = [
     '2vs2',

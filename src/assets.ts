@@ -22,8 +22,8 @@ const gobs = new Map<GobName, Gob>();
 
 export const register_gob = (gob: Gob) => {
     gobs.set(gob.name, gob);
-}
+};
 
 export const get_gob = (name: GobName) => {
     return gobs.get(name);
-}
+};

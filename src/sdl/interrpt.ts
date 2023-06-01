@@ -1,5 +1,5 @@
-import { KEY } from "../constants";
-import { poll_events } from "./events";
+import { KEY } from '../constants';
+import { poll_events } from './events';
 
 let lastTick = 0;
 const TICK_LENGTH = 1000 / 60;
@@ -8,23 +8,23 @@ const keyb: Record<string, boolean> = {};
 
 export const last_keys: string[] = new Array(50);
 
-function add_last_key (key: string) {
+function add_last_key(key: string) {
     for (let i = 49; i > 0; i--) {
         last_keys[i] = last_keys[i - 1];
     }
     last_keys[0] = key;
 }
 
-function getTicks () {
+function getTicks() {
     return performance.now();
-};
-
-export function key_pressed(key: string) {
-	return keyb[key];
 }
 
-export function addkey (key: string, pressed: boolean = false) {
-    return keyb[key] = pressed;
+export function key_pressed(key: string) {
+    return keyb[key];
+}
+
+export function addkey(key: string, pressed: boolean = false) {
+    return (keyb[key] = pressed);
 }
 
 export function intr_sysupdate(): number {
@@ -34,8 +34,8 @@ export function intr_sysupdate(): number {
 
     for (const event of poll_events()) {
         switch (event.type) {
-            case "keydown":
-            case "keyup":
+            case 'keydown':
+            case 'keyup':
                 if (event.repeat) {
                     continue;
                 }
@@ -88,8 +88,8 @@ export function intr_sysupdate(): number {
         const timeSinceTick = now - lastTick;
         numOfTicks = Math.floor(timeSinceTick / TICK_LENGTH);
 
-        lastTick = lastTick + (numOfTicks * TICK_LENGTH);
+        lastTick = lastTick + numOfTicks * TICK_LENGTH;
     }
 
-	return numOfTicks;
+    return numOfTicks;
 }

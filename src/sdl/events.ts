@@ -1,16 +1,16 @@
-type Event_Type = "keydown" | "keyup";
+type Event_Type = 'keydown' | 'keyup';
 
 type Event = {
-    type: Event_Type,
-    repeat: boolean,
-    scancode: string,
-    key: string,
-}
+    type: Event_Type;
+    repeat: boolean;
+    scancode: string;
+    key: string;
+};
 let captured_events: Event[] = [];
 
 globalThis.ce = captured_events;
 
-function capture_sdl_event (type: Event_Type, event: KeyboardEvent) {
+function capture_sdl_event(type: Event_Type, event: KeyboardEvent) {
     if (event.metaKey || event.ctrlKey || event.altKey) {
         // Ignore key events with modifiers
         return;
@@ -25,17 +25,17 @@ function capture_sdl_event (type: Event_Type, event: KeyboardEvent) {
     });
 }
 
-const capture_sdl_event_keydown = (e: KeyboardEvent) => capture_sdl_event("keydown", e);
-const capture_sdl_event_keyup = (e: KeyboardEvent) => capture_sdl_event("keyup", e);
+const capture_sdl_event_keydown = (e: KeyboardEvent) => capture_sdl_event('keydown', e);
+const capture_sdl_event_keyup = (e: KeyboardEvent) => capture_sdl_event('keyup', e);
 
-export function init_controls_listener () {
-    window.addEventListener("keydown", capture_sdl_event_keydown);
-    window.addEventListener("keyup", capture_sdl_event_keyup);
+export function init_controls_listener() {
+    window.addEventListener('keydown', capture_sdl_event_keydown);
+    window.addEventListener('keyup', capture_sdl_event_keyup);
 }
 
-export function deinit_controls_listener () {
-    window.addEventListener("keydown", capture_sdl_event_keydown);
-    window.addEventListener("keyup", capture_sdl_event_keyup);
+export function deinit_controls_listener() {
+    window.addEventListener('keydown', capture_sdl_event_keydown);
+    window.addEventListener('keyup', capture_sdl_event_keyup);
 }
 
 export function poll_events() {

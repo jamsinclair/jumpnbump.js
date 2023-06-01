@@ -1,4 +1,4 @@
-export function memset (array, value, size) {
+export function memset(array, value, size) {
     for (let i = 0; i < size; i++) {
         array[i] = value;
     }
@@ -10,7 +10,7 @@ export function rnd(max_value) {
 
 export function assert(assertion) {
     if (!assertion) {
-        throw new Error("Assertion failed");
+        throw new Error('Assertion failed');
     }
 }
 

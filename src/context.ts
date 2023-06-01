@@ -1,5 +1,5 @@
-import { Pob } from "./assets";
-import { JNB_MAX_PLAYERS, NUM } from "./constants";
+import { Pob } from './assets';
+import { JNB_MAX_PLAYERS, NUM } from './constants';
 
 class PageInfo {
     num_pobs: number;
@@ -56,8 +56,7 @@ class GameObject {
     frame: number;
     ticks: number;
     image: number;
-};
-
+}
 
 type GameContext = {
     state: 'initial' | 'running' | 'paused' | 'stopped';
@@ -75,13 +74,13 @@ type GameContext = {
             pobs: Pob[];
         };
         pob_backbuf: number[];
-    },
+    };
     player: Player[];
     ai: (0 | 1)[];
     objects: GameObject[];
-}
+};
 
-const fillArray = <Value>(array: Value[], getValue: () => Value ) => {
+const fillArray = <Value>(array: Value[], getValue: () => Value) => {
     for (let i = 0; i < array.length; i++) {
         array[i] = getValue();
     }
@@ -96,15 +95,15 @@ const getDefaultContext: () => GameContext = () => ({
         no_sound: false,
         music_no_sound: false,
         no_gore: false,
-        error_str: "",
+        error_str: '',
         draw_page: 0,
         view_page: 0,
-        page_info: {num_pobs: 0, pobs: []},
+        page_info: { num_pobs: 0, pobs: [] },
         pob_backbuf: [],
     },
     player: fillArray(new Array(JNB_MAX_PLAYERS), () => new Player()),
     ai: new Array(JNB_MAX_PLAYERS),
-    objects: fillArray(new Array(NUM.OBJECTS), () => new GameObject())
+    objects: fillArray(new Array(NUM.OBJECTS), () => new GameObject()),
 });
 
 const context = getDefaultContext();
@@ -116,6 +115,6 @@ export const resetContext = () => {
     context.player = newContext.player;
     context.ai = newContext.ai;
     context.objects = newContext.objects;
-}
+};
 
 export default context;

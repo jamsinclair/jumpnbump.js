@@ -2,7 +2,7 @@ import ctx from './context';
 
 const PAUSED_POLL_MS = 500;
 
-export function run_in_frame_loop (updateFn: () => Promise<number>) {
+export function run_in_frame_loop(updateFn: () => Promise<number>) {
     return new Promise((resolve) => {
         let loop = async () => {
             if (ctx.state === 'paused') {
@@ -21,7 +21,7 @@ export function run_in_frame_loop (updateFn: () => Promise<number>) {
             } else {
                 requestAnimationFrame(loop);
             }
-        }
+        };
 
         loop();
     });

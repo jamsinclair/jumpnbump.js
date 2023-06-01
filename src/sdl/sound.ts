@@ -1,5 +1,5 @@
-import { read_data } from "../data";
-import { MAX_VOLUME, MOD, SFX } from "../constants";
+import { read_data } from '../data';
+import { MAX_VOLUME, MOD, SFX } from '../constants';
 import { Smp } from '@webtrack/smp';
 import { Mod } from '@webtrack/mod';
 /* @ts-ignore - Special static import with Vite */
@@ -8,7 +8,7 @@ import audioWorkletUrl from '@webtrack/mod/dist/mod-processor.js?url';
 import wasmUrl from '@webtrack/mod/dist/hxcmod_player.wasm?url';
 import context from '../context';
 
-type SoundConfig = { loop: boolean, default_freq: number };
+type SoundConfig = { loop: boolean; default_freq: number };
 const soundSettings: SoundConfig[] = [];
 const sounds: ArrayBuffer[] = [];
 const channels: Smp[][] = [];
@@ -22,9 +22,10 @@ const SAFE_MAX_SAMPLE_RATE = 96000;
 // MDN says that the AudioContext implementation should at least support PCM sample rates from 8000-96000Hz
 // FireFox throws an error for sample rates below 8000Hz
 // https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/AudioContext
-const limitToWebSafeSampleRate = (sampleRate: number) => Math.min(Math.max(sampleRate, SAFE_MIN_SAMPLE_RATE), SAFE_MAX_SAMPLE_RATE);
+const limitToWebSafeSampleRate = (sampleRate: number) =>
+    Math.min(Math.max(sampleRate, SAFE_MIN_SAMPLE_RATE), SAFE_MAX_SAMPLE_RATE);
 
-export function dj_set_sfx_channel_volume (channel_num: number, volume: number) {
+export function dj_set_sfx_channel_volume(channel_num: number, volume: number) {
     if (!channels[channel_num]) {
         return;
     }
@@ -34,9 +35,16 @@ export function dj_set_sfx_channel_volume (channel_num: number, volume: number) 
     }
 }
 
-export function dj_play_sfx(sfx_num: number, freq: number, volume: number, panning: number, delay: number, channel: number) {
+export function dj_play_sfx(
+    sfx_num: number,
+    freq: number,
+    volume: number,
+    panning: number,
+    delay: number,
+    channel: number
+) {
     if (main_info.music_no_sound || main_info.no_sound) {
-		return;
+        return;
     }
 
     if (!sounds[sfx_num]) {
@@ -58,22 +66,24 @@ export function dj_play_sfx(sfx_num: number, freq: number, volume: number, panni
     return;
 }
 
-export function dj_get_sfx_settings (sfx_num: number) {
-    return soundSettings[sfx_num] || {
-        loop: false,
-        default_freq: 11025
-    };
+export function dj_get_sfx_settings(sfx_num: number) {
+    return (
+        soundSettings[sfx_num] || {
+            loop: false,
+            default_freq: 11025,
+        }
+    );
 }
 
-export function dj_set_sfx_settings (sfx_num: number, settings: SoundConfig) {
+export function dj_set_sfx_settings(sfx_num: number, settings: SoundConfig) {
     soundSettings[sfx_num] = settings;
 }
 
-export function dj_set_nosound (enable: number) {
+export function dj_set_nosound(enable: number) {
     return;
 }
 
-export function dj_start_mod () {
+export function dj_start_mod() {
     if (main_info.no_sound) {
         return;
     }
@@ -85,19 +95,15 @@ export function dj_start_mod () {
     track.play();
 }
 
-export function dj_stop_mod () {
+export function dj_stop_mod() {
     return;
 }
 
-export function dj_init () {
-    
-}
+export function dj_init() {}
 
-export function dj_deinit () {
-    
-}
+export function dj_deinit() {}
 
-export function dj_stop () {
+export function dj_stop() {
     const track = getCurrentTrack();
     if (track === null) {
         return;
@@ -109,11 +115,11 @@ export function dj_stop () {
     });
 }
 
-export function dj_ready_mod (mod_type: MOD) {
+export function dj_ready_mod(mod_type: MOD) {
     currentTrack = mod_type;
 }
 
-export function dj_set_mod_volume (volume: number) {
+export function dj_set_mod_volume(volume: number) {
     if (main_info.no_sound) {
         return;
     }
@@ -125,15 +131,11 @@ export function dj_set_mod_volume (volume: number) {
     track.setVolume(volume / MAX_VOLUME);
 }
 
-export function dj_set_sfx_volume (volume: number) {
+export function dj_set_sfx_volume(volume: number) {}
 
-}
+export function dj_mix() {}
 
-export function dj_mix () {
-
-}
-
-export function dj_stop_sfx_channel (channel_num: number) {
+export function dj_stop_sfx_channel(channel_num: number) {
     if (!channels[channel_num]) {
         return;
     }
@@ -143,17 +145,17 @@ export function dj_stop_sfx_channel (channel_num: number) {
     }
 }
 
-export function dj_load_sfx (filename: string, sfx_num: SFX) {
+export function dj_load_sfx(filename: string, sfx_num: SFX) {
     const src = read_data(filename);
     const dest = new Uint8Array(src.byteLength / 2);
     for (let i = 0; i < dest.byteLength; i++) {
-        const temp = src[i * 2] + (src[(i * 2) + 1] << 8);
+        const temp = src[i * 2] + (src[i * 2 + 1] << 8);
         dest[i] = temp;
     }
     sounds[sfx_num] = dest.buffer;
 }
 
-export function dj_load_mod (filename: string, mod_num: MOD) {
+export function dj_load_mod(filename: string, mod_num: MOD) {
     const src = read_data(filename);
     const mod = new Mod({ src, audioWorkletUrl, wasmUrl });
     tracks[mod_num] = mod;
@@ -168,7 +170,8 @@ function handleUserGesture(event: Event) {
 
 function handleKeyboardUserGesture(event: KeyboardEvent) {
     dj_start_mod();
-    const isArrowKeys = event.key === 'ArrowUp' || event.key === 'ArrowDown' || event.key === 'ArrowLeft' || event.key === 'ArrowRight';
+    const isArrowKeys =
+        event.key === 'ArrowUp' || event.key === 'ArrowDown' || event.key === 'ArrowLeft' || event.key === 'ArrowRight';
 
     // Ignore arrow keys, as they are not considered user gestures in Firefox
     if (!isArrowKeys && event.isTrusted) {

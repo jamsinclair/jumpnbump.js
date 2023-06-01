@@ -14,10 +14,7 @@ export function LevelItem({
 }) {
     const selectedClass = selected ? ' selected' : '';
     return (
-        <button
-            className={`level-item${selectedClass}`}
-            onClick={() => onSelection(name)}
-        >
+        <button className={`level-item${selectedClass}`} onClick={() => onSelection(name)}>
             <img src={imageSrc} alt={name} loading="lazy" />
             {name}
         </button>

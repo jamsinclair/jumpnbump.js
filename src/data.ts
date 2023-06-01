@@ -1,6 +1,6 @@
-import { toShort } from "./c";
-import { BAN } from "./constants";
-import { Gob, GobName } from "./assets";
+import { toShort } from './c';
+import { BAN } from './constants';
+import { Gob, GobName } from './assets';
 
 let datafile_buffer;
 let datafile_index;
@@ -12,10 +12,10 @@ const PALETTE_256_SIZE = 768;
 type FileRef = {
     offset: number;
     len: number;
-}
+};
 
 const flip = false;
- 
+
 function read_dat_index(): Record<string, FileRef> {
     const dat_index = {};
 
@@ -24,7 +24,9 @@ function read_dat_index(): Record<string, FileRef> {
     ptr += 4;
 
     for (var file_number = 0; file_number < num_files_contained; file_number++) {
-        const file_name = String.fromCharCode.apply(null, datafile_buffer.subarray(ptr, ptr + 12)).replace(/[^\x20-\xFF]/g, '');
+        const file_name = String.fromCharCode
+            .apply(null, datafile_buffer.subarray(ptr, ptr + 12))
+            .replace(/[^\x20-\xFF]/g, '');
         ptr += 12;
         const file_offset = read_four_byte_int(ptr);
         ptr += 4;
@@ -40,13 +42,15 @@ function read_dat_index(): Record<string, FileRef> {
 }
 
 function read_four_byte_int(ptr: number): number {
-    return ((datafile_buffer[ptr + 0] << 0) +
-                (datafile_buffer[ptr + 1] << 8) +
-                (datafile_buffer[ptr + 2] << 16) +
-                (datafile_buffer[ptr + 3] << 24));
+    return (
+        (datafile_buffer[ptr + 0] << 0) +
+        (datafile_buffer[ptr + 1] << 8) +
+        (datafile_buffer[ptr + 2] << 16) +
+        (datafile_buffer[ptr + 3] << 24)
+    );
 }
 
-export function preread_datafile (file: ArrayBuffer) {
+export function preread_datafile(file: ArrayBuffer) {
     datafile_buffer = new Uint8Array(file);
     datafile_index = read_dat_index();
 }
@@ -54,7 +58,7 @@ export function preread_datafile (file: ArrayBuffer) {
 export function dat_open(requested_file_name: string): number {
     const offset = datafile_index[requested_file_name.toUpperCase()].offset;
     if (offset == null) {
-        throw "Could not find index for " + requested_file_name;
+        throw 'Could not find index for ' + requested_file_name;
     }
     return offset;
 }
@@ -62,7 +66,7 @@ export function dat_open(requested_file_name: string): number {
 export function dat_filelen(requested_file_name: string): number {
     const file_len = datafile_index[requested_file_name.toUpperCase()].len;
     if (file_len == null) {
-        throw "Could not find file length for " + requested_file_name;
+        throw 'Could not find file length for ' + requested_file_name;
     }
     return file_len;
 }
@@ -78,8 +82,7 @@ export function read_pcx(filename, pal) {
         if ((a & 0xc0) == 0xc0) {
             var b = datafile_buffer[handle++];
             a &= 0x3f;
-            for (var c1 = 0; c1 < a && ofs < buf_len; c1++)
-                colormap[ofs++] = b;
+            for (var c1 = 0; c1 < a && ofs < buf_len; c1++) colormap[ofs++] = b;
         } else {
             colormap[ofs++] = a;
         }
@@ -107,18 +110,22 @@ export function read_gob(filename: string): Gob {
 
     const gob = new Gob();
     gob.name = filename.replace('.gob', '') as GobName;
-    gob.num_images = (gob_data[0]) + (gob_data[1] << 8);
+    gob.num_images = gob_data[0] + (gob_data[1] << 8);
 
     for (let i = 0; i < gob.num_images; i++) {
-        let offset = (gob_data[i * 4 + 2]) + (gob_data[i * 4 + 3] << 8) + (gob_data[i * 4 + 4] << 16) + (gob_data[i * 4 + 5] << 24);
+        let offset =
+            gob_data[i * 4 + 2] +
+            (gob_data[i * 4 + 3] << 8) +
+            (gob_data[i * 4 + 4] << 16) +
+            (gob_data[i * 4 + 5] << 24);
 
-        gob.width[i] = toShort((gob_data[offset]) + (gob_data[offset + 1] << 8));
+        gob.width[i] = toShort(gob_data[offset] + (gob_data[offset + 1] << 8));
         offset += 2;
-        gob.height[i] = toShort((gob_data[offset]) + (gob_data[offset + 1] << 8));
+        gob.height[i] = toShort(gob_data[offset] + (gob_data[offset + 1] << 8));
         offset += 2;
-        gob.hs_x[i] = toShort((gob_data[offset]) + (gob_data[offset + 1] << 8));
+        gob.hs_x[i] = toShort(gob_data[offset] + (gob_data[offset + 1] << 8));
         offset += 2;
-        gob.hs_y[i] = toShort((gob_data[offset]) + (gob_data[offset + 1] << 8));
+        gob.hs_y[i] = toShort(gob_data[offset] + (gob_data[offset + 1] << 8));
         offset += 2;
 
         let image_size = gob.width[i] * gob.height[i];
@@ -130,35 +137,31 @@ export function read_gob(filename: string): Gob {
 }
 
 export function read_level() {
-	let handle = dat_open("levelmap.txt");
-    let fileEndIndex = dat_filelen("levelmap.txt") + handle;
+    let handle = dat_open('levelmap.txt');
+    let fileEndIndex = dat_filelen('levelmap.txt') + handle;
     const new_map: number[][] = new Array(17);
 
-	for (let c1 = 0; c1 < 16; c1++) {
+    for (let c1 = 0; c1 < 16; c1++) {
         for (let c2 = 0; c2 < 22; c2++) {
             let chr: number = 1;
             if (!new_map[c1]) {
                 new_map[c1] = new Array(22);
             }
 
-			while (handle < fileEndIndex) {
-				chr = datafile_buffer[handle++] - ("0".charCodeAt(0));
-				if (chr >= 0 && chr <= 4)
-					break;
-			}
+            while (handle < fileEndIndex) {
+                chr = datafile_buffer[handle++] - '0'.charCodeAt(0);
+                if (chr >= 0 && chr <= 4) break;
+            }
 
-			if (flip)
-				new_map[c1][21 - c2] = chr;
-			else
-				new_map[c1][c2] = chr;
-		}
-	}
-
-	for (let c2 = 0; c2 < 22; c2++) {
-        if (!new_map[16])
-            new_map[16] = [];
-		new_map[16][c2] = BAN.SOLID;
+            if (flip) new_map[c1][21 - c2] = chr;
+            else new_map[c1][c2] = chr;
+        }
     }
 
-	return new_map;
+    for (let c2 = 0; c2 < 22; c2++) {
+        if (!new_map[16]) new_map[16] = [];
+        new_map[16][c2] = BAN.SOLID;
+    }
+
+    return new_map;
 }

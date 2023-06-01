@@ -6,15 +6,15 @@ type Sprite = {
     height: number;
     data: Uint8ClampedArray;
     alphaColor?: number;
-}
+};
 
 type PositionedSprite = Sprite & {
-    x: number,
-    y: number,
-}
+    x: number;
+    y: number;
+};
 
 class PalettedCache {
-    cache: Record<string, Record<string, ImageData>> = {}; 
+    cache: Record<string, Record<string, ImageData>> = {};
     paletteKey: string = '';
 
     updatePaletteKey(key: string) {
@@ -51,12 +51,12 @@ const findBestAlphaColor = (data: Uint8ClampedArray): number => {
     }
     // fallback to 0
     return 0;
-}
+};
 
 type MaskExtractData = {
     data: Uint8ClampedArray;
     alphaColor: number;
-}
+};
 
 function extractMaskFromBackground(background: Uint8ClampedArray, mask: Uint8ClampedArray): MaskExtractData {
     const maskData = Uint8ClampedArray.from(mask);
@@ -76,7 +76,7 @@ function extractMaskFromBackground(background: Uint8ClampedArray, mask: Uint8Cla
 }
 
 export class PalettedRenderer {
-    imageCache: PalettedCache = new PalettedCache(); 
+    imageCache: PalettedCache = new PalettedCache();
     width: number;
     height: number;
     background: Sprite;
@@ -93,31 +93,31 @@ export class PalettedRenderer {
             key: 'background',
             data: new Uint8ClampedArray(width * height * 3),
             width: this.width,
-            height: this.height
+            height: this.height,
         };
         this.mask = {
             key: 'mask',
             data: new Uint8ClampedArray(width * height * 3),
             width: this.width,
             height: this.height,
-            alphaColor: 0
+            alphaColor: 0,
         };
         globalThis.renderer = this;
     }
 
-    setPalette (palette: Uint8ClampedArray): void {
+    setPalette(palette: Uint8ClampedArray): void {
         this.palette = palette;
         this.imageCache.updatePaletteKey(crc32(palette as any).toString(16));
     }
 
-    registerBackground (background: Uint8ClampedArray): void {
-        this.imageCache.purgeForKey( this.background.key);
-        this.background.data = background
+    registerBackground(background: Uint8ClampedArray): void {
+        this.imageCache.purgeForKey(this.background.key);
+        this.background.data = background;
         const image = this.#renderPixels(background, this.width, this.height);
         this.imageCache.set(this.background.key, image);
     }
 
-    registerMask (mask: Uint8ClampedArray): void {
+    registerMask(mask: Uint8ClampedArray): void {
         this.imageCache.purgeForKey(this.mask.key);
         const extractData = extractMaskFromBackground(this.background.data, mask);
         this.mask.data = extractData.data;
@@ -126,7 +126,7 @@ export class PalettedRenderer {
         this.imageCache.set(this.mask.key, image);
     }
 
-    getImage ({key, data, width, height, alphaColor }: Sprite): ImageData {
+    getImage({ key, data, width, height, alphaColor }: Sprite): ImageData {
         const cached = this.imageCache.get(key);
         if (cached) {
             return cached;
@@ -136,13 +136,13 @@ export class PalettedRenderer {
         return rendered;
     }
 
-    putObject (x: number, y: number, sprite: Sprite): void {
+    putObject(x: number, y: number, sprite: Sprite): void {
         this.currentObjects.push({ x, y, ...sprite });
         const rendered = this.getImage(sprite);
         this.imageCache.set(sprite.key, rendered);
     }
 
-    #renderPixels (pixels: Uint8ClampedArray, width: number, height: number, alphaColor?: number): ImageData {
+    #renderPixels(pixels: Uint8ClampedArray, width: number, height: number, alphaColor?: number): ImageData {
         const data = new Uint8ClampedArray(width * height * 4);
         for (let i = 0; i < pixels.length; i++) {
             const colorIndex = pixels[i] * 3;
@@ -154,20 +154,17 @@ export class PalettedRenderer {
         return new ImageData(data, width, height);
     }
 
-    render (): ImageData {
+    render(): ImageData {
         const background = this.getImage(this.background);
         const currentFrame = Uint8ClampedArray.from(background.data);
-        const spritesToRender = [
-            ...this.currentObjects,
-            { x: 0, y: 0, ...this.mask }
-        ];
+        const spritesToRender = [...this.currentObjects, { x: 0, y: 0, ...this.mask }];
         for (let object of spritesToRender) {
             const image = this.getImage(object);
             const { x, y, width } = object;
             for (let i = 0; i < image.data.length; i += 4) {
                 const xIndex = (i / 4) % width;
-                const yIndex = Math.floor((i / 4) / width);
-                const xPos = x + xIndex % width;
+                const yIndex = Math.floor(i / 4 / width);
+                const xPos = x + (xIndex % width);
                 const yPos = y + yIndex;
                 if (xPos < 0 || xPos >= this.width || yPos < 0 || yPos >= this.height) {
                     continue;

@@ -1,8 +1,8 @@
-import { PalettedRenderer } from "sdl/paletted-renderer";
-import { SCREEN_HEIGHT, SCREEN_WIDTH } from "./constants";
-import { main } from "./main";
-import type { MainOptions } from "./main";
-import ctx, { resetContext } from './context'
+import { PalettedRenderer } from 'sdl/paletted-renderer';
+import { SCREEN_HEIGHT, SCREEN_WIDTH } from './constants';
+import { main } from './main';
+import type { MainOptions } from './main';
+import ctx, { resetContext } from './context';
 
 export type OptionalGameOptions = Partial<MainOptions>;
 
@@ -18,38 +18,38 @@ export class Engine {
         canvas.height = SCREEN_HEIGHT;
     }
 
-    init (options: MainOptions) {
+    init(options: MainOptions) {
         this.options = options;
         resetContext();
     }
 
-    async run () {
+    async run() {
         ctx.state = 'running';
         return main(this.canvas, this.options).then((num) => this._onExit(num));
     }
 
-    togglePause () {
+    togglePause() {
         const isPaused = ctx.state === 'paused';
         ctx.state = isPaused ? 'running' : 'paused';
     }
 
-    resume () {
+    resume() {
         ctx.state = 'running';
     }
 
-    pause () {
+    pause() {
         ctx.state = 'paused';
     }
 
-    stop () {
+    stop() {
         ctx.state = 'stopped';
     }
 
-    getState () {
+    getState() {
         return ctx.state;
     }
 
-    onExit (callback: (exitCode: number) => void) {
+    onExit(callback: (exitCode: number) => void) {
         this._onExit = callback;
     }
 }
