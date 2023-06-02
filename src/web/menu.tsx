@@ -4,6 +4,7 @@ import type { OptionalGameOptions } from '../engine';
 import { Game } from './game';
 
 import './menu.css';
+import { GameInfoOverlay } from './game-info-overlay';
 
 function Header() {
     const parallaxLayerRef = useRef<HTMLDivElement>(null);
@@ -111,7 +112,12 @@ export function Menu() {
     });
 
     if (isGameRunning) {
-        return <Game level={selectedLevel} gameOptions={gameOptions} onExit={() => setIsGameRunning(false)} />;
+        return (
+            <>
+                <GameInfoOverlay />
+                <Game level={selectedLevel} gameOptions={gameOptions} onExit={() => setIsGameRunning(false)} />
+            </>
+        );
     }
 
     const onSetSelectedLevel = (name: string) => {
@@ -177,6 +183,7 @@ export function Menu() {
                     close={() => setShowLevelSelector(false)}
                 />
             ) : null}
+            <GameInfoOverlay />
         </>
     );
 }
