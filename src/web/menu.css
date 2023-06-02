@@ -119,3 +119,9 @@
     z-index: -1;
     transform: translate(calc(var(--x, -1) * 1px), calc(var(--y, 5) * 1px)) translateZ(-1px) scale(2);
 }
+
+.menu-footer {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 12px;
+}

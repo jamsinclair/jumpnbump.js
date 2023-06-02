@@ -183,6 +183,15 @@ export function Menu() {
                     </li>
                 </ul>
                 <GameOptions gameOptions={gameOptions} setGameOptions={setGameOptions} />
+                <footer className="menu-footer">
+                    <p>
+                        Jump 'n Bump is a game by Brainchild Design.
+                    </p>
+                    <p>
+                        The source code for this version of Jump 'n Bump is available on{' '}
+                        <a href="https://github.com/jamsinclair/jumpnbump.js">GitHub</a>.
+                    </p>
+                </footer>
             </main>
             {showLevelSelector ? (
                 <LevelSelector
