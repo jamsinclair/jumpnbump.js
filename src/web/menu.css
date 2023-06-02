@@ -120,6 +120,12 @@
     transform: translate(calc(var(--x, -1) * 1px), calc(var(--y, 5) * 1px)) translateZ(-1px) scale(2);
 }
 
+@supports (background-image: url('/logo/clouds.webp')) {
+    .menu-logo-parallax-layer:before {
+        background-image: url('/logo/clouds.webp');
+    }
+}
+
 .menu-footer {
     text-align: center;
     margin-top: 1rem;
