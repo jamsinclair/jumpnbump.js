@@ -173,6 +173,11 @@ export function Menu() {
                             Load Custom Level
                         </label>
                     </li>
+                    <li>
+                        <a className="menu-button" href="https://github.com/jamsinclair/jumpnbump.js#jump-n-bump-javascript">
+                            About
+                        </a>
+                    </li>
                 </ul>
                 <GameOptions gameOptions={gameOptions} setGameOptions={setGameOptions} />
             </main>
