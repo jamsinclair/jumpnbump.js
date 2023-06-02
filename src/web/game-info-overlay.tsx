@@ -64,7 +64,7 @@ export function GameInfoOverlay() {
         }
     };
 
-    const toggleDialog = (e?: Event) => {
+    const toggleDialog = (e?: unknown) => {
         if (e instanceof KeyboardEvent && e.key !== 'enter') return;
 
         if (dialogRef.current && !dialogRef.current.open) {
