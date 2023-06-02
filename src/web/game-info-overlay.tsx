@@ -58,28 +58,26 @@ const toggleAi = [
 
 export function GameInfoOverlay() {
     const dialogRef = React.useRef<HTMLDialogElement>(null);
-    const onDismissDialog = () => {
+    const dismissDialog = () => {
         if (dialogRef.current && dialogRef.current.open) {
+            dialogRef.current.close();
+        }
+    };
+
+    const toggleDialog = (e?: Event) => {
+        if (e instanceof KeyboardEvent && e.key !== 'enter') return;
+
+        if (dialogRef.current && !dialogRef.current.open) {
+            dialogRef.current.showModal();
+        } else if (dialogRef.current) {
             dialogRef.current.close();
         }
     };
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') {
-                if (dialogRef.current && dialogRef.current.open) {
-                    dialogRef.current.close();
-                    e.stopImmediatePropagation();
-                }
-            }
-
-            if (e.key === '?') {
-                if (dialogRef.current && !dialogRef.current.open) {
-                    dialogRef.current.showModal();
-                } else if (dialogRef.current) {
-                    dialogRef.current.close();
-                }
-            }
+            if (e.key === 'Escape') dismissDialog();
+            if (e.key === '?') toggleDialog();
         };
 
         window.addEventListener('keydown', handleKeyDown);
@@ -90,48 +88,58 @@ export function GameInfoOverlay() {
     }, [dialogRef]);
 
     return (
-        <dialog className="game-info-overlay" ref={dialogRef}>
-            <h2>General</h2>
-            <table>
-                <tbody>
-                    {shortcuts.map(({ keys, description }) => (
-                        <tr key={keys}>
-                            <td>{description}</td>
-                            <td>{keys}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-            <h2>Controls</h2>
-            <table>
-                <tbody>
-                    {controls.map(({ keys, description }) => (
-                        <tr key={keys}>
-                            <td>{description}</td>
-                            <td>{keys}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-            <h2>Toggle AI Players (when game is in progress)</h2>
-            <table>
-                <tbody>
-                    {toggleAi.map(({ keys, description }) => (
-                        <tr key={keys}>
-                            <td>{description}</td>
-                            <td>{keys}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+        <>
+            <dialog className="game-info-overlay" ref={dialogRef}>
+                <h2>General</h2>
+                <table>
+                    <tbody>
+                        {shortcuts.map(({ keys, description }) => (
+                            <tr key={keys}>
+                                <td>{description}</td>
+                                <td>{keys}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+                <h2>Controls</h2>
+                <table>
+                    <tbody>
+                        {controls.map(({ keys, description }) => (
+                            <tr key={keys}>
+                                <td>{description}</td>
+                                <td>{keys}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+                <h2>Toggle AI Players (when game is in progress)</h2>
+                <table>
+                    <tbody>
+                        {toggleAi.map(({ keys, description }) => (
+                            <tr key={keys}>
+                                <td>{description}</td>
+                                <td>{keys}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+                <button
+                    className="game-info-overlay-close"
+                    onClick={dismissDialog}
+                    onKeyDown={dismissDialog}
+                    aria-label="Close Controls & Shortcuts Overlay"
+                >
+                    <CloseIcon />
+                </button>
+            </dialog>
             <button
-                className="game-info-overlay-close"
-                onClick={onDismissDialog}
-                onKeyDown={onDismissDialog}
-                aria-label="Close Controls & Shortcuts Overlay"
+                className="game-info-overlay-toggle"
+                aria-label="Toggle Controls & Shortcuts Overlay"
+                onClick={toggleDialog}
+                onKeyDown={toggleDialog}
             >
-                <CloseIcon />
+                ?
             </button>
-        </dialog>
+        </>
     );
 }

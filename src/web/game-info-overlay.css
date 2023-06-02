@@ -67,3 +67,37 @@
     width: 1.5rem;
     height: 1.5rem;
 }
+
+.game-info-overlay-toggle {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    background: none;
+    font-size: 1.2rem;
+    width: 2rem;
+    height: 2rem;
+    text-align: center;
+    line-height: 0;
+    margin: 0;
+    outline: 1px solid #fff;
+    outline-offset: -1px;
+    color: #fff;
+    transition: outline-width 200ms ease, outline-offset 200ms ease, fill 200ms ease, background-color 200ms ease;
+}
+
+.game-info-overlay-toggle:focus,
+.game-info-overlay-toggle:hover {
+    outline-offset: -3px;
+    outline-width: 3px;
+}
+
+.game-info-overlay[open] + .game-info-overlay-toggle,
+.game-info-overlay-toggle:active {
+    outline-offset: -3px;
+    outline-width: 3px;
+    background-color: #fff;
+    color: #000;
+    fill: #000;
+}

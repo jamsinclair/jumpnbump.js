@@ -174,7 +174,10 @@ export function Menu() {
                         </label>
                     </li>
                     <li>
-                        <a className="menu-button" href="https://github.com/jamsinclair/jumpnbump.js#jump-n-bump-javascript">
+                        <a
+                            className="menu-button"
+                            href="https://github.com/jamsinclair/jumpnbump.js#jump-n-bump-javascript"
+                        >
                             About
                         </a>
                     </li>
