@@ -9,7 +9,8 @@
         "build": "vite build",
         "preview": "vite preview",
         "lint": "prettier -l .",
-        "lint:fix": "prettier -l --write ."
+        "lint:fix": "prettier -l --write .",
+        "test": "tsc"
     },
     "keywords": [],
     "author": "",
