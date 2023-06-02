@@ -102,7 +102,7 @@ const getDefaultContext: () => GameContext = () => ({
         pob_backbuf: [],
     },
     player: fillArray(new Array(JNB_MAX_PLAYERS), () => new Player()),
-    ai: new Array(JNB_MAX_PLAYERS),
+    ai: fillArray(new Array(JNB_MAX_PLAYERS), () => 0),
     objects: fillArray(new Array(NUM.OBJECTS), () => new GameObject()),
 });
 

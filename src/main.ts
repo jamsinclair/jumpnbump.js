@@ -68,13 +68,13 @@ import {
 import { preread_datafile, read_gob, read_level, read_pcx } from './data';
 import { menu } from './menu';
 import ctx from './context';
+import type { Player } from './context';
 import { run_in_frame_loop } from './loop';
 import { deinit_controls_listener, init_controls_listener } from './sdl/events';
 import { Pob, register_gob, get_gob } from './assets';
 
 const main_info = ctx.info;
 const player = ctx.player;
-const ai = ctx.ai;
 const objects = ctx.objects;
 
 let endscore_reached = 0;
@@ -368,7 +368,7 @@ async function menu_loop() {
         c1 < JNB_MAX_PLAYERS;
         c1++ // reset player values
     ) {
-        ai[c1] = 0;
+        ctx.ai[c1] = 0;
     }
 
     while (1) {
@@ -684,7 +684,7 @@ function cpu_move() {
 
     for (i = 0; i < JNB_MAX_PLAYERS; i++) {
         nearest_distance = -1;
-        if (ai[i] && player[i].enabled) {
+        if (ctx.ai[i] && player[i].enabled) {
             // this player is a computer
             // get nearest target
             for (j = 0; j < JNB_MAX_PLAYERS; j++) {
@@ -791,7 +791,7 @@ function cpu_move() {
                 else if (i == 2) key = KEY.PL3_LEFT;
                 else key = KEY.PL4_LEFT;
 
-                addkey(key);
+                addkey(key, true);
             } else {
                 let key: KEY;
                 if (i == 0) key = KEY.PL1_LEFT;
@@ -799,7 +799,7 @@ function cpu_move() {
                 else if (i == 2) key = KEY.PL3_LEFT;
                 else key = KEY.PL4_LEFT;
 
-                addkey(key);
+                addkey(key, false);
             }
 
             if (rm) {
@@ -809,7 +809,7 @@ function cpu_move() {
                 else if (i == 2) key = KEY.PL3_RIGHT;
                 else key = KEY.PL4_RIGHT;
 
-                addkey(key);
+                addkey(key, true);
             } else {
                 let key: KEY;
                 if (i == 0) key = KEY.PL1_RIGHT;
@@ -817,7 +817,7 @@ function cpu_move() {
                 else if (i == 2) key = KEY.PL3_RIGHT;
                 else key = KEY.PL4_RIGHT;
 
-                addkey(key);
+                addkey(key, false);
             }
 
             if (jm) {
@@ -827,7 +827,7 @@ function cpu_move() {
                 else if (i == 2) key = KEY.PL3_JUMP;
                 else key = KEY.PL4_JUMP;
 
-                addkey(key);
+                addkey(key, true);
             } else {
                 let key: KEY;
                 if (i == 0) key = KEY.PL1_JUMP;
@@ -835,7 +835,7 @@ function cpu_move() {
                 else if (i == 2) key = KEY.PL3_JUMP;
                 else key = KEY.PL4_JUMP;
 
-                addkey(key);
+                addkey(key, false);
             }
         }
     }

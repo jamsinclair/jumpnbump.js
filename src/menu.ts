@@ -27,7 +27,6 @@ const menu_cur_pal = new Uint8ClampedArray(768);
 
 const player = ctx.player;
 const main_info = ctx.info;
-const ai = ctx.ai;
 
 const objects = ctx.objects;
 
@@ -116,7 +115,7 @@ export async function menu() {
             c1 < JNB_MAX_PLAYERS;
             c1++ // set AI to false
         )
-            ai[c1] = 0;
+            ctx.ai[c1] = 0;
 
         while (update_count) {
             if (key_pressed(KEY.ESCAPE) && !esc_pressed) {
