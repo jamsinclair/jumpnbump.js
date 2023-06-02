@@ -8,7 +8,8 @@
         "dev": "vite",
         "build": "vite build",
         "preview": "vite preview",
-        "lint": "prettier -l ."
+        "lint": "prettier -l .",
+        "lint:fix": "prettier -l --write ."
     },
     "keywords": [],
     "author": "",
