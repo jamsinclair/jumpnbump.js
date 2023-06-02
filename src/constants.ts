@@ -86,7 +86,7 @@ export const PALETTE_256_SIZE = 768;
 
 export const JNB_MAX_PLAYERS = 4;
 export const JNB_END_SCORE = 100;
-export const JNB_VERSION = '2.0-dev';
+export const JNB_VERSION = '3.0-js';
 
 export const NUM_POBS = 200;
 export const NUM_OBJECTS = 200;
