@@ -1,5 +1,6 @@
 import { KEY } from '../constants';
 import { poll_events } from './events';
+import { toggle_fullscreen } from './gfx';
 
 let lastTick = 0;
 const TICK_LENGTH = 1000 / 60;
@@ -40,9 +41,6 @@ export function intr_sysupdate(): number {
                     continue;
                 }
                 switch (event.scancode) {
-                    case KEY.F10:
-                        // todo toggle fullscreen
-                        break;
                     case KEY.ONE:
                         // todo toggle ai
                         // release any pressed keys
@@ -67,6 +65,11 @@ export function intr_sysupdate(): number {
                         addkey(KEY.PL4_LEFT, false);
                         addkey(KEY.PL4_RIGHT, false);
                         addkey(KEY.PL4_JUMP, false);
+                    case KEY.F:
+                        if (event.key === 'F' && event.type === 'keydown') {
+                            toggle_fullscreen();
+                            break;
+                        }
                     default:
                         if (event.type === 'keyup') {
                             add_last_key(event.key);

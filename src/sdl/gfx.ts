@@ -155,3 +155,11 @@ export function put_text(page: number, x: number, y: number, text: string, align
         cur_x += pob_width(image, font_gobs) + 1;
     }
 }
+
+export function toggle_fullscreen() {
+    if (document.fullscreenElement) {
+        document.exitFullscreen();
+    } else {
+        document.body.requestFullscreen();
+    }
+}

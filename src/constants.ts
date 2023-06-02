@@ -39,6 +39,7 @@ export enum KEY {
     THREE = 'Digit3',
     FOUR = 'Digit4',
     F10 = 'F10',
+    F = 'KeyF',
 }
 
 export enum MOVEMENT {
