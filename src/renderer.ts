@@ -8,7 +8,6 @@ import { get_pixel, put_pob, set_pixel } from './sdl/gfx';
 import ctx from './context';
 import { Gob } from './assets';
 
-// Probably move elsewhere
 const mask_pic = [];
 
 type Scores = {

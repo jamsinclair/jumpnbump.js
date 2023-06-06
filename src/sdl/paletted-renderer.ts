@@ -102,7 +102,6 @@ export class PalettedRenderer {
             height: this.height,
             alphaColor: 0,
         };
-        globalThis.renderer = this;
     }
 
     setPalette(palette: Uint8ClampedArray): void {

@@ -44,7 +44,6 @@ export function intr_sysupdate(): number {
                 switch (event.scancode) {
                     case KEY.ONE:
                         if (event.type === 'keydown') {
-                            // console.log('toggle ai 1')
                             ctx.ai[0] = !ctx.ai[0] ? 1 : 0;
                         }
                         // release any pressed keys

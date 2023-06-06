@@ -1,24 +1,6 @@
 import { Pob } from './assets';
 import { JNB_MAX_PLAYERS, NUM } from './constants';
 
-class PageInfo {
-    num_pobs: number;
-    pobs: Pob[];
-}
-
-class MainInfo {
-    joy_enabled: boolean;
-    mouse_enabled: boolean;
-    no_sound: boolean;
-    music_no_sound: boolean;
-    no_gore: boolean;
-    error_str: string;
-    draw_page: number;
-    view_page: number;
-    page_info: PageInfo;
-    pob_backbuf: number[];
-}
-
 class Player {
     action_left: boolean;
     action_up: boolean;

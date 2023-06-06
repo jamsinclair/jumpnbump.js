@@ -81,24 +81,10 @@ const cur_pal = new Uint8ClampedArray(768);
 const is_server = true;
 const is_net = false;
 
-const flip = false;
-
 let client_player_num = -1;
 let server_said_bye = 0;
 
 let flies_enabled = true;
-
-function flip_pixels(pixels) {
-    let temp: number = 0;
-
-    for (let y = 0; y < SCREEN_HEIGHT; y++) {
-        for (let x = 0; x < 352 / 2; x++) {
-            temp = pixels[y * SCREEN_WIDTH + x];
-            pixels[y * SCREEN_WIDTH + x] = pixels[y * SCREEN_WIDTH + (352 - x) - 1];
-            pixels[y * SCREEN_WIDTH + (352 - x) - 1] = temp;
-        }
-    }
-}
 
 function player_kill(c1: number, c2: number) {
     const player = ctx.player;
@@ -1646,9 +1632,6 @@ async function init_level(level: number, pal: Uint8ClampedArray): Promise<number
     let background_pic = read_pcx('level.pcx', pal);
     let mask_pic = read_pcx('mask.pcx', null);
     const number_gobs = get_gob('numbers');
-
-    // if (flip)
-    // 	flip_pixels(mask_pic);
 
     register_background(background_pic, pal);
     register_mask(mask_pic, pal);
