@@ -4,9 +4,10 @@ import { tellServerPlayerMoved } from '../network';
 import ctx from '../context';
 
 const client_player_num = -1;
-const player = ctx.player;
 
 export function update_player_actions() {
+    const player = ctx.player;
+
     let tmp = false;
     if (client_player_num < 0) {
         tmp = key_pressed(KEY.PL1_LEFT);

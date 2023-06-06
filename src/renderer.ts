@@ -9,10 +9,7 @@ import ctx from './context';
 import { Gob } from './assets';
 
 // Probably move elsewhere
-const main_info = ctx.info;
-const objects = ctx.objects;
 const mask_pic = [];
-const player = ctx.player;
 
 type Scores = {
     num_pobs: number;
@@ -71,6 +68,8 @@ export function add_object(
     anim: number,
     frame: number
 ) {
+    const objects = ctx.objects;
+
     for (let c1 = 0; c1 < NUM.OBJECTS; c1++) {
         if (!objects[c1] || objects[c1].used === 0) {
             const resolved_anim = frame > 10 ? Math.floor(anim / 10) : anim;
@@ -100,6 +99,8 @@ export function add_object(
 }
 
 export function add_pob(page: number, x: number, y: number, image: number, pob_data: Gob): number {
+    const main_info = ctx.info;
+
     if (main_info.page_info.num_pobs >= NUM.POBS) return 1;
 
     const pob = {
@@ -140,6 +141,8 @@ export function add_leftovers(player: number, x: number, y: number, image: numbe
 }
 
 export function draw_flies() {
+    const main_info = ctx.info;
+
     for (let c2 = 0; c2 < NUM.FLIES; c2++) {
         flies[c2].back[main_info.draw_page] = get_pixel(main_info.draw_page, flies[c2].x, flies[c2].y);
         flies[c2].back_defined[main_info.draw_page] = 1;
@@ -148,6 +151,8 @@ export function draw_flies() {
 }
 
 export async function draw_pobs() {
+    const main_info = ctx.info;
+
     for (let c1 = main_info.page_info.num_pobs - 1; c1 >= 0; c1--) {
         put_pob(
             0,
@@ -189,6 +194,7 @@ export function draw_score() {
 }
 
 function get_closest_player_to_point(x: number, y: number) {
+    const player = ctx.player;
     let cur_dist = 0;
     let dist = 0x7fff;
     let closest_player = 0;
@@ -213,6 +219,7 @@ function get_closest_player_to_point(x: number, y: number) {
 }
 
 export function update_flies(update_count: number) {
+    const player = ctx.player;
     let s1, s2, s3, s4;
 
     /* get center of fly swarm */
@@ -285,6 +292,17 @@ export function position_flies() {
             flies[c1].y = s2 + rnd(101) - 50;
             if (GET_BAN_MAP_XY(flies[c1].x, flies[c1].y) == BAN.VOID) break;
         }
+        flies[c1].back_defined[0] = 0;
+        flies[c1].back_defined[1] = 0;
+    }
+}
+
+export function init_renderer() {
+    leftovers.page.num_pobs = 0;
+    leftovers.page.pobs = [];
+    scores.num_pobs = 0;
+    scores.pobs = [];
+    for (let c1 = 0; c1 < NUM.FLIES; c1++) {
         flies[c1].back_defined[0] = 0;
         flies[c1].back_defined[1] = 0;
     }

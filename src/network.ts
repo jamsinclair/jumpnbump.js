@@ -6,7 +6,6 @@ import { JNB_END_SCORE, MOVEMENT, OBJ, SFX, SFX_FREQ } from './constants';
 import ctx from './context';
 import { get_gob } from './assets';
 
-const player = ctx.player;
 const is_server = true;
 const is_net = false;
 const sock = null;
@@ -32,6 +31,7 @@ type NetPacket = {
 };
 
 export function serverSendKillPacket(killer: number, victim: number) {
+    const player = ctx.player;
     const pkt = {
         cmd: NETCMD.KILL,
         arg: killer,
@@ -47,6 +47,7 @@ export function serverSendKillPacket(killer: number, victim: number) {
 }
 
 function processKillPacket(pkt: NetPacket) {
+    const player = ctx.player;
     let c1 = pkt.arg;
     let c2 = pkt.arg2;
     let x = pkt.arg3;
@@ -130,6 +131,7 @@ function processKillPacket(pkt: NetPacket) {
 }
 
 export function processMovePacket(pkt: NetPacket) {
+    const player = ctx.player;
     const playerid = pkt.arg;
     const { movement_type, new_val } = pkt.arg2;
 
@@ -148,6 +150,7 @@ export function processMovePacket(pkt: NetPacket) {
 }
 
 export function tellServerPlayerMoved(player_id: number, movement_type: MOVEMENT, new_val: boolean) {
+    const player = ctx.player;
     const pkt: NetPacket = {
         cmd: NETCMD.MOVE,
         arg: player_id,

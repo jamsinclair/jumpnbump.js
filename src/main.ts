@@ -53,6 +53,7 @@ import {
     draw_score,
     position_flies,
     update_flies,
+    init_renderer,
 } from './renderer';
 import { memset, rnd } from './c';
 import {
@@ -71,10 +72,6 @@ import ctx from './context';
 import { run_in_frame_loop } from './loop';
 import { deinit_controls_listener, init_controls_listener } from './sdl/events';
 import { Pob, register_gob, get_gob } from './assets';
-
-const main_info = ctx.info;
-const player = ctx.player;
-const objects = ctx.objects;
 
 let endscore_reached = 0;
 
@@ -104,6 +101,7 @@ function flip_pixels(pixels) {
 }
 
 function player_kill(c1: number, c2: number) {
+    const player = ctx.player;
     if (player[c1].y_add >= 0) {
         if (is_server) serverSendKillPacket(c1, c2);
     } else {
@@ -112,6 +110,7 @@ function player_kill(c1: number, c2: number) {
 }
 
 function collision_check() {
+    const player = ctx.player;
     let c1 = 0,
         c2 = 0,
         c3 = 0;
@@ -183,6 +182,8 @@ function collision_check() {
 }
 
 async function game_loop() {
+    const main_info = ctx.info;
+    const player = ctx.player;
     let mod_vol, sfx_vol;
     let update_count = 1;
     let end_loop_flag = 0;
@@ -359,8 +360,10 @@ async function game_loop() {
 }
 
 async function menu_loop() {
+    const player = ctx.player;
     let mod_vol;
     let c1, c2;
+    const main_info = ctx.info;
 
     for (
         c1 = 0;
@@ -402,8 +405,6 @@ async function menu_loop() {
 
         main_info.page_info.num_pobs = 0;
         main_info.page_info.num_pobs = 0;
-        main_info.view_page = 0;
-        main_info.draw_page = 1;
 
         await game_loop();
 
@@ -416,9 +417,6 @@ async function menu_loop() {
                 }
             }
         }
-
-        main_info.view_page = 0;
-        main_info.draw_page = 1;
 
         dj_stop_sfx_channel(4);
 
@@ -554,6 +552,7 @@ export type MainOptions = {
 };
 
 export async function main(canvas: HTMLCanvasElement, options: MainOptions): Promise<number> {
+    const main_info = ctx.info;
     main_info.no_gore = options.nogore || false;
     main_info.no_sound = options.nosound || false;
     main_info.music_no_sound = options.musicnosound || false;
@@ -572,6 +571,7 @@ export async function main(canvas: HTMLCanvasElement, options: MainOptions): Pro
 }
 
 function player_action_left(c1: number) {
+    const player = ctx.player;
     let s1 = 0,
         s2 = 0;
     let below_left, below, below_right;
@@ -617,6 +617,7 @@ function player_action_left(c1: number) {
 }
 
 function player_action_right(c1: number) {
+    const player = ctx.player;
     let s1 = 0,
         s2 = 0;
     let below_left, below, below_right;
@@ -674,6 +675,7 @@ function map_tile(pos_x: number, pos_y: number) {
 }
 
 function cpu_move() {
+    const player = ctx.player;
     let lm, rm, jm;
     let i, j;
     let cur_posx, cur_posy, tar_posx, tar_posy;
@@ -845,6 +847,8 @@ function steer_players() {
     let s1 = 0,
         s2 = 0;
 
+    const player = ctx.player;
+    const objects = ctx.objects;
     cpu_move();
     update_player_actions();
 
@@ -1204,6 +1208,7 @@ function steer_players() {
 }
 
 function position_player(player_num: number) {
+    const player = ctx.player;
     let c1;
     let s1, s2;
 
@@ -1246,6 +1251,8 @@ function position_player(player_num: number) {
 }
 
 function update_objects() {
+    const main_info = ctx.info;
+    const objects = ctx.objects;
     const object_gobs = get_gob('objects');
     let s1 = 0;
 
@@ -1631,6 +1638,8 @@ function update_objects() {
 }
 
 async function init_level(level: number, pal: Uint8ClampedArray): Promise<number> {
+    const player = ctx.player;
+    const objects = ctx.objects;
     let c1, c2;
     let s1, s2;
 
@@ -1742,9 +1751,12 @@ function deinit_level() {
 }
 
 function init_program(canvas: HTMLCanvasElement, datafile: ArrayBuffer, pal: Uint8ClampedArray) {
+    const player = ctx.player;
+    const main_info = ctx.info;
     let c1 = 0;
 
     gfx_init(canvas);
+    init_renderer();
 
     // TODO set flags here?
 

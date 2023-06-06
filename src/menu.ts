@@ -25,11 +25,6 @@ let menu_mask;
 const menu_pal = new Uint8ClampedArray(768);
 const menu_cur_pal = new Uint8ClampedArray(768);
 
-const player = ctx.player;
-const main_info = ctx.info;
-
-const objects = ctx.objects;
-
 function update_objects() {}
 
 const message = [
@@ -62,6 +57,8 @@ export async function menu() {
     let fade_dir, fade_count;
     let fade_pal = new Uint8ClampedArray(48);
     let update_count;
+    const player = ctx.player;
+    const main_info = ctx.info;
     const rabbit_gobs = get_gob('rabbit');
 
     if ((await menu_init()) != 0) return 1;
@@ -655,6 +652,9 @@ export async function menu() {
 }
 
 async function menu_init() {
+    const main_info = ctx.info;
+    const objects = ctx.objects;
+    const player = ctx.player;
     let c1;
 
     fillpalette(0, 0, 0);
