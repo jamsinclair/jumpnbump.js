@@ -1654,10 +1654,6 @@ async function init_level(level: number, pal: Uint8ClampedArray): Promise<number
     register_mask(mask_pic, pal);
 
     for (c1 = 0; c1 < JNB_MAX_PLAYERS; c1++) {
-        if (c1 === 0 || c1 === 1) {
-            player[c1].enabled = true;
-        }
-
         if (player[c1].enabled) {
             player[c1].bumps = 0;
             for (c2 = 0; c2 < JNB_MAX_PLAYERS; c2++) player[c1].bumped[c2] = 0;
