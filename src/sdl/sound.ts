@@ -14,7 +14,6 @@ const sounds: ArrayBuffer[] = [];
 const channels: Smp[][] = [];
 const tracks: Mod[] = [];
 let currentTrack: MOD | null = null;
-const main_info = context.info;
 const getCurrentTrack = () => tracks[currentTrack] ?? null;
 
 const SAFE_MIN_SAMPLE_RATE = 8000;
@@ -43,7 +42,7 @@ export function dj_play_sfx(
     delay: number,
     channel: number
 ) {
-    if (main_info.music_no_sound || main_info.no_sound) {
+    if (context.info.music_no_sound || context.info.no_sound) {
         return;
     }
 
@@ -84,7 +83,7 @@ export function dj_set_nosound(enable: number) {
 }
 
 export function dj_start_mod() {
-    if (main_info.no_sound) {
+    if (context.info.no_sound) {
         return;
     }
 
@@ -120,7 +119,7 @@ export function dj_ready_mod(mod_type: MOD) {
 }
 
 export function dj_set_mod_volume(volume: number) {
-    if (main_info.no_sound) {
+    if (context.info.no_sound) {
         return;
     }
 
