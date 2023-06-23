@@ -2,15 +2,39 @@ import { player_anims } from './animation';
 import { rnd, toShort } from './c';
 import { add_object, add_score } from './renderer';
 import { dj_play_sfx } from './sdl/sound';
-import { JNB_END_SCORE, MOVEMENT, OBJ, SFX, SFX_FREQ } from './constants';
+import { JNB_END_SCORE, JNB_MAX_PLAYERS, MOVEMENT, OBJ, SFX, SFX_FREQ } from './constants';
 import ctx from './context';
 import { get_gob } from './assets';
+import Peer, { type DataConnection } from 'peerjs';
 
-const is_server = true;
-const is_net = false;
-const sock = null;
+type NetPacket = {
+    cmd: NETCMD;
+    arg?: string | number;
+    arg2?: string | number;
+    arg3?: string | number;
+    arg4?: string | number;
+};
 
-enum NETCMD {
+type NetworkState = {
+    buggered_off: boolean;
+    peer: Peer | null;
+    sock: DataConnection | null;
+    socketset: NetPacket[];
+};
+
+const network_state: NetworkState = {
+    buggered_off: false,
+    peer: null,
+    sock: null,
+    socketset: [],
+};
+const net_info: {
+    sock?: DataConnection;
+    socketset: NetPacket[];
+    hasBeenAcknowledged?: boolean;
+}[] = [];
+
+export enum NETCMD {
     NACK = 0,
     ACK = 1,
     HELLO = 2,
@@ -22,12 +46,24 @@ enum NETCMD {
     KILL = 8,
 }
 
-type NetPacket = {
-    cmd: NETCMD;
-    arg: number;
-    arg2: any;
-    arg3: any;
-    arg4: any;
+/**
+ * In order to provide ever so slightly faster networking, we're going to use our own serializer
+ * From my own testing, slightly faster to serialize than JSON.stringify and for small messages
+ * a dramatically smaller byte size which should help with latency.
+ */
+export const serializePacket = (pkt: NetPacket) => {
+    return Object.values(pkt).join(',');
+};
+
+export const deserializePacket = (str: string): NetPacket => {
+    const [cmd, arg, arg2, arg3, arg4] = str.split(',');
+    return {
+        cmd: parseInt(cmd),
+        arg,
+        arg2,
+        arg3,
+        arg4,
+    };
 };
 
 export function serverSendKillPacket(killer: number, victim: number) {
@@ -41,17 +77,24 @@ export function serverSendKillPacket(killer: number, victim: number) {
     };
 
     processKillPacket(pkt);
-    if (is_net) {
+    if (ctx.is_net) {
         sendPacketToAll(pkt);
     }
 }
 
+function processAlivePacket(packet) {
+    const player_id = Number(packet.arg);
+    ctx.player[player_id].dead_flag = false;
+    ctx.player[player_id].x = Number(packet.arg2);
+    ctx.player[player_id].y = Number(packet.arg3);
+}
+
 function processKillPacket(pkt: NetPacket) {
     const player = ctx.player;
-    let c1 = pkt.arg;
-    let c2 = pkt.arg2;
-    let x = pkt.arg3;
-    let y = pkt.arg4;
+    let c1 = Number(pkt.arg);
+    let c2 = Number(pkt.arg2);
+    let x = Number(pkt.arg3);
+    let y = Number(pkt.arg4);
     let c4 = 0;
     let s1 = 0;
 
@@ -130,10 +173,11 @@ function processKillPacket(pkt: NetPacket) {
     }
 }
 
-export function processMovePacket(pkt: NetPacket) {
+function processMovePacket(pkt: NetPacket) {
     const player = ctx.player;
     const playerid = pkt.arg;
-    const { movement_type, new_val } = pkt.arg2;
+    const movement_type = Number(pkt.arg2[0]);
+    const new_val = Number(pkt.arg2[1]);
 
     if (movement_type == MOVEMENT.LEFT) {
         player[playerid].action_left = new_val;
@@ -145,8 +189,14 @@ export function processMovePacket(pkt: NetPacket) {
         console.log('bogus MOVE packet!\n');
     }
 
-    player[playerid].x = pkt.arg3;
-    player[playerid].y = pkt.arg4;
+    player[playerid].x = Number(pkt.arg3);
+    player[playerid].y = Number(pkt.arg4);
+}
+
+function processPositionPacket(packet) {
+    const player_id = packet.arg;
+    ctx.player[player_id].x = Number(packet.arg2);
+    ctx.player[player_id].y = Number(packet.arg3);
 }
 
 export function tellServerPlayerMoved(player_id: number, movement_type: MOVEMENT, new_val: boolean) {
@@ -154,38 +204,285 @@ export function tellServerPlayerMoved(player_id: number, movement_type: MOVEMENT
     const pkt: NetPacket = {
         cmd: NETCMD.MOVE,
         arg: player_id,
-        arg2: {
-            movement_type,
-            new_val,
-        },
+        arg2: `${movement_type}${new_val ? 1 : 0}`,
         arg3: player[player_id].x,
         arg4: player[player_id].y,
     };
 
-    if (is_server) {
+    if (ctx.is_server) {
         processMovePacket(pkt);
-        if (is_net) {
+        if (ctx.is_net) {
             sendPacketToAll(pkt);
         }
     } else {
-        sendPacketToSock(sock, pkt);
+        sendPacketToSock(network_state.sock, pkt);
     }
 }
 
-export function serverSendAlive(player_id: number) {}
+export function serverSendAlive(player_id: number) {
+    if (!ctx.is_server) {
+        return;
+    }
 
-export function serverTellEveryoneGoodbye() {}
+    const packet = {
+        cmd: NETCMD.ALIVE,
+        arg: player_id,
+        arg2: ctx.player[player_id].x,
+        arg3: ctx.player[player_id].y,
+    };
+    sendPacketToAll(packet);
+}
 
-export function tellServerGoodbye() {}
+export function serverTellEveryoneGoodbye() {
+    const { buggered_off, peer } = network_state;
+    if (!buggered_off) {
+        network_state.buggered_off = true;
+        for (let i = 0; i < JNB_MAX_PLAYERS; i++) {
+            if (ctx.player[i].enabled) {
+                const newPacket = {
+                    cmd: NETCMD.BYE,
+                    arg: i,
+                };
+                sendPacketToAll(newPacket);
+            }
+        }
+    }
+    if (peer) {
+        setTimeout(() => {
+            peer.destroy();
+            network_state.peer = null;
+        }, 1000);
+    }
+}
 
-export function update_players_from_clients() {}
+export function tellServerGoodbye() {
+    if (!network_state.buggered_off) {
+        network_state.buggered_off = true;
+        const packet = {
+            cmd: NETCMD.BYE,
+            arg: ctx.client_player_num,
+        };
+        sendPacketToSock(network_state.sock, packet);
+    }
+}
+
+export function update_players_from_clients() {
+    if (!ctx.is_server) {
+        return;
+    }
+
+    for (let i = 0; i < JNB_MAX_PLAYERS; i++) {
+        if (i === ctx.client_player_num || !ctx.player[i].enabled) {
+            continue;
+        }
+
+        const playerId = i;
+        net_info[playerId].socketset.forEach((packet: NetPacket) => {
+            if (packet.cmd === NETCMD.POSITION) {
+                processPositionPacket(packet);
+                for (i = 0; i < JNB_MAX_PLAYERS; i++) {
+                    if (i != playerId) {
+                        sendPacket(i, packet);
+                    }
+                }
+            } else if (packet.cmd === NETCMD.MOVE) {
+                processMovePacket(packet);
+                sendPacketToAll(packet);
+            } else {
+                console.warn(`SERVER: Got unknown packet ${packet.cmd}`);
+            }
+        });
+
+        net_info[playerId].socketset = [];
+    }
+}
 
 export function update_players_from_server(): boolean {
+    const { player } = ctx;
+    const { socketset } = network_state;
+    if (ctx.is_server) {
+        return false;
+    }
+
+    const packets = socketset.splice(0, socketset.length);
+
+    packets.forEach((packet) => {
+        if (packet.cmd === NETCMD.BYE) {
+            player[Number(packet.arg)].enabled = false;
+        } else if (packet.cmd === NETCMD.MOVE) {
+            processMovePacket(packet);
+        } else if (packet.cmd === NETCMD.ALIVE) {
+            processAlivePacket(packet);
+        } else if (packet.cmd === NETCMD.POSITION) {
+            processPositionPacket(packet);
+        } else if (packet.cmd === NETCMD.KILL) {
+            processKillPacket(packet);
+        } else {
+            console.warn(`CLIENT: Got an unknown packet: ${packet.cmd}`);
+        }
+    });
+
     return true;
 }
 
-export function tellServerNewPosition() {}
+export function tellServerNewPosition() {
+    // const { client_player_num, is_server } = ctx;
+    // const newPacket = {
+    //   cmd: NETCMD.POSITION,
+    //   arg: client_player_num,
+    //   arg2: ctx.player[client_player_num].x,
+    //   arg3: ctx.player[client_player_num].y
+    // };
+    // if (is_server) {
+    //   sendPacketToAll(newPacket);
+    // } else {
+    //   sendPacketToSock(network_state.sock, newPacket);
+    // }
+}
 
-function sendPacketToAll(pkt: NetPacket) {}
+/**
+ * This code differs from the libregames network initialization code.
+ * Rather than handle the connection of peers, we leave that to the consumer.
+ * They need to pass in a list of PeerJS Connections, and we will handle the rest.
+ * The first socket is the server (Peer), and the rest are clients (DataConnection).
+ */
+export function init_server(sockets: [Peer, ...DataConnection[]]): Promise<void> {
+    reset_network_state();
 
-function sendPacketToSock(sock: any, pkt: NetPacket) {}
+    ctx.client_player_num = 0;
+    ctx.player[ctx.client_player_num].enabled = true;
+    network_state.peer = sockets[0];
+    net_info[0] = {
+        sock: null,
+        socketset: [],
+        hasBeenAcknowledged: true,
+    };
+
+    const expectedNumberOfPlayers = sockets.filter(Boolean).length;
+
+    return new Promise((resolve, reject) => {
+        const greenlightPacket = {
+            cmd: NETCMD.GREENLIGHT,
+            arg: 1,
+        };
+
+        const greenlightTimeout = setTimeout(() => {
+            console.warn('SERVER: Some players did not acknowledge and will not be connected - continuing anyway.');
+            resolve();
+            sendPacketToAll(greenlightPacket);
+        }, 5000);
+
+        const haveAllPlayersAcknowledged = () => {
+            const numberOfPlayersAcknowledged = Object.values(net_info).filter((player) => {
+                return player.hasBeenAcknowledged;
+            }).length;
+            return numberOfPlayersAcknowledged === expectedNumberOfPlayers;
+        };
+
+        for (let i = 1; i < JNB_MAX_PLAYERS; i++) {
+            const socket = sockets[i] as DataConnection;
+
+            if (socket) {
+                greenlightPacket[`arg${i + 1}}`] = 0;
+
+                socket.on('data', (data: string) => {
+                    const packet = deserializePacket(data);
+                    if (packet.cmd === NETCMD.HELLO) {
+                        // Send an ACK to the client to let them know they are connected and what player number they are.
+                        sendPacketToSock(socket, {
+                            cmd: NETCMD.ACK,
+                            arg: i,
+                        });
+
+                        greenlightPacket[`arg${i + 1}}`] = 1;
+                        ctx.player[i].enabled = true;
+                        net_info[i].hasBeenAcknowledged = true;
+
+                        if (haveAllPlayersAcknowledged()) {
+                            clearTimeout(greenlightTimeout);
+                            resolve();
+                            sendPacketToAll(greenlightPacket);
+                        }
+
+                        return;
+                    }
+
+                    net_info[i].socketset.push(packet);
+                });
+            }
+
+            net_info[i] = {
+                sock: socket,
+                socketset: [],
+            };
+        }
+    });
+}
+
+/**
+ * This code differs from the libregames network initialization code.
+ * Rather than handle connecting to the server, we leave that to the consumer.
+ * They need to pass in the open connection with the server player (Using the PeerJS library).
+ */
+export async function connect_to_server(socket: DataConnection): Promise<void> {
+    reset_network_state();
+    network_state.sock = socket;
+
+    return new Promise((resolve, reject) => {
+        let haveBeenAcknowleged = false;
+
+        sendPacketToSock(network_state.sock, {
+            cmd: NETCMD.HELLO,
+        });
+
+        network_state.sock.on('data', (data: string) => {
+            const packet = deserializePacket(data);
+
+            if (!haveBeenAcknowleged && packet.cmd === NETCMD.ACK) {
+                haveBeenAcknowleged = true;
+                ctx.client_player_num = Number(packet.arg);
+                console.log('CLIENT: Waiting for greenlight...');
+            }
+
+            if (haveBeenAcknowleged && packet.cmd === NETCMD.GREENLIGHT) {
+                console.log('CLIENT: got greenlit.');
+
+                for (let i = 0; i < JNB_MAX_PLAYERS; i++) {
+                    const data = packet[i === 0 ? 'arg' : `arg${i + 1}`];
+                    ctx.player[i].enabled = data === '1' ? true : false;
+                }
+
+                resolve();
+                return;
+            }
+
+            network_state.socketset.push(packet);
+        });
+    });
+}
+
+function sendPacketToAll(pkt: NetPacket) {
+    for (let i = 0; i < JNB_MAX_PLAYERS; i++) {
+        sendPacket(i, pkt);
+    }
+}
+
+function sendPacket(player_id, packet) {
+    if (player_id < JNB_MAX_PLAYERS && player_id >= 0) {
+        if (ctx.player[player_id].enabled && player_id != ctx.client_player_num) {
+            sendPacketToSock(net_info[player_id]?.sock, packet);
+        }
+    }
+}
+
+function sendPacketToSock(socket: DataConnection | undefined, pkt: NetPacket) {
+    socket && socket.send(serializePacket(pkt));
+}
+
+function reset_network_state() {
+    network_state.buggered_off = false;
+    network_state.peer = null;
+    network_state.sock = null;
+    network_state.socketset = [];
+    net_info.splice(0, net_info.length);
+}

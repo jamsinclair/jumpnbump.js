@@ -3,10 +3,8 @@ import { key_pressed } from './interrpt';
 import { tellServerPlayerMoved } from '../network';
 import ctx from '../context';
 
-const client_player_num = -1;
-
 export function update_player_actions() {
-    const player = ctx.player;
+    const { player, client_player_num } = ctx;
 
     let tmp = false;
     if (client_player_num < 0) {

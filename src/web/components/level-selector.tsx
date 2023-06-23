@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { LEVELS, RECOMMENDED_LEVELS } from './constants';
+import React, { useEffect } from 'react';
+import { LEVELS, RECOMMENDED_LEVELS } from '../constants';
 import { LevelItem } from './level-item';
 import './level-selector.css';
 import { CloseIcon } from './close-icon';

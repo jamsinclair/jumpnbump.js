@@ -58,7 +58,9 @@ const toggleAi = [
 
 export function GameInfoOverlay() {
     const dialogRef = React.useRef<HTMLDialogElement>(null);
-    const dismissDialog = () => {
+    const dismissDialog = (e?: unknown) => {
+        if (e instanceof KeyboardEvent && e.key !== 'enter') return;
+
         if (dialogRef.current && dialogRef.current.open) {
             dialogRef.current.close();
         }

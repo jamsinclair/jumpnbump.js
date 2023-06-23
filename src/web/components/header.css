@@ -1,0 +1,56 @@
+.header {
+    text-align: center;
+}
+
+.header {
+    display: inline-block;
+    width: 100%;
+    padding: 1rem 0;
+}
+
+.header-logo-container {
+    height: 76px;
+    max-width: 400px;
+    margin: 0 auto;
+    overflow: hidden;
+    position: relative;
+}
+
+.header-logo-parallax-layer {
+    background-image: url('/logo/transparent-logo.png');
+    background-attachment: center;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    color: transparent;
+    user-select: none;
+}
+
+.header-logo-parallax-layer:before {
+    content: '';
+    background-image: url('/logo/clouds.jpeg');
+    background-attachment: center;
+    background-position: center;
+    background-repeat: repeat;
+    background-size: cover;
+    height: 200%;
+    position: absolute;
+    top: -50%;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    transform: translate(calc(var(--x, -1) * 1px), calc(var(--y, 5) * 1px)) translateZ(-1px) scale(2);
+}
+
+@supports (background-image: url('/logo/clouds.webp')) {
+    .header-logo-parallax-layer:before {
+        background-image: url('/logo/clouds.webp');
+    }
+}

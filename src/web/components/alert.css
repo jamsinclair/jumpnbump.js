@@ -1,0 +1,47 @@
+.alert {
+    position: relative;
+}
+
+.alert-title {
+    text-align: center;
+}
+
+.alert-error .alert-title {
+    color: red;
+}
+
+.alert-close-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0.5rem;
+    cursor: pointer;
+    background: none;
+    border: none;
+    outline: 1px solid transparent;
+    outline-offset: -1px;
+    color: #000;
+    fill: #000;
+    transition: outline-width 200ms ease, outline-offset 200ms ease, fill 200ms ease, background-color 200ms ease;
+}
+
+.alert-close-button:focus,
+.alert-close-button:hover {
+    outline-color: #000;
+    outline-offset: -3px;
+    outline-width: 3px;
+}
+
+.alert-close-button:active {
+    outline-offset: -3px;
+    outline-width: 3px;
+    background-color: #000;
+    color: #fff;
+    fill: #fff;
+}
+
+.alert-close-button svg {
+    display: block;
+    width: 1.5rem;
+    height: 1.5rem;
+}

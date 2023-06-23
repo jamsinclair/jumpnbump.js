@@ -34,6 +34,8 @@ import { update_player_actions } from './sdl/input';
 import { addkey, intr_sysupdate, key_pressed } from './sdl/interrpt';
 import { GET_BAN_MAP_IN_WATER, GET_BAN_MAP_TILE, GET_BAN_MAP_XY, SET_BAN_MAP } from './level';
 import {
+    connect_to_server,
+    init_server,
     serverSendAlive,
     serverSendKillPacket,
     serverTellEveryoneGoodbye,
@@ -72,16 +74,13 @@ import ctx from './context';
 import { run_in_frame_loop } from './loop';
 import { deinit_controls_listener, init_controls_listener } from './sdl/events';
 import { Pob, register_gob, get_gob } from './assets';
+import Peer, { DataConnection } from 'peerjs';
 
 let endscore_reached = 0;
 
 const pal = new Uint8ClampedArray(768);
 const cur_pal = new Uint8ClampedArray(768);
 
-const is_server = true;
-const is_net = false;
-
-let client_player_num = -1;
 let server_said_bye = 0;
 
 let flies_enabled = true;
@@ -89,7 +88,7 @@ let flies_enabled = true;
 function player_kill(c1: number, c2: number) {
     const player = ctx.player;
     if (player[c1].y_add >= 0) {
-        if (is_server) serverSendKillPacket(c1, c2);
+        if (ctx.is_server) serverSendKillPacket(c1, c2);
     } else {
         if (player[c2].y_add < 0) player[c2].y_add = 0;
     }
@@ -169,7 +168,7 @@ function collision_check() {
 
 async function game_loop() {
     const main_info = ctx.info;
-    const player = ctx.player;
+    const { client_player_num, player, is_net, is_server } = ctx;
     let mod_vol, sfx_vol;
     let update_count = 1;
     let end_loop_flag = 0;
@@ -362,7 +361,7 @@ async function menu_loop() {
     while (1) {
         const rabbit_gobs = get_gob('rabbit');
 
-        if (!is_net) {
+        if (!ctx.is_net) {
             if ((await menu()) != 0) {
                 deinit_program();
                 break;
@@ -394,8 +393,8 @@ async function menu_loop() {
 
         await game_loop();
 
-        if (is_net) {
-            if (is_server) {
+        if (ctx.is_net) {
+            if (ctx.is_server) {
                 serverTellEveryoneGoodbye();
             } else {
                 if (!server_said_bye) {
@@ -525,7 +524,7 @@ async function menu_loop() {
         dj_set_nosound(1);
         dj_stop_mod();
 
-        if (is_net) return 0; /* don't go back to menu if in net game. */
+        if (ctx.is_net) return 0; /* don't go back to menu if in net game. */
     }
 }
 
@@ -535,6 +534,10 @@ export type MainOptions = {
     musicnosound?: boolean;
     nogore?: boolean;
     noflies?: boolean;
+    is_net?: boolean;
+    is_server?: boolean;
+    sockets?: [Peer, ...DataConnection[]];
+    hostSocket?: DataConnection;
 };
 
 export async function main(canvas: HTMLCanvasElement, options: MainOptions): Promise<number> {
@@ -543,6 +546,11 @@ export async function main(canvas: HTMLCanvasElement, options: MainOptions): Pro
     main_info.no_sound = options.nosound || false;
     main_info.music_no_sound = options.musicnosound || false;
     flies_enabled = options.noflies ? false : true;
+
+    ctx.is_net = options.is_net || false;
+    ctx.is_server = typeof options.is_server === 'boolean' ? options.is_server : true;
+    ctx.sockets = options.sockets || undefined;
+    ctx.hostSocket = options.hostSocket || null;
 
     if ((await init_program(canvas, options.dat, pal)) != 0) {
         deinit_program();
@@ -1226,8 +1234,10 @@ function position_player(player_num: number) {
             player[player_num].frame_tick = 0;
             player[player_num].image = player_anims[player[player_num].anim].frame[player[player_num].frame].image;
 
-            if (is_server) {
-                if (is_net) serverSendAlive(player_num);
+            if (ctx.is_server) {
+                if (ctx.is_net) {
+                    serverSendAlive(player_num);
+                }
                 player[player_num].dead_flag = false;
             }
 
@@ -1729,8 +1739,8 @@ function deinit_level() {
     dj_stop_mod();
 }
 
-function init_program(canvas: HTMLCanvasElement, datafile: ArrayBuffer, pal: Uint8ClampedArray) {
-    const player = ctx.player;
+async function init_program(canvas: HTMLCanvasElement, datafile: ArrayBuffer, pal: Uint8ClampedArray) {
+    const { client_player_num, player } = ctx;
     const main_info = ctx.info;
     let c1 = 0;
 
@@ -1742,10 +1752,10 @@ function init_program(canvas: HTMLCanvasElement, datafile: ArrayBuffer, pal: Uin
     /** It should not be necessary to assign a default player number here. The
 	server assigns one in init_server, the client gets one assigned by the server,
 	all provided the user didn't choose one on the commandline. */
-    if (is_net) {
-        if (client_player_num < 0) client_player_num = 0;
-        player[client_player_num].enabled = true;
-    }
+    // if (is_net) {
+    //     if (client_player_num < 0) ctx.client_player_num = 0;
+    //     player[client_player_num].enabled = true;
+    // }
 
     preread_datafile(datafile);
     read_pcx('menu.pcx', pal);
@@ -1786,13 +1796,15 @@ function init_program(canvas: HTMLCanvasElement, datafile: ArrayBuffer, pal: Uin
 
     setpalette(0, 256, pal);
 
-    // if (is_net) {
-    // 	if (is_server) {
-    // 		init_server(netarg);
-    // 	} else {
-    // 		connect_to_server(netarg);
-    // 	}
-    // }
+    if (ctx.is_net) {
+        if (ctx.is_server && Array.isArray(ctx.sockets)) {
+            await init_server(ctx.sockets);
+        } else if (!ctx.is_server && ctx.hostSocket) {
+            await connect_to_server(ctx.hostSocket);
+        } else {
+            throw new Error('Invalid network game configuration');
+        }
+    }
 
     reset_cheats();
     init_controls_listener();

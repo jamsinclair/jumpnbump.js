@@ -1,0 +1,89 @@
+.copy-game-id {
+    appearance: none;
+    background: none;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 0;
+    font-size: inherit;
+    color: inherit;
+}
+
+.copy-game-id:focus {
+    outline: 1px solid #fff;
+    outline-offset: -1px;
+}
+
+.player-list-item {
+    display: flex;
+    font-weight: 700;
+    align-items: center;
+    padding: 0 1rem;
+    margin-bottom: 1rem;
+}
+
+.player-name label {
+    position: absolute;
+    left: -9999px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    color: transparent;
+}
+
+.player-name-name {
+    display: inline-block;
+    padding: 0.1rem;
+    margin-right: 0.5rem;
+    border: 1px solid transparent;
+    width: 5rem;
+    cursor: pointer;
+}
+
+.player-name-name:hover {
+    border: 1px solid #fff;
+}
+
+.player-name-input {
+    appearance: none;
+    display: inline-block;
+    padding: 0.1rem;
+    width: 5rem;
+    margin-right: 0.5rem;
+    border: 1px solid transparent;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+
+.player-name-input:hover {
+    border: 1px solid #fff;
+}
+
+.player-name-input:focus {
+    border: 1px solid #fff;
+}
+
+.player-list-item.unassigned {
+    opacity: 0.5;
+}
+
+.player-list-item .avatar {
+    width: 25px;
+    height: auto;
+}
+
+.player-list-item .avatar img {
+    display: block;
+    width: 25px;
+    height: auto;
+}
+
+.player-list-item p {
+    flex: 1 0 77%;
+    font-size: 1rem;
+    text-align: left;
+    margin: 0 0 0 1rem;
+}

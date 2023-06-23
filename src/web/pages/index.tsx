@@ -1,54 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { LevelSelector } from './level-selector';
-import type { OptionalGameOptions } from '../engine';
-import { Game } from './game';
+import React, { useState } from 'react';
+import { Link } from 'preact-router/match';
+import { LevelSelector } from '../components/level-selector';
+import type { OptionalGameOptions } from '../../engine';
+import { Game } from '../components/game';
 
-import './menu.css';
-import { GameInfoOverlay } from './game-info-overlay';
-
-function Header() {
-    const parallaxLayerRef = useRef<HTMLDivElement>(null);
-    const parallaxIntensity = 8;
-
-    useEffect(() => {
-        const handleMouseMove = (e: MouseEvent) => {
-            if (!parallaxLayerRef.current) {
-                return;
-            }
-            const { clientX, clientY } = e;
-            const { left, top, width, height } = parallaxLayerRef.current.getBoundingClientRect();
-            const x = ((clientX - left) / width) * parallaxIntensity;
-            const y = ((clientY - top) / height) * parallaxIntensity;
-            parallaxLayerRef.current.style.setProperty('--x', x.toString());
-            parallaxLayerRef.current.style.setProperty('--y', y.toString());
-        };
-
-        window.addEventListener('mousemove', handleMouseMove);
-
-        return () => {
-            window.removeEventListener('mousemove', handleMouseMove);
-        };
-    }, [parallaxLayerRef]);
-
-    return (
-        <header className="menu-header">
-            <div className="menu-logo-container">
-                <div ref={parallaxLayerRef} className="menu-logo-parallax-layer">
-                    <h1>Jump 'n Bump</h1>
-                </div>
-            </div>
-        </header>
-    );
-}
-
-function LevelPreview({ level }: { level: string }) {
-    return (
-        <div className="menu-level-preview">
-            <img src={`/levels/${level}.jpg`} alt={`Preview of the level ${level}`} />
-            <p>Level: {getLevelName(level)}</p>
-        </div>
-    );
-}
+import '../menu.css';
+import { Header } from '../components/header';
+import { LevelPreview } from '../components/level-preview';
 
 function GameOptions({
     gameOptions,
@@ -94,14 +52,7 @@ function GameOptions({
     );
 }
 
-const getLevelName = (level: string) => {
-    if (level === 'jumpbump') {
-        return 'jumpbump (original level)';
-    }
-    return level;
-};
-
-export function Menu() {
+export function IndexPage({ path }: { path: string }) {
     const [selectedLevel, setSelectedLevel] = useState('jumpbump');
     const [showLevelSelector, setShowLevelSelector] = useState(false);
     const [isGameRunning, setIsGameRunning] = useState(false);
@@ -114,7 +65,6 @@ export function Menu() {
     if (isGameRunning) {
         return (
             <>
-                <GameInfoOverlay />
                 <Game level={selectedLevel} gameOptions={gameOptions} onExit={() => setIsGameRunning(false)} />
             </>
         );
@@ -146,7 +96,7 @@ export function Menu() {
         <>
             <Header />
             <main className="menu-main">
-                <LevelPreview level={selectedLevel} />
+                <LevelPreview level={selectedLevel} onClick={() => setShowLevelSelector(true)} />
                 <ul>
                     <li>
                         <button className="menu-button" onClick={() => setIsGameRunning(true)}>
@@ -174,6 +124,11 @@ export function Menu() {
                         </label>
                     </li>
                     <li>
+                        <Link className="menu-button" href="/online-multiplayer">
+                            Online Multiplayer
+                        </Link>
+                    </li>
+                    <li>
                         <a
                             className="menu-button"
                             href="https://github.com/jamsinclair/jumpnbump.js#jump-n-bump-javascript"
@@ -198,7 +153,6 @@ export function Menu() {
                     close={() => setShowLevelSelector(false)}
                 />
             ) : null}
-            <GameInfoOverlay />
         </>
     );
 }

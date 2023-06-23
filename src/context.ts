@@ -1,3 +1,4 @@
+import Peer, { DataConnection } from 'peerjs';
 import { Pob } from './assets';
 import { JNB_MAX_PLAYERS, NUM } from './constants';
 
@@ -60,6 +61,11 @@ type GameContext = {
     player: Player[];
     ai: (0 | 1)[];
     objects: GameObject[];
+    client_player_num: number;
+    is_net: boolean;
+    is_server: boolean;
+    sockets?: [Peer, ...DataConnection[]];
+    hostSocket?: DataConnection;
 };
 
 const fillArray = <Value>(array: Value[], getValue: () => Value) => {
@@ -86,6 +92,9 @@ const getDefaultContext: () => GameContext = () => ({
     player: fillArray(new Array(JNB_MAX_PLAYERS), () => new Player()),
     ai: fillArray(new Array(JNB_MAX_PLAYERS), () => 0),
     objects: fillArray(new Array(NUM.OBJECTS), () => new GameObject()),
+    client_player_num: -1,
+    is_net: false,
+    is_server: true,
 });
 
 const context = getDefaultContext();
@@ -97,6 +106,11 @@ export const resetContext = () => {
     context.player = newContext.player;
     context.ai = newContext.ai;
     context.objects = newContext.objects;
+    context.client_player_num = newContext.client_player_num;
+    context.is_net = newContext.is_net;
+    context.is_server = newContext.is_server;
+    context.hostSocket = undefined;
+    context.sockets = undefined;
 };
 
 export default context;

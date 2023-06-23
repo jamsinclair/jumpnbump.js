@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Engine } from '../engine';
-import type { OptionalGameOptions } from '../engine';
+import { Engine } from '../../engine';
+import type { OptionalGameOptions } from '../../engine';
 
 const BASE_LEVEL_URL = '/levels';
 
