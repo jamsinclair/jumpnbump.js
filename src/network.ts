@@ -85,8 +85,18 @@ export function serverSendKillPacket(killer: number, victim: number) {
 function processAlivePacket(packet) {
     const player_id = Number(packet.arg);
     ctx.player[player_id].dead_flag = false;
+
     ctx.player[player_id].x = Number(packet.arg2);
     ctx.player[player_id].y = Number(packet.arg3);
+
+    // Reset animation and frame info for player
+    // This is a bit of a hack, but prevents a bug where players respawn
+    // in different positions on host and client
+    ctx.player[player_id].anim = 6;
+    ctx.player[player_id].frame = 0;
+    ctx.player[player_id].frame_tick = 0;
+    ctx.player[player_id].x_add = 0;
+    ctx.player[player_id].y_add = 0;
 }
 
 function processKillPacket(pkt: NetPacket) {
