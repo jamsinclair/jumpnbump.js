@@ -7,12 +7,16 @@ import ctx from './context';
 import { get_gob } from './assets';
 import Peer, { type DataConnection } from 'peerjs';
 
+const TILE_SIZE = 16;
+const MAX_POSITION_DIFFERENCE = 3 * TILE_SIZE;
+
 type NetPacket = {
     cmd: NETCMD;
     arg?: string | number;
     arg2?: string | number;
     arg3?: string | number;
     arg4?: string | number;
+    arg5?: string | number;
 };
 
 type NetworkState = {
@@ -20,6 +24,7 @@ type NetworkState = {
     peer: Peer | null;
     sock: DataConnection | null;
     socketset: NetPacket[];
+    movementTick: number;
 };
 
 const network_state: NetworkState = {
@@ -27,11 +32,13 @@ const network_state: NetworkState = {
     peer: null,
     sock: null,
     socketset: [],
+    movementTick: 0,
 };
 const net_info: {
     sock?: DataConnection;
     socketset: NetPacket[];
     hasBeenAcknowledged?: boolean;
+    movementTick: number;
 }[] = [];
 
 export enum NETCMD {
@@ -56,13 +63,14 @@ export const serializePacket = (pkt: NetPacket) => {
 };
 
 export const deserializePacket = (str: string): NetPacket => {
-    const [cmd, arg, arg2, arg3, arg4] = str.split(',');
+    const [cmd, arg, arg2, arg3, arg4, arg5] = str.split(',');
     return {
         cmd: parseInt(cmd),
         arg,
         arg2,
         arg3,
         arg4,
+        arg5,
     };
 };
 
@@ -183,30 +191,71 @@ function processKillPacket(pkt: NetPacket) {
     }
 }
 
-function processMovePacket(pkt: NetPacket) {
+function processMovePacket(pkt: NetPacket, is_local?: boolean) {
     const player = ctx.player;
-    const playerid = pkt.arg;
+    const player_id = Number(pkt.arg);
     const movement_type = Number(pkt.arg2[0]);
-    const new_val = Number(pkt.arg2[1]);
+    const new_val = pkt.arg2[1] === '1';
+    const packetMovementTick = Number(pkt.arg5);
+
+    if (player_id === ctx.client_player_num && !is_local) {
+        return;
+    }
+
+    if (ctx.is_server && !is_local) {
+        if (packetMovementTick < net_info[player_id].movementTick) {
+            // Ignore packets that arrive after a newer one has already been processed
+            // This can happen if a packet is delayed in transit
+            return;
+        }
+
+        net_info[player_id].movementTick = packetMovementTick;
+    }
 
     if (movement_type == MOVEMENT.LEFT) {
-        player[playerid].action_left = new_val;
+        player[player_id].action_left = new_val;
     } else if (movement_type == MOVEMENT.RIGHT) {
-        player[playerid].action_right = new_val;
+        player[player_id].action_right = new_val;
     } else if (movement_type == MOVEMENT.UP) {
-        player[playerid].action_up = new_val;
+        player[player_id].action_up = new_val;
     } else {
         console.log('bogus MOVE packet!\n');
     }
 
-    player[playerid].x = Number(pkt.arg3);
-    player[playerid].y = Number(pkt.arg4);
+    const newX = Number(pkt.arg3);
+    const newY = Number(pkt.arg4);
+
+    const dx = Math.abs(newX - ctx.player[player_id].x) >> 16;
+    const dy = Math.abs(newY - ctx.player[player_id].y) >> 16;
+
+    if (dx < MAX_POSITION_DIFFERENCE && dy < MAX_POSITION_DIFFERENCE) {
+        // Ignore packets that are too close to our current position
+        // This helps prevent jittery movement of other players
+        return;
+    }
+
+    player[player_id].x = Number(pkt.arg3);
+    player[player_id].y = Number(pkt.arg4);
 }
 
 function processPositionPacket(packet) {
     const player_id = packet.arg;
-    ctx.player[player_id].x = Number(packet.arg2);
-    ctx.player[player_id].y = Number(packet.arg3);
+    const newX = Number(packet.arg2);
+    const newY = Number(packet.arg3);
+    console.log(`got position packet Player: ${packet.arg} | X: ${packet.arg2} | Y: ${packet.arg3}`)
+
+    const dx = Math.abs(newX - ctx.player[player_id].x) >> 16;
+    const dy = Math.abs(newY - ctx.player[player_id].y) >> 16;
+
+    if (dx < MAX_POSITION_DIFFERENCE && dy < MAX_POSITION_DIFFERENCE) {
+        // Ignore packets that are too close to our current position
+        // This helps prevent jittery movement of other players
+        return;
+    }
+
+
+    ctx.player[player_id].x = newX;
+    ctx.player[player_id].y = newY;
 }
 
 export function tellServerPlayerMoved(player_id: number, movement_type: MOVEMENT, new_val: boolean) {
@@ -217,10 +266,18 @@ export function tellServerPlayerMoved(player_id: number, movement_type: MOVEMENT
         arg2: `${movement_type}${new_val ? 1 : 0}`,
         arg3: player[player_id].x,
         arg4: player[player_id].y,
+        arg5: ++network_state.movementTick,
     };
 
+    // Always process the move on the client.
+    // This gives feedback to the player immediately and makes non-host players feel more responsive.
+    //
+    // It will mean that the game logic is not 100% in sync with the server and invalid deaths may occur.
+    // This is a tradeoff I'm willing to make to get an MVP Peer-to-Peer mode working.
+    // A large refactor and new network approach would be needed to add more integrity for online play.
+    processMovePacket(pkt, true);
+
     if (ctx.is_server) {
-        processMovePacket(pkt);
         if (ctx.is_net) {
             sendPacketToAll(pkt);
         }
@@ -336,18 +393,19 @@ export function update_players_from_server(): boolean {
 }
 
 export function tellServerNewPosition() {
-    // const { client_player_num, is_server } = ctx;
-    // const newPacket = {
-    //   cmd: NETCMD.POSITION,
-    //   arg: client_player_num,
-    //   arg2: ctx.player[client_player_num].x,
-    //   arg3: ctx.player[client_player_num].y
-    // };
-    // if (is_server) {
-    //   sendPacketToAll(newPacket);
-    // } else {
-    //   sendPacketToSock(network_state.sock, newPacket);
-    // }
+    const { client_player_num, is_server } = ctx;
+    const newPacket = {
+      cmd: NETCMD.POSITION,
+      arg: client_player_num,
+      arg2: ctx.player[client_player_num].x,
+      arg3: ctx.player[client_player_num].y,
+      arg4: ++network_state.movementTick,
+    };
+    if (is_server) {
+      sendPacketToAll(newPacket);
+    } else {
+      sendPacketToSock(network_state.sock, newPacket);
+    }
 }
 
 /**
@@ -366,6 +424,7 @@ export function init_server(sockets: [Peer, ...DataConnection[]]): Promise<void>
         sock: null,
         socketset: [],
         hasBeenAcknowledged: true,
+        movementTick: 0,
     };
 
     const expectedNumberOfPlayers = sockets.filter(Boolean).length;
@@ -424,6 +483,7 @@ export function init_server(sockets: [Peer, ...DataConnection[]]): Promise<void>
             net_info[i] = {
                 sock: socket,
                 socketset: [],
+                movementTick: 0,
             };
         }
     });
