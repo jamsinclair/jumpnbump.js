@@ -4,7 +4,7 @@
 
 > **Play in your browser at https://jumpnbump.net** 🐰✨
 >
-> Alternatively available at https://jumpnbump.vercel.app
+> Alternatively available at https://jumpnbump.netlify.app
 
 This is a game for the whole family. You play cute fluffy little bunnies and
 hop on each other's heads.
