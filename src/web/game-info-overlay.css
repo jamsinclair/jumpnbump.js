@@ -45,7 +45,11 @@
     outline-offset: -1px;
     color: #000;
     fill: #000;
-    transition: outline-width 200ms ease, outline-offset 200ms ease, fill 200ms ease, background-color 200ms ease;
+    transition:
+        outline-width 200ms ease,
+        outline-offset 200ms ease,
+        fill 200ms ease,
+        background-color 200ms ease;
 }
 
 .game-info-overlay-close:focus,
@@ -84,7 +88,11 @@
     outline: 1px solid #fff;
     outline-offset: -1px;
     color: #fff;
-    transition: outline-width 200ms ease, outline-offset 200ms ease, fill 200ms ease, background-color 200ms ease;
+    transition:
+        outline-width 200ms ease,
+        outline-offset 200ms ease,
+        fill 200ms ease,
+        background-color 200ms ease;
 }
 
 .game-info-overlay-toggle:focus,

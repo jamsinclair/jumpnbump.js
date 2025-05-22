@@ -6,7 +6,9 @@
     outline: inherit;
     color: #fff;
     font-weight: 700;
-    transition: outline-width 200ms ease, outline-offset 200ms ease;
+    transition:
+        outline-width 200ms ease,
+        outline-offset 200ms ease;
     outline: 1px solid transparent;
     border: 1px solid transparent;
     outline-offset: -1px;

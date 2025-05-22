@@ -36,7 +36,11 @@
     outline-offset: -1px;
     color: #fff;
     fill: #fff;
-    transition: outline-width 200ms ease, outline-offset 200ms ease, fill 200ms ease, background-color 200ms ease;
+    transition:
+        outline-width 200ms ease,
+        outline-offset 200ms ease,
+        fill 200ms ease,
+        background-color 200ms ease;
 }
 
 .level-selector-close:focus,

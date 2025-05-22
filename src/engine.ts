@@ -6,12 +6,14 @@ import ctx, { resetContext } from './context';
 
 export type OptionalGameOptions = Partial<MainOptions>;
 
+type GameState = 'initial' | 'running' | 'paused' | 'stopped';
+
 export class Engine {
     canvas: HTMLCanvasElement;
     options: MainOptions;
     renderer: PalettedRenderer;
     _onExit: (exitCode: number) => void = () => {};
-
+    _onStateChange: (state: GameState) => void = () => {};
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
         canvas.width = SCREEN_WIDTH;
@@ -24,29 +26,38 @@ export class Engine {
     }
 
     async run() {
-        ctx.state = 'running';
+        this.changeState('running');
         return main(this.canvas, this.options).then((num) => this._onExit(num));
     }
 
     togglePause() {
         const isPaused = ctx.state === 'paused';
-        ctx.state = isPaused ? 'running' : 'paused';
+        this.changeState(isPaused ? 'running' : 'paused');
     }
 
     resume() {
-        ctx.state = 'running';
+        this.changeState('running');
     }
 
     pause() {
-        ctx.state = 'paused';
+        this.changeState('paused');
     }
 
     stop() {
-        ctx.state = 'stopped';
+        this.changeState('stopped');
     }
 
-    getState() {
+    getState(): GameState {
         return ctx.state;
+    }
+
+    changeState(state: GameState) {
+        ctx.state = state;
+        this._onStateChange(state);
+    }
+
+    onStateChange(callback: (state: GameState) => void) {
+        this._onStateChange = callback;
     }
 
     onExit(callback: (exitCode: number) => void) {

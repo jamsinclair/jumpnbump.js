@@ -24,14 +24,14 @@ it were QWERTY.
 
 The controls on a **QWERTY** keyboard are:
 
--   A, W, D to steer Dot
--   ←, ↑, → to steer Jiffy
--   J, I, L to steer Fizz
--   4, 8, 6 to steer Mijji (on the numeric pad)
+- A, W, D to steer Dot
+- ←, ↑, → to steer Jiffy
+- J, I, L to steer Fizz
+- 4, 8, 6 to steer Mijji (on the numeric pad)
 
--   ? (SHIFT + /) toggles the shortcut overlay
--   F (SHIFT + f) toggles fullscreen
--   ESC ends the current game. When pressed from the menu screen it will exit to the Web UI landing page.
+- ? (SHIFT + /) toggles the shortcut overlay
+- F (SHIFT + f) toggles fullscreen
+- ESC ends the current game. When pressed from the menu screen it will exit to the Web UI landing page.
 
 ## Extra levels
 

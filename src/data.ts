@@ -1,6 +1,6 @@
-import { toShort } from './c';
-import { BAN } from './constants';
-import { Gob, GobName } from './assets';
+import { toShort } from './c.ts';
+import { BAN } from './constants.ts';
+import { Gob, GobName } from './assets.ts';
 
 let datafile_buffer;
 let datafile_index;

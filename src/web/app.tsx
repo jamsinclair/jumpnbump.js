@@ -1,12 +1,24 @@
-import React from 'react';
-import { createRoot } from 'react-dom/client';
-import './global.css';
+import { render } from 'preact';
+import { lazy, LocationProvider, ErrorBoundary, Router, Route } from 'preact-iso';
 
-import { Menu } from './menu';
+import './app.css';
+
+const Play = lazy(() => import('./pages/play'));
+const Levels = lazy(() => import('./pages/levels'));
+const NotFound = () => <div>404 - Not Found</div>;
 
 function App() {
-    return <Menu />;
+    return (
+        <LocationProvider>
+            <ErrorBoundary>
+                <Router>
+                    <Route path="/" component={Play} />
+                    <Route path="/levels/:page?" component={Levels} />
+                    <Route default component={NotFound} />
+                </Router>
+            </ErrorBoundary>
+        </LocationProvider>
+    );
 }
 
-const root = createRoot(document.getElementById('app'));
-root.render(<App />);
+render(<App />, document.getElementById('app')!);
