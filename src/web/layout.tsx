@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import { ComponentChildren } from 'preact';
 
 function ParallaxLogo() {
@@ -35,7 +35,11 @@ function ParallaxLogo() {
 }
 
 export function Layout({ title, children }: { title: string; children: ComponentChildren }) {
-    const onlineCount = useMemo(() => Math.floor(Math.random() * 20), []);
+    const [onlineCount, setOnlineCount] = useState(0);
+
+    useEffect(() => {
+        setOnlineCount(Math.floor(Math.random() * 20));
+    }, []);
 
     return (
         <div className="bg-brainchild-bg w-full h-full min-h-screen flex justify-center">
