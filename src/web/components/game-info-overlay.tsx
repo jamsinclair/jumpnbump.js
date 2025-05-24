@@ -1,6 +1,5 @@
-import React, { useEffect } from 'react';
-import './game-info-overlay.css';
-import { CloseIcon } from './close-icon';
+import { useEffect, useRef } from 'preact/hooks';
+import { Close } from '../icons/close';
 
 const shortcuts = [
     {
@@ -57,7 +56,7 @@ const toggleAi = [
 ];
 
 export function GameInfoOverlay() {
-    const dialogRef = React.useRef<HTMLDialogElement>(null);
+    const dialogRef = useRef<HTMLDialogElement>(null);
     const dismissDialog = () => {
         if (dialogRef.current && dialogRef.current.open) {
             dialogRef.current.close();
@@ -71,6 +70,12 @@ export function GameInfoOverlay() {
             dialogRef.current.showModal();
         } else if (dialogRef.current) {
             dialogRef.current.close();
+        }
+    };
+
+    const onButtonKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            dismissDialog();
         }
     };
 
@@ -89,51 +94,56 @@ export function GameInfoOverlay() {
 
     return (
         <>
-            <dialog className="game-info-overlay" ref={dialogRef}>
-                <h2>General</h2>
-                <table>
+            <dialog
+                className="opacity-85 p-4 fixed inset-0 m-auto w-max h-max max-w-[90%] max-h-[90%] overflow-auto"
+                ref={dialogRef}
+            >
+                <h2 className="text-xs uppercase font-semibold px-2 my-2">General</h2>
+                <table className="w-full border-collapse text-xs">
                     <tbody>
                         {shortcuts.map(({ keys, description }) => (
-                            <tr key={keys}>
-                                <td>{description}</td>
-                                <td>{keys}</td>
+                            <tr key={keys} className="border-t border-black">
+                                <td className="p-2 w-[70%]">{description}</td>
+                                <td className="p-2 w-[30%] font-bold">{keys}</td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
-                <h2>Controls</h2>
-                <table>
+                <h2 className="text-xs uppercase font-semibold px-2 my-2">Controls</h2>
+                <table className="w-full border-collapse text-xs">
                     <tbody>
                         {controls.map(({ keys, description }) => (
-                            <tr key={keys}>
-                                <td>{description}</td>
-                                <td>{keys}</td>
+                            <tr key={keys} className="border-t border-black">
+                                <td className="p-2 w-[70%]">{description}</td>
+                                <td className="p-2 w-[30%] font-bold">{keys}</td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
-                <h2>Toggle AI Players (when game is in progress)</h2>
-                <table>
+                <h2 className="text-xs uppercase font-semibold px-2 my-2">
+                    Toggle AI Players (when game is in progress)
+                </h2>
+                <table className="w-full border-collapse text-xs">
                     <tbody>
                         {toggleAi.map(({ keys, description }) => (
-                            <tr key={keys}>
-                                <td>{description}</td>
-                                <td>{keys}</td>
+                            <tr key={keys} className="border-t border-black">
+                                <td className="p-2 w-[70%]">{description}</td>
+                                <td className="p-2 w-[30%] font-bold">{keys}</td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
                 <button
-                    className="game-info-overlay-close"
+                    className="absolute top-0 right-0 p-2 cursor-pointer bg-transparent border-none outline-1 outline-black -outline-offset-1 text-black transition-all duration-200 ease-in-out hover:outline-offset-[-3px] hover:outline-[3px] active:outline-offset-[-3px] active:outline-[3px] active:bg-black active:text-white focus:outline-[3px] focus:outline-offset-[-3px]"
                     onClick={dismissDialog}
-                    onKeyDown={dismissDialog}
+                    onKeyDown={onButtonKeyDown}
                     aria-label="Close Controls & Shortcuts Overlay"
                 >
-                    <CloseIcon />
+                    <Close className="w-6 h-6" />
                 </button>
             </dialog>
             <button
-                className="game-info-overlay-toggle"
+                className="fixed bottom-4 right-4 cursor-pointer p-2 bg-transparent text-[1.2rem] w-8 h-8 text-center leading-none m-0 outline-1 outline-white -outline-offset-1 text-white transition-all duration-200 ease-in-out hover:outline-offset-[-3px] hover:outline-[3px] active:outline-offset-[-3px] active:outline-[3px] active:bg-white active:text-black"
                 aria-label="Toggle Controls & Shortcuts Overlay"
                 onClick={toggleDialog}
                 onKeyDown={toggleDialog}
