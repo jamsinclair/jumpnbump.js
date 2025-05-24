@@ -162,6 +162,7 @@ export default function levels() {
                                 <img
                                     src={`/levels/${level.imageUrl}`}
                                     alt={level.name}
+                                    loading="lazy"
                                     className="w-full max-w-50 h-auto"
                                 />
                             </div>
