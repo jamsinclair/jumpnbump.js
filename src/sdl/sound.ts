@@ -98,9 +98,17 @@ export function dj_stop_mod() {
     return;
 }
 
-export function dj_init() {}
+export function dj_init() {
+    window.addEventListener('touchstart', handleUserGesture);
+    window.addEventListener('mousedown', handleUserGesture);
+    window.addEventListener('keydown', handleKeyboardUserGesture);
+}
 
-export function dj_deinit() {}
+export function dj_deinit() {
+    window.removeEventListener('touchstart', handleUserGesture);
+    window.removeEventListener('mousedown', handleUserGesture);
+    window.removeEventListener('keydown', handleKeyboardUserGesture);
+}
 
 export function dj_stop() {
     const track = getCurrentTrack();
@@ -177,7 +185,3 @@ function handleKeyboardUserGesture(event: KeyboardEvent) {
         window.removeEventListener(event.type, handleKeyboardUserGesture);
     }
 }
-
-window.addEventListener('touchstart', handleUserGesture);
-window.addEventListener('mousedown', handleUserGesture);
-window.addEventListener('keydown', handleKeyboardUserGesture);
