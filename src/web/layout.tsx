@@ -51,7 +51,7 @@ export function Layout({ title, children }: { title: string; children: Component
                     <header>
                         <ParallaxLogo />
                     </header>
-                    <div className="bg-brainchild-separator border-t-1 border-b-1 border-black w-full p-1 flex flex-row justify-end items-center text-xs">
+                    <div className="bg-brainchild-separator border-t-1 border-b-1 border-black w-full p-1 flex flex-row justify-end items-center text-sm md:text-xs">
                         <div className="pr-4">
                             <span className="font-bold">Members:</span> <span>4362.</span>
                             <span className="pl-1 font-bold">Online:</span> <span>{onlineCount}.</span>
@@ -70,7 +70,7 @@ export function Layout({ title, children }: { title: string; children: Component
                                 <li>
                                     <a
                                         href="/"
-                                        className="bg-brainchild-primary hover:bg-brainchild-primary-hover border-1 text-black text-sm text-center md:text-right font-bold px-3 py-1 md:px-2 md:py-0 flex-grow-0 w-auto md:w-25 cursor-pointer block"
+                                        className="bg-brainchild-primary hover:bg-brainchild-primary-hover border-1 text-black text-md md:text-sm text-center md:text-right font-bold px-3 py-1 md:px-2 md:py-0 flex-grow-0 w-auto md:w-25 cursor-pointer block"
                                     >
                                         PLAY
                                     </a>
@@ -78,7 +78,7 @@ export function Layout({ title, children }: { title: string; children: Component
                                 <li>
                                     <a
                                         href="/levels"
-                                        className="bg-brainchild-primary hover:bg-brainchild-primary-hover border-1 text-black text-sm text-center md:text-right font-bold px-3 py-1 md:px-2 md:py-0 flex-grow-0 w-auto md:w-25 cursor-pointer block"
+                                        className="bg-brainchild-primary hover:bg-brainchild-primary-hover border-1 text-black text-md md:text-sm text-center md:text-right font-bold px-3 py-1 md:px-2 md:py-0 flex-grow-0 w-auto md:w-25 cursor-pointer block"
                                     >
                                         LEVELS
                                     </a>
@@ -86,7 +86,7 @@ export function Layout({ title, children }: { title: string; children: Component
                                 <li>
                                     <a
                                         href="/about"
-                                        className="bg-brainchild-primary hover:bg-brainchild-primary-hover border-1 text-black text-sm text-center md:text-right font-bold px-3 py-1 md:px-2 md:py-0 flex-grow-0 w-auto md:w-25 cursor-pointer block"
+                                        className="bg-brainchild-primary hover:bg-brainchild-primary-hover border-1 text-black text-md md:text-sm text-center md:text-right font-bold px-3 py-1 md:px-2 md:py-0 flex-grow-0 w-auto md:w-25 cursor-pointer block"
                                     >
                                         ABOUT
                                     </a>
@@ -94,7 +94,7 @@ export function Layout({ title, children }: { title: string; children: Component
                                 <li>
                                     <a
                                         href="https://github.com/jamsinclair/jumpnbump.js"
-                                        className="bg-brainchild-primary hover:bg-brainchild-primary-hover border-1 text-black text-sm text-center md:text-right font-bold px-3 py-1 md:px-2 md:py-0 flex-grow-0 w-auto md:w-25 cursor-pointer block"
+                                        className="bg-brainchild-primary hover:bg-brainchild-primary-hover border-1 text-black text-md md:text-sm text-center md:text-right font-bold px-3 py-1 md:px-2 md:py-0 flex-grow-0 w-auto md:w-25 cursor-pointer block"
                                     >
                                         SOURCE
                                     </a>
@@ -108,7 +108,7 @@ export function Layout({ title, children }: { title: string; children: Component
                     </div>
                 </div>
                 <footer className="">
-                    <p className="text-xs text-center">
+                    <p className="text-sm md:text-xs text-center">
                         Website and JavaScript port by{' '}
                         <a href="https://github.com/jamsinclair/jumpnbump.js" className="underline">
                             Jamie Sinclair

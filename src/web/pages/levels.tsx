@@ -117,8 +117,8 @@ export default function levels() {
 
     return (
         <Layout title="Levels">
-            <Card title="Jump 'n Bump Levels" className="w-full px-3">
-                <p className="text-xs pt-3">
+            <Card title="Jump 'n Bump Levels" className="w-full px-4 md:px-3">
+                <p className="text-sm md:text-xs pt-3">
                     Here you can download some of the levels that fans of Jump 'n Bump have made. If you want to add
                     your own, or update the information for a level, please{' '}
                     <a
@@ -133,16 +133,16 @@ export default function levels() {
                     <div>
                         <input
                             type="text"
-                            className="text-xs border-2 border-inset min-w-30 p-1 md:py-0"
+                            className="text-sm md:text-xs border-2 border-inset min-w-30 p-1 md:py-0"
                             placeholder="Search by name or author"
                             value={searchQuery}
                             onInput={debounce(onSearchQueryInput, 300)}
                         />
                     </div>
                     <div>
-                        <label className="text-xs font-bold mr-1">Show:</label>
+                        <label className="text-sm md:text-xs font-bold mr-1">Show:</label>
                         <select
-                            className="text-xs border-2 border-inset min-w-30 p-1 md:py-0 mt-2 md:mt-0"
+                            className="text-sm md:text-xs border-2 border-inset min-w-30 p-1 md:py-0 mt-2 md:mt-0"
                             onChange={onPageSelect}
                             value={currentPage}
                         >
@@ -155,7 +155,7 @@ export default function levels() {
                     </div>
                 </div>
                 <div className="flex flex-col gap-6 pt-4">
-                    {levelsToShow.length === 0 && <div className="text-center text-xs">No levels found</div>}
+                    {levelsToShow.length === 0 && <div className="text-center text-sm md:text-xs">No levels found</div>}
                     {levelsToShow.map((level) => (
                         <div key={level.datFile} className="flex flex-col md:flex-row gap-4">
                             <div className="w-full md:w-[40%]">
@@ -167,8 +167,8 @@ export default function levels() {
                                 />
                             </div>
                             <div className="w-full md:w-[60%] flex flex-col gap-1">
-                                <h3 className="font-bold text-sm italic">{level.name}</h3>
-                                <div className="text-xs">
+                                <h3 className="font-bold text-md md:text-sm italic">{level.name}</h3>
+                                <div className="text-sm md:text-xs">
                                     by:{' '}
                                     {level.authorUrl ? (
                                         <a href={level.authorUrl} className="text-brainchild-secondary font-bold">
@@ -178,7 +178,7 @@ export default function levels() {
                                         <span className="font-bold">{level.author}</span>
                                     )}
                                 </div>
-                                <ul className="list-none text-xs mt-3">
+                                <ul className="list-none text-sm md:text-xs mt-3">
                                     <li>
                                         <span className="font-bold">Size:</span> {level.size}
                                     </li>
@@ -188,7 +188,7 @@ export default function levels() {
                                 </ul>
                                 <a
                                     href={`/levels/${level.datFile}`}
-                                    className="text-brainchild-secondary text-xs font-bold mt-1"
+                                    className="text-brainchild-secondary text-sm md:text-xs font-bold mt-1"
                                     download={`${level.datFile}.dat`}
                                     target="_blank"
                                 >
@@ -203,14 +203,14 @@ export default function levels() {
                         {currentPage > 1 && (
                             <a
                                 href={`/levels/${currentPage - 1}`}
-                                className="text-brainchild-secondary text-xs font-bold"
+                                className="text-brainchild-secondary text-sm md:text-xs font-bold"
                             >
                                 Previous Page
                             </a>
                         )}
                     </div>
                     <div className="w-1/3 text-center">
-                        <span className="text-xs">
+                        <span className="text-sm md:text-xs">
                             Page {currentPage} of {numberOfPages}
                         </span>
                     </div>
@@ -218,7 +218,7 @@ export default function levels() {
                         {currentPage < numberOfPages && (
                             <a
                                 href={`/levels/${currentPage + 1}`}
-                                className="text-brainchild-secondary text-xs font-bold"
+                                className="text-brainchild-secondary text-sm md:text-xs font-bold"
                             >
                                 Next Page
                             </a>

@@ -98,8 +98,8 @@ export function GameInfoOverlay() {
                 className="opacity-85 p-4 fixed inset-0 m-auto w-max h-max max-w-[90%] max-h-[90%] overflow-auto"
                 ref={dialogRef}
             >
-                <h2 className="text-xs uppercase font-semibold px-2 my-2">General</h2>
-                <table className="w-full border-collapse text-xs">
+                <h2 className="text-sm md:text-xs uppercase font-semibold px-2 my-2">General</h2>
+                <table className="w-full border-collapse text-sm md:text-xs">
                     <tbody>
                         {shortcuts.map(({ keys, description }) => (
                             <tr key={keys} className="border-t border-black">
@@ -109,8 +109,8 @@ export function GameInfoOverlay() {
                         ))}
                     </tbody>
                 </table>
-                <h2 className="text-xs uppercase font-semibold px-2 my-2">Controls</h2>
-                <table className="w-full border-collapse text-xs">
+                <h2 className="text-sm md:text-xs uppercase font-semibold px-2 my-2">Controls</h2>
+                <table className="w-full border-collapse text-sm md:text-xs">
                     <tbody>
                         {controls.map(({ keys, description }) => (
                             <tr key={keys} className="border-t border-black">
@@ -120,10 +120,10 @@ export function GameInfoOverlay() {
                         ))}
                     </tbody>
                 </table>
-                <h2 className="text-xs uppercase font-semibold px-2 my-2">
+                <h2 className="text-sm md:text-xs uppercase font-semibold px-2 my-2">
                     Toggle AI Players (when game is in progress)
                 </h2>
-                <table className="w-full border-collapse text-xs">
+                <table className="w-full border-collapse text-sm md:text-xs">
                     <tbody>
                         {toggleAi.map(({ keys, description }) => (
                             <tr key={keys} className="border-t border-black">

@@ -19,7 +19,7 @@ export default function About() {
 
     return (
         <Layout title="Secrets">
-            <Card title="Jump 'n Bump Secrets" className="w-full text-center text-xs pb-3">
+            <Card title="Jump 'n Bump Secrets" className="w-full text-center text-sm md:text-xs pb-3">
                 <p className="mt-3">These are the secrets in the game.</p>
                 <p>They are pretty impossible to find on your own,</p>
                 <p>but now you know them and don't have to ask us anymore! :)</p>

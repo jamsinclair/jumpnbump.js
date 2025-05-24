@@ -17,7 +17,7 @@ export function LevelItem({
             onClick={() => onSelection()}
         >
             <img src={imageSrc} alt={name} loading="lazy" className="w-50 h-32 object-cover mb-1 border border-black" />
-            <span className="text-sm mt-1">{name}</span>
+            <span className="text-md md:text-sm mt-1">{name}</span>
         </button>
     );
 }

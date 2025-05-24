@@ -81,7 +81,7 @@ function LevelPreview({ level }: { level: Level }) {
     return (
         <div>
             <img src={`/levels/${level.imageUrl}`} alt={`Preview of the level ${level.name}`} />
-            <p className="text-xs font-bold py-1">{level.name}</p>
+            <p className="text-sm md:text-xs font-bold py-1">{level.name}</p>
         </div>
     );
 }
@@ -144,16 +144,16 @@ export default function Play() {
         <Layout title="Play">
             <div className="flex flex-col w-full gap-2">
                 <Card title="Jump 'n Bump" className="w-full md:w-86 flex-shrink-0 pb-3">
-                    <p className="text-xs pt-3">
+                    <p className="text-sm md:text-xs pt-3">
                         Play <span className="italic">Jump 'n Bump</span> right here in your web browser! This is a
                         loving port of the original game for the web. Gather your friends around the keyboard and let
                         the lagomorphic playful violence begin!
                     </p>
-                    <p className="text-xs pt-3">
+                    <p className="text-sm md:text-xs pt-3">
                         Start with the original level, or choose from over 200 levels available in the{' '}
                         <span className="italic">“Level”</span> section.
                     </p>
-                    <p className="text-xs pt-3">
+                    <p className="text-sm md:text-xs pt-3">
                         You can also choose to play with no music, sound effects, or gore. Don’t forget to discover the
                         hidden&nbsp;
                         <a className="text-brainchild-secondary font-bold" href="/secrets">
@@ -163,20 +163,20 @@ export default function Play() {
                     </p>
                 </Card>
                 <Card title="Controls" className="w-full md:w-86">
-                    <p className="text-xs pt-3">
+                    <p className="text-sm md:text-xs pt-3">
                         <span className="font-bold">Dott:</span> Use the arrow keys to move around.
                     </p>
-                    <p className="text-xs pt-3">
+                    <p className="text-sm md:text-xs pt-3">
                         <span className="font-bold">Jiffy:</span> Use the A,W,D keys to move around.
                     </p>
-                    <p className="text-xs pt-3">
+                    <p className="text-sm md:text-xs pt-3">
                         <span className="font-bold">Fizz:</span> Use the J,I,L keys to move around.
                     </p>
-                    <p className="text-xs pt-3">
+                    <p className="text-sm md:text-xs pt-3">
                         <span className="font-bold">Mijji:</span> Use the numpad arrow keys to move around.
                     </p>
-                    <p className="text-xs pt-3">Additional controls:</p>
-                    <ul className="list-disc list-inside text-xs">
+                    <p className="text-sm md:text-xs pt-3">Additional controls:</p>
+                    <ul className="list-disc list-inside text-sm md:text-xs">
                         <li>
                             <span className="font-bold">ESC:</span> End the game. Press it again to exit the game.
                         </li>
@@ -192,7 +192,7 @@ export default function Play() {
             <div className="flex flex-col w-full gap-2 pt-2 md:pt-0">
                 <Card title="Play">
                     <button
-                        className="w-full mt-2 mx-auto block bg-brainchild-tertiary hover:bg-brainchild-tertiary-hover border-1 border-black p-1 text-sm font-bold uppercase cursor-pointer focus:outline-none focus:ring-2 focus:ring-brainchild-tertiary focus:ring-offset-2"
+                        className="w-full mt-2 mx-auto block bg-brainchild-tertiary hover:bg-brainchild-tertiary-hover border-1 border-black p-1 text-md md:text-sm font-bold uppercase cursor-pointer focus:outline-none focus:ring-2 focus:ring-brainchild-tertiary focus:ring-offset-2"
                         onClick={() => setIsGameRunning(true)}
                     >
                         Start Game
@@ -203,7 +203,7 @@ export default function Play() {
                         <LevelPreview level={selectedLevel} />
                         <button
                             onClick={() => setShowLevelSelector(true)}
-                            className="w-full mt-2 mx-auto block bg-brainchild-tertiary hover:bg-brainchild-tertiary-hover border-1 border-black p-1 text-sm font-bold uppercase cursor-pointer focus:outline-none focus:ring-2 focus:ring-brainchild-tertiary focus:ring-offset-2"
+                            className="w-full mt-2 mx-auto block bg-brainchild-tertiary hover:bg-brainchild-tertiary-hover border-1 border-black p-1 text-md md:text-sm font-bold uppercase cursor-pointer focus:outline-none focus:ring-2 focus:ring-brainchild-tertiary focus:ring-offset-2"
                         >
                             Change Level
                         </button>
@@ -216,7 +216,7 @@ export default function Play() {
                         <label
                             htmlFor="custom-level"
                             title="Load a custom level from your computer. Jump 'n Bump levels usually have the .dat extension."
-                            className="w-full mt-2 mx-auto block text-center bg-brainchild-tertiary hover:bg-brainchild-tertiary-hover border-1 border-black p-1 text-sm font-bold uppercase cursor-pointer"
+                            className="w-full mt-2 mx-auto block text-center bg-brainchild-tertiary hover:bg-brainchild-tertiary-hover border-1 border-black p-1 text-md md:text-sm font-bold uppercase cursor-pointer"
                         >
                             Load Level File
                         </label>
@@ -231,7 +231,7 @@ export default function Play() {
                                 checked={gameOptions.noflies}
                                 onChange={(e: any) => setGameOptions({ ...gameOptions, noflies: e.target.checked })}
                             />
-                            <span className="text-sm">No Flies</span>
+                            <span className="text-md md:text-sm">No Flies</span>
                         </label>
                         <label className="flex items-center gap-2">
                             <input
@@ -240,7 +240,7 @@ export default function Play() {
                                 checked={gameOptions.nogore}
                                 onChange={(e: any) => setGameOptions({ ...gameOptions, nogore: e.target.checked })}
                             />
-                            <span className="text-sm">No Gore</span>
+                            <span className="text-md md:text-sm">No Gore</span>
                         </label>
                         <label className="flex items-center gap-2">
                             <input
@@ -250,7 +250,7 @@ export default function Play() {
                                 onChange={(e: any) => setGameOptions({ ...gameOptions, nosound: e.target.checked })}
                                 disabled={gameOptions.musicnosound}
                             />
-                            <span className="text-sm">No Sound Effects</span>
+                            <span className="text-md md:text-sm">No Sound Effects</span>
                         </label>
                         <label className="flex items-center gap-2">
                             <input
@@ -265,7 +265,7 @@ export default function Play() {
                                     })
                                 }
                             />
-                            <span className="text-sm">No Music and Sound</span>
+                            <span className="text-md md:text-sm">No Music and Sound</span>
                         </label>
                     </div>
                 </Card>

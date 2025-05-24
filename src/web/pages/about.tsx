@@ -40,26 +40,26 @@ export default function About() {
     return (
         <Layout title="About">
             <Card title="History" className="w-full md:w-84 flex-shrink-0">
-                <p className="text-xs pt-3">
+                <p className="text-sm md:text-xs pt-3">
                     Sweden, 1998. Four extremely talented, smart and goodlooking friends came together to make gaming
                     history.
                 </p>
-                <ul className="list-disc list-inside text-xs pt-3 pl-2 pb-1">
+                <ul className="list-disc list-inside text-sm md:text-xs pt-3 pl-2 pb-1">
                     <li>Mattias Brynervall (Programming, Web Development)</li>
                     <li>Andreas Brynervall (Graphics, Game Design)</li>
                     <li>Martin Magnusson (Graphics, Game Design)</li>
                     <li>Anders JG Nilsson (Music, Sound Effects)</li>
                 </ul>
-                <p className="text-xs pt-3">
+                <p className="text-sm md:text-xs pt-3">
                     Together they created Jump 'n Bump and other games under Brainchild Design. They released the game
                     for free and it quickly became popular as emailware. Being shared between friends, family and the
                     world. Bringing people together, crowded around a keyboard and providing hours of fun.
                 </p>
-                <p className="text-xs pt-3">
+                <p className="text-sm md:text-xs pt-3">
                     Not long after, they released the game's source code for free. Allowing it to live on over the years
                     and to continue to bring joy to our lives.
                 </p>
-                <p className="text-xs pt-3">
+                <p className="text-sm md:text-xs pt-3">
                     If you'd like to help expand the history or add any additional information, please feel free to{' '}
                     <a
                         href="https://github.com/jamsinclair/jumpnbump.js"
@@ -71,9 +71,9 @@ export default function About() {
                     for this website's repository.
                 </p>
             </Card>
-            <div className="flex flex-col w-full gap-2 pt-2 md:pt-0">
+            <div className="flex flex-col w-full gap-4 md:gap-2 pt-4 md:pt-0">
                 <Card title="Download Game">
-                    <p className="text-xs pt-3">
+                    <p className="text-sm md:text-xs pt-3">
                         There is a modern fork of the original game available from{' '}
                         <a href="https://libregames.gitlab.io/jumpnbump/" className="underline">
                             LibreGames
@@ -86,11 +86,11 @@ export default function About() {
                         className="mt-3 mx-auto flex flex-col items-center justify-center hover:scale-105 transition-all duration-300"
                     >
                         <Download size={40} className="drop-shadow-xl/50" />
-                        <span className="text-xs tracking-[.25em] text-shadow-lg">download</span>
+                        <span className="text-sm md:text-xs tracking-[.25em] text-shadow-lg">download</span>
                     </a>
                 </Card>
                 <Card title="Source Code">
-                    <ul className="list-disc list-inside text-xs pt-3 pb-1">
+                    <ul className="list-disc list-inside text-sm md:text-xs pt-3 pb-1">
                         <li>
                             <a
                                 href="https://gitlab.com/LibreGames/jumpnbump"

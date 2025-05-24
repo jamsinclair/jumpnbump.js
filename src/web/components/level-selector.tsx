@@ -141,7 +141,7 @@ export function LevelSelector({
                         <input
                             type="text"
                             placeholder="Search by name"
-                            className="border-inset border-2 px-1 bg-white text-sm"
+                            className="border-inset border-2 px-1 bg-white text-md md:text-sm"
                             onInput={(e: any) => setSearchQuery(e.target.value)}
                         />
                     </div>
