@@ -4,11 +4,14 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
     build: {
-        target: 'es2020',
+        target: 'es2018',
     },
     plugins: [
         preact({
-            prerender: { enabled: true },
+            prerender: {
+                enabled: true,
+                renderTarget: '#app',
+            },
         }),
         tailwindcss(),
     ],
