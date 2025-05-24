@@ -1,4 +1,3 @@
-import { Download } from '../icons/download';
 import { Card } from '../components/card';
 import { Layout } from '../layout';
 import { PageMeta, usePageMeta } from '../hooks/page-meta';

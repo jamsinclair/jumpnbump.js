@@ -39,7 +39,7 @@ export default function About() {
 
     return (
         <Layout title="About">
-            <Card title="History" className="w-84 flex-shrink-0">
+            <Card title="History" className="w-full md:w-84 flex-shrink-0">
                 <p className="text-xs pt-3">
                     Sweden, 1998. Four extremely talented, smart and goodlooking friends came together to make gaming
                     history.
@@ -71,7 +71,7 @@ export default function About() {
                     for this website's repository.
                 </p>
             </Card>
-            <div className="flex flex-col w-full gap-2">
+            <div className="flex flex-col w-full gap-2 pt-2 md:pt-0">
                 <Card title="Download Game">
                     <p className="text-xs pt-3">
                         There is a modern fork of the original game available from{' '}

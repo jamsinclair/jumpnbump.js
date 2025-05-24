@@ -39,12 +39,12 @@ export function Layout({ title, children }: { title: string; children: Component
 
     return (
         <div className="bg-brainchild-bg w-full h-full min-h-screen flex justify-center">
-            <div className="[width:690px] mt-10 p-2">
-                <h2 className="italic text-lg text-right uppercase tracking-[.25em] px-4">
+            <div className="w-full [max-width:690px]  mx-auto mt-2 md:mt-10 p-2 sm:p-4">
+                <h2 className="italic text-sm md:text-lg text-right uppercase tracking-[.25em] px-4">
                     Inspired by Brainchild Design
                 </h2>
-                <div className="bg-brainchild-fg border-2 border-black rounded-3xl rounded-tl-none w-151 relative mr-0 ml-auto">
-                    <header className="">
+                <div className="bg-brainchild-fg border-2 border-black rounded-3xl rounded-tl-none w-full md:w-151 md:ml-auto md:mr-0 relative overflow-hidden md:overflow-visible">
+                    <header>
                         <ParallaxLogo />
                     </header>
                     <div className="bg-brainchild-separator border-t-1 border-b-1 border-black w-full p-1 flex flex-row justify-end items-center text-xs">
@@ -53,40 +53,50 @@ export function Layout({ title, children }: { title: string; children: Component
                             <span className="pl-1 font-bold">Online:</span> <span>{onlineCount}.</span>
                         </div>
                     </div>
-                    <div className="ml-9 mr-5 pt-4 border-b-1 border-black">
+                    <div className="mx-4 md:ml-9 md:mr-5 pt-4 border-b-1 border-black">
                         <div className="w-66 bg-gradient-to-r from-brainchild-fg to-brainchild-separator-darker px-2 ml-auto text-right">
                             <h2 className="uppercase text-xl italic text-white font-bold text-stroke-1 leading-none">
                                 {title}
                             </h2>
                         </div>
                     </div>
-                    <div className="flex flex-row py-4 pl-9 pr-5 gap-2 relative items-start">
-                        <div className="flex flex-col gap-0.5 absolute -left-19">
-                            <a
-                                href="/"
-                                className="bg-brainchild-primary hover:bg-brainchild-primary-hover border-1 text-black text-sm text-right font-bold px-2 flex-grow-0 w-25 cursor-pointer"
-                            >
-                                PLAY
-                            </a>
-                            <a
-                                href="/levels"
-                                className="bg-brainchild-primary hover:bg-brainchild-primary-hover border-1 text-black text-sm text-right font-bold px-2 flex-grow-0 w-25 cursor-pointer"
-                            >
-                                LEVELS
-                            </a>
-                            <a
-                                href="/about"
-                                className="bg-brainchild-primary hover:bg-brainchild-primary-hover border-1 text-black text-sm text-right font-bold px-2 flex-grow-0 w-25 cursor-pointer"
-                            >
-                                ABOUT
-                            </a>
-                            <a
-                                href="https://github.com/jamsinclair/jumpnbump.js"
-                                className="bg-brainchild-primary hover:bg-brainchild-primary-hover border-1 text-black text-sm text-right font-bold px-2 flex-grow-0 w-25 cursor-pointer"
-                            >
-                                SOURCE
-                            </a>
-                        </div>
+                    <div className="flex flex-col md:flex-row p-4 md:py-4 md:pl-9 md:pr-5 md:gap-2 relative md:items-start">
+                        <nav className="order-first md:order-none md:absolute md:-left-19 md:mb-0">
+                            <ul className="flex flex-row flex-wrap justify-center gap-2 mb-4 md:flex-col md:gap-0.5 list-none p-0 m-0">
+                                <li>
+                                    <a
+                                        href="/"
+                                        className="bg-brainchild-primary hover:bg-brainchild-primary-hover border-1 text-black text-sm text-center md:text-right font-bold px-3 py-1 md:px-2 md:py-0 flex-grow-0 w-auto md:w-25 cursor-pointer block"
+                                    >
+                                        PLAY
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="/levels"
+                                        className="bg-brainchild-primary hover:bg-brainchild-primary-hover border-1 text-black text-sm text-center md:text-right font-bold px-3 py-1 md:px-2 md:py-0 flex-grow-0 w-auto md:w-25 cursor-pointer block"
+                                    >
+                                        LEVELS
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="/about"
+                                        className="bg-brainchild-primary hover:bg-brainchild-primary-hover border-1 text-black text-sm text-center md:text-right font-bold px-3 py-1 md:px-2 md:py-0 flex-grow-0 w-auto md:w-25 cursor-pointer block"
+                                    >
+                                        ABOUT
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="https://github.com/jamsinclair/jumpnbump.js"
+                                        className="bg-brainchild-primary hover:bg-brainchild-primary-hover border-1 text-black text-sm text-center md:text-right font-bold px-3 py-1 md:px-2 md:py-0 flex-grow-0 w-auto md:w-25 cursor-pointer block"
+                                    >
+                                        SOURCE
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
                         {children}
                     </div>
                 </div>

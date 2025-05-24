@@ -143,7 +143,7 @@ export default function Play() {
     return (
         <Layout title="Play">
             <div className="flex flex-col w-full gap-2">
-                <Card title="Jump 'n Bump" className="w-86 flex-shrink-0 pb-3">
+                <Card title="Jump 'n Bump" className="w-full md:w-86 flex-shrink-0 pb-3">
                     <p className="text-xs pt-3">
                         Play <span className="italic">Jump 'n Bump</span> right here in your web browser! This is a
                         loving port of the original game for the web. Gather your friends around the keyboard and let
@@ -162,7 +162,7 @@ export default function Play() {
                         .
                     </p>
                 </Card>
-                <Card title="Controls">
+                <Card title="Controls" className="w-full md:w-86">
                     <p className="text-xs pt-3">
                         <span className="font-bold">Dott:</span> Use the arrow keys to move around.
                     </p>
@@ -189,7 +189,7 @@ export default function Play() {
                     </ul>
                 </Card>
             </div>
-            <div className="flex flex-col w-full gap-2">
+            <div className="flex flex-col w-full gap-2 pt-2 md:pt-0">
                 <Card title="Play">
                     <button
                         className="w-full mt-2 mx-auto block bg-brainchild-tertiary hover:bg-brainchild-tertiary-hover border-1 border-black p-1 text-sm font-bold uppercase cursor-pointer focus:outline-none focus:ring-2 focus:ring-brainchild-tertiary focus:ring-offset-2"
