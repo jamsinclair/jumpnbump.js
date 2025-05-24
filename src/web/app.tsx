@@ -31,7 +31,6 @@ if (typeof window !== 'undefined') {
 
 function getHeadElements(meta: PageMeta) {
     return [
-        { type: 'title', props: { children: meta.title } },
         { type: 'meta', props: { name: 'description', content: meta.description } },
         { type: 'meta', props: { name: 'keywords', content: meta.keywords?.join(', ') } },
 
