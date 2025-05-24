@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /secrets
+
+Sitemap: https://jumpnbump.net/sitemap.xml

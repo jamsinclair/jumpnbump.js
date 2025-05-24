@@ -1,0 +1,108 @@
+@import 'tailwindcss';
+
+.border-inset {
+    border-style: inset;
+}
+
+.text-stroke-1 {
+    -webkit-text-stroke-width: 1px;
+    text-stroke-width: 1px;
+    -webkit-text-stroke-color: black;
+    text-stroke-color: black;
+}
+
+.text-stroke-2 {
+    -webkit-text-stroke-width: 2px;
+    text-stroke-width: 2px;
+    -webkit-text-stroke-color: black;
+    text-stroke-color: black;
+}
+
+.logo-container {
+    height: 84px;
+    max-width: 430px;
+    margin: 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.logo-parallax-layer {
+    background-image: url('/logo/transparent-logo-alt.png');
+    background-attachment: scroll;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    color: transparent;
+    user-select: none;
+    z-index: 1;
+    transform-style: preserve-3d;
+}
+
+.logo-parallax-layer:before {
+    content: '';
+    background-image: url('/logo/clouds.jpeg');
+    background-attachment: scroll;
+    background-position: center;
+    background-repeat: repeat;
+    background-size: cover;
+    height: 200%;
+    position: absolute;
+    top: -50%;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    transform: translate(calc(var(--x, -1) * 1px), calc(var(--y, 5) * 1px)) translateZ(-1px) scale(2);
+}
+
+.game-canvas {
+    display: block;
+    margin: auto;
+    width: 100%;
+    height: 100%;
+    max-width: calc(100vh * 400 / 256);
+    max-height: calc(100vw * 256 / 400);
+
+    image-rendering: optimizeSpeed;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: -o-crisp-edges;
+    image-rendering: pixelated;
+    -ms-interpolation-mode: nearest-neighbor;
+}
+
+.custom-level-upload-input:focus + label {
+    outline: 2px solid var(--color-brainchild-tertiary);
+    outline-offset: 2px;
+}
+
+@supports (background-image: url('/logo/clouds.webp')) {
+    .logo-parallax-layer:before {
+        background-image: url('/logo/clouds.webp');
+    }
+}
+
+@theme {
+    --default-font-family: 'Verdana', 'Geneva', 'Tahoma', 'sans-serif';
+
+    --color-brainchild-bg: #415f64;
+    --color-brainchild-fg: #a0afaf;
+    --color-brainchild-separator: #8c9b9b;
+    --color-brainchild-separator-darker: #788787;
+    --color-brainchild-primary: #bebe96;
+    --color-brainchild-primary-hover: #d0d1b6;
+    --color-brainchild-secondary: #004080;
+    --color-brainchild-tertiary: #82a0d2;
+    --color-brainchild-tertiary-hover: #92b0d2;
+
+    --text-xs: 0.6666666667rem;
+    --text-xs--line-height: calc(1.25 / 0.6666666667rem);
+    --text-sm: 0.8333333375rem;
+    --text-sm--line-height: calc(1.25 / 0.8333333375rem);
+}

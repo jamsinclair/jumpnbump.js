@@ -32,8 +32,8 @@ export function init_controls_listener() {
 }
 
 export function deinit_controls_listener() {
-    window.addEventListener('keydown', capture_sdl_event_keydown);
-    window.addEventListener('keyup', capture_sdl_event_keyup);
+    window.removeEventListener('keydown', capture_sdl_event_keydown);
+    window.removeEventListener('keyup', capture_sdl_event_keyup);
 }
 
 export function poll_events() {

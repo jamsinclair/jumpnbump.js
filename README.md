@@ -6,15 +6,11 @@
 >
 > Alternatively available at https://jumpnbump.netlify.app
 
-This is a game for the whole family. You play cute fluffy little bunnies and
-hop on each other's heads.
+A JavaScript port of the original Jump 'n Bump game.
 
-At the beginning you are in the menu, where you have to let each active player
-jump over the tree trunk to enter the play area, and then walk to the right.
-You will then enter the arena. The aim is to jump on the other bunnies' heads…
+Play the classic Jump 'n Bump game directly in your browser! Choose from 200+ levels, customize game options, and enjoy the original multiplayer bunny action with friends around one keyboard.
 
-Jump 'n Bump was originally a DOS game by Brainchild Design, which was open
-sourced under the GPL license and ported to SDL, and then SDL2, and now JavaScript!
+Jump 'n Bump was originally a DOS game by Brainchild Design, which was open sourced under the GPL license and ported to SDL, and then SDL2, and now JavaScript!
 
 ## Controls
 
@@ -24,14 +20,14 @@ it were QWERTY.
 
 The controls on a **QWERTY** keyboard are:
 
--   A, W, D to steer Dot
--   ←, ↑, → to steer Jiffy
--   J, I, L to steer Fizz
--   4, 8, 6 to steer Mijji (on the numeric pad)
+- A, W, D to steer Dot
+- ←, ↑, → to steer Jiffy
+- J, I, L to steer Fizz
+- 4, 8, 6 to steer Mijji (on the numeric pad)
 
--   ? (SHIFT + /) toggles the shortcut overlay
--   F (SHIFT + f) toggles fullscreen
--   ESC ends the current game. When pressed from the menu screen it will exit to the Web UI landing page.
+- ? (SHIFT + /) toggles the shortcut overlay
+- F (SHIFT + f) toggles fullscreen
+- ESC ends the current game. When pressed from the menu screen it will exit to the Web UI landing page.
 
 ## Extra levels
 
@@ -41,7 +37,7 @@ You can also play any valid `.dat` level file from your computer. Select the `Lo
 
 ## Compilation
 
-Requires Node.js 18+ to be installed on your machine.
+Requires Node.js 20+ to be installed on your machine.
 
 1. Clone this repository
 1. Change to the root directory of the repository
