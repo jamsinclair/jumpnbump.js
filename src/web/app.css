@@ -77,6 +77,12 @@
     -ms-interpolation-mode: nearest-neighbor;
 }
 
+.game-canvas-loading {
+    opacity: 0;
+    height: 0;
+    width: 0;
+}
+
 .custom-level-upload-input:focus + label {
     outline: 2px solid var(--color-brainchild-tertiary);
     outline-offset: 2px;

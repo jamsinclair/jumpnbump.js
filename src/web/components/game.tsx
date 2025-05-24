@@ -59,7 +59,7 @@ export default function Game({
             )}
             <canvas
                 id="canvas"
-                className={`game-canvas ${gameState === 'initial' ? 'opacity-0 h-0 w-0' : ''}`}
+                className={`game-canvas ${gameState === 'initial' ? 'game-canvas-loading' : ''}`}
                 ref={canvasRef}
             ></canvas>
         </div>
