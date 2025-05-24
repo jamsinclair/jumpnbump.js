@@ -129,14 +129,14 @@ export default function Play() {
 
     if (isGameRunning) {
         return (
-            <>
+            <div className="h-screen w-screen bg-black">
                 <GameInfoOverlay />
                 <Game
                     datFileName={selectedLevel.datFile}
                     gameOptions={gameOptions}
                     onExit={() => setIsGameRunning(false)}
                 />
-            </>
+            </div>
         );
     }
 
