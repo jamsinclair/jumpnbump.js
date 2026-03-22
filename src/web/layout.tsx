@@ -34,7 +34,15 @@ function ParallaxLogo() {
     );
 }
 
-export function Layout({ title, children }: { title: string; children: ComponentChildren }) {
+export function Layout({
+    title,
+    children,
+    banner,
+}: {
+    title: string;
+    children: ComponentChildren;
+    banner?: ComponentChildren;
+}) {
     const [onlineCount, setOnlineCount] = useState(0);
 
     useEffect(() => {
@@ -57,6 +65,7 @@ export function Layout({ title, children }: { title: string; children: Component
                             <span className="pl-1 font-bold">Online:</span> <span>{onlineCount}.</span>
                         </div>
                     </div>
+                    {banner}
                     <div className="mx-4 md:ml-9 md:mr-5 pt-4 border-b-1 border-black">
                         <div className="w-66 bg-gradient-to-r from-brainchild-fg to-brainchild-separator-darker px-2 ml-auto text-right">
                             <h2 className="uppercase text-xl italic text-white font-bold text-stroke-1 leading-none">
@@ -102,7 +111,12 @@ export function Layout({ title, children }: { title: string; children: Component
                             </ul>
                         </nav>
                         <div className="hidden md:block absolute top-34 -left-19 pointer-events-none">
-                            <img src="/sidebar.gif" alt="sidebar gif animation" className="[width:100px]" />
+                            <img
+                                src="/sidebar.gif"
+                                alt="sidebar gif animation"
+                                className="[width:100px]"
+                                loading="lazy"
+                            />
                         </div>
                         {children}
                     </div>

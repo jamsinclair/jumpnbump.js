@@ -1,5 +1,5 @@
 import { KEY } from '../constants';
-import { poll_events } from './events';
+import { poll_events, get_mouse_buttons } from './events';
 import { toggle_fullscreen } from './gfx';
 import ctx from '../context';
 
@@ -23,6 +23,10 @@ function getTicks() {
 
 export function key_pressed(key: string) {
     return keyb[key];
+}
+
+export function mouse_button_pressed(button: number): boolean {
+    return get_mouse_buttons()[button] ?? false;
 }
 
 export function addkey(key: string, pressed: boolean = false) {

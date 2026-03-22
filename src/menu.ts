@@ -27,23 +27,7 @@ const menu_cur_pal = new Uint8ClampedArray(768);
 
 function update_objects() {}
 
-const message = [
-    `Jump 'n Bump ${JNB_VERSION}`,
-    'by Brainchild Design in 1998.',
-    'Code by Mattias Brynervall.',
-    'Graphics by Martin Magnusson',
-    'and Andreas Brynervall.',
-    'Music by Anders Nilsson.',
-    'Linux port by Chuck Mason.',
-    'SDL port by Florian Schulze.',
-    'SDL2 port by Come Chilliet.',
-    'JavaScript port by James Sinclair.',
-    'Visit the source code at:',
-    'github.com/jamsinclair/jumpnbumpjs',
-    "Jump 'n Bump is free software",
-    'licensed under GPL 2.0 or later.',
-    '',
-];
+const message = ['Discover over 250 fan levels', 'relive the classic game!'];
 
 const NUM_MESSAGES = message.length;
 

@@ -83,6 +83,19 @@
     width: 0;
 }
 
+@keyframes marquee {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+.animate-marquee {
+    animation: marquee 20s linear infinite;
+}
+
 .custom-level-upload-input:focus + label {
     outline: 2px solid var(--color-brainchild-tertiary);
     outline-offset: 2px;

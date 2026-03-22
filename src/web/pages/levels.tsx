@@ -19,22 +19,35 @@ const levelsPageMeta: PageMeta = {
         'retro game levels',
         'multiplayer game levels',
     ],
-    ogImage: '/screenshot-large.jpg',
+    ogImage: 'https://jumpnbump.net/levels-og.jpg',
     ogDescription:
         "Discover and download over 200 custom fan-made levels for the classic multiplayer game Jump 'n Bump. Browse by page or search by creator.",
     ogTitle: "Jump 'n Bump Level Library - Fan-Made Custom Levels",
     ogType: 'website',
     ogUrl: 'https://jumpnbump.net/levels',
+    canonical: 'https://jumpnbump.net/levels',
     structuredData: {
         '@context': 'https://schema.org',
-        '@type': 'CollectionPage',
-        name: "Jump 'n Bump Custom Levels",
-        description: "Browse and download over 200 custom fan-made levels for the classic game Jump 'n Bump",
-        numberOfItems: 256,
-        author: {
-            '@type': 'Person',
-            name: 'Jamie Sinclair',
-        },
+        '@graph': [
+            {
+                '@type': 'CollectionPage',
+                name: "Jump 'n Bump Custom Levels",
+                description: "Browse and download over 200 custom fan-made levels for the classic game Jump 'n Bump",
+                numberOfItems: 256,
+                url: 'https://jumpnbump.net/levels',
+                author: {
+                    '@type': 'Person',
+                    name: 'Jamie Sinclair',
+                },
+            },
+            {
+                '@type': 'BreadcrumbList',
+                itemListElement: [
+                    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://jumpnbump.net/' },
+                    { '@type': 'ListItem', position: 2, name: 'Levels', item: 'https://jumpnbump.net/levels' },
+                ],
+            },
+        ],
     },
 };
 
@@ -71,9 +84,11 @@ export default function levels() {
         );
     };
 
-    usePageMeta(
-        searchQuery ? { ...levelsPageMeta, robots: 'noindex, nofollow' } : { ...levelsPageMeta, title: pageTitle }
-    );
+    usePageMeta({
+        ...levelsPageMeta,
+        title: pageTitle,
+        ...(searchQuery || currentPage > 1 ? { robots: 'noindex, nofollow' } : {}),
+    });
 
     useEffect(() => {
         // Parse page number

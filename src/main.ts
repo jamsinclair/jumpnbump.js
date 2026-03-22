@@ -72,6 +72,7 @@ import ctx from './context';
 import { run_in_frame_loop } from './loop';
 import { deinit_controls_listener, init_controls_listener } from './sdl/events';
 import { Pob, register_gob, get_gob } from './assets';
+import { GameInputDevice } from 'inputs';
 
 let endscore_reached = 0;
 
@@ -535,6 +536,7 @@ export type MainOptions = {
     musicnosound?: boolean;
     nogore?: boolean;
     noflies?: boolean;
+    controls?: GameInputDevice[];
 };
 
 export async function main(canvas: HTMLCanvasElement, options: MainOptions): Promise<number> {
@@ -542,6 +544,12 @@ export async function main(canvas: HTMLCanvasElement, options: MainOptions): Pro
     main_info.no_gore = options.nogore || false;
     main_info.no_sound = options.nosound || false;
     main_info.music_no_sound = options.musicnosound || false;
+
+    if (options.controls && options.controls.length === JNB_MAX_PLAYERS) {
+        // Override default controls
+        ctx.controls = options.controls;
+    }
+
     flies_enabled = options.noflies ? false : true;
 
     if ((await init_program(canvas, options.dat, pal)) != 0) {

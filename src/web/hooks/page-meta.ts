@@ -10,6 +10,7 @@ export type PageMeta = {
     ogType?: string;
     robots?: string;
     ogUrl: string;
+    canonical?: string;
     structuredData?: Record<string, any>;
 };
 
@@ -39,16 +40,32 @@ export function usePageMeta(meta: PageMeta) {
         updateOrCreateMeta('description', meta.description);
         updateOrCreateMeta('keywords', meta.keywords.join(', '));
 
-        updateOrCreateMeta('og:image', meta.ogImage || '/screenshot-large.jpg');
+        updateOrCreateMeta('og:image', meta.ogImage || 'https://jumpnbump.net/jump-og.jpg');
         updateOrCreateMeta('og:description', meta.ogDescription);
         updateOrCreateMeta('og:title', meta.ogTitle || meta.title);
         updateOrCreateMeta('og:type', meta.ogType || 'website');
         updateOrCreateMeta('og:url', meta.ogUrl);
 
+        updateOrCreateMeta('twitter:card', 'summary_large_image');
+        updateOrCreateMeta('twitter:title', meta.ogTitle || meta.title);
+        updateOrCreateMeta('twitter:description', meta.ogDescription);
+        updateOrCreateMeta('twitter:image', meta.ogImage || 'https://jumpnbump.net/jump-og.jpg');
+
         if (meta.robots) {
             updateOrCreateMeta('robots', meta.robots);
         } else {
             document.querySelector('meta[name="robots"]')?.remove();
+        }
+
+        const existingCanonical = document.querySelector('link[rel="canonical"]');
+        if (meta.canonical) {
+            if (existingCanonical) {
+                existingCanonical.setAttribute('href', meta.canonical);
+            } else {
+                document.head.insertAdjacentHTML('beforeend', `<link rel="canonical" href="${meta.canonical}" />`);
+            }
+        } else {
+            existingCanonical?.remove();
         }
 
         if (meta.structuredData) {

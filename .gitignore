@@ -2,3 +2,7 @@ node_modules
 .DS_Store
 lib
 dist
+.playwright*
+.claude
+docs
+.superpowers
