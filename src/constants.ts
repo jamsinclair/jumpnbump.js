@@ -1,3 +1,5 @@
+import { GameInputDevice } from 'inputs';
+
 export enum OBJ {
     SPRING = 0,
     SPLASH = 1,
@@ -41,6 +43,13 @@ export enum KEY {
     F10 = 'F10',
     F = 'KeyF',
 }
+
+export const DEFAULT_CONTROLS: GameInputDevice[] = [
+    { type: 'keyboard', mappings: [KEY.PL1_LEFT, KEY.PL1_RIGHT, KEY.PL1_JUMP] },
+    { type: 'keyboard', mappings: [KEY.PL2_LEFT, KEY.PL2_RIGHT, KEY.PL2_JUMP] },
+    { type: 'keyboard', mappings: [KEY.PL3_LEFT, KEY.PL3_RIGHT, KEY.PL3_JUMP] },
+    { type: 'keyboard', mappings: [KEY.PL4_LEFT, KEY.PL4_RIGHT, KEY.PL4_JUMP] },
+];
 
 export enum MOVEMENT {
     LEFT = 1,

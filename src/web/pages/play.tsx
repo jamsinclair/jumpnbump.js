@@ -6,6 +6,14 @@ import { OptionalGameOptions } from 'engine';
 import { GameInfoOverlay } from '../components/game-info-overlay';
 import { PageMeta, usePageMeta } from '../hooks/page-meta';
 import { lazy } from 'preact-iso';
+import { Controls } from '../components/controls';
+import { DEFAULT_CONTROLS } from '../../constants';
+import type { GameInputDevice } from '../../inputs';
+
+const DEBUG_GAMEPAD = new URLSearchParams(window.location.search).has('debug');
+const GamepadDebug = DEBUG_GAMEPAD
+    ? lazy(() => import('../components/gamepad-debug').then((m) => ({ default: m.GamepadDebug })))
+    : null;
 
 const playPageMeta: PageMeta = {
     title: "Play Jump 'n Bump Online - Free Browser Game",
@@ -91,11 +99,13 @@ const Game = lazy(() => import('../components/game'));
 export default function Play() {
     const [isGameRunning, setIsGameRunning] = useState(false);
     const [showLevelSelector, setShowLevelSelector] = useState(false);
+    const [hasControlsError, setHasControlsError] = useState(false);
     const [gameOptions, setGameOptions] = useState<OptionalGameOptions>({
         noflies: false,
         nogore: false,
         nosound: false,
         musicnosound: false,
+        controls: DEFAULT_CONTROLS,
     });
     const [selectedLevel, setSelectedLevel] = useState<Level>({
         name: "Jump 'n Bump (Original)",
@@ -125,6 +135,30 @@ export default function Play() {
         reader.readAsArrayBuffer(file);
     };
 
+    const [savedControlState, setSavedControlState] = useState<{
+        playerControlIds: Record<string, string>;
+        gamepadConfigs: Record<string, string[]>;
+    }>({ playerControlIds: {}, gamepadConfigs: {} });
+
+    const onControlsChange = (controls: GameInputDevice[], errors: string[]) => {
+        setGameOptions((prev) => ({ ...prev, controls }));
+        setHasControlsError(errors.length > 0);
+    };
+
+    const onControlsStateChange = (
+        playerControlIds: Record<string, string>,
+        gamepadConfigs: Record<string, string[]>
+    ) => {
+        setSavedControlState({ playerControlIds, gamepadConfigs });
+    };
+
+    const [showBanner, setShowBanner] = useState(() => localStorage.getItem('hideBanner') !== 'true');
+
+    const dismissBanner = () => {
+        localStorage.setItem('hideBanner', 'true');
+        setShowBanner(false);
+    };
+
     usePageMeta(playPageMeta);
 
     if (isGameRunning) {
@@ -140,8 +174,32 @@ export default function Play() {
         );
     }
 
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const banner = showBanner ? (
+        <div
+            className="group relative w-full border-t-1 border-b-1 border-black bg-brainchild-secondary text-white font-bold text-sm overflow-hidden py-0.5 cursor-pointer select-none"
+            onClick={dismissBanner}
+        >
+            {prefersReducedMotion ? (
+                <p className="text-center">★ NEW! Gamepad &amp; Controller Support Added! ★</p>
+            ) : (
+                <div className="overflow-hidden whitespace-nowrap">
+                    <span className="inline-block animate-marquee">
+                        ★ NEW! Gamepad &amp; Controller Support Added! ★ Plug in your controller, press a button, and
+                        start playing! &nbsp;&nbsp;&nbsp;★ NEW! Gamepad &amp; Controller Support Added! ★ Plug in your
+                        controller, press a button, and start playing! &nbsp;&nbsp;&nbsp;
+                    </span>
+                </div>
+            )}
+            <div className="absolute inset-0 flex items-center justify-center bg-brainchild-secondary opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                ✕ Dismiss
+            </div>
+        </div>
+    ) : null;
+
     return (
-        <Layout title="Play">
+        <Layout title="Play" banner={banner}>
+            {GamepadDebug && <GamepadDebug />}
             <div className="flex flex-col w-full gap-2">
                 <Card title="Jump 'n Bump" className="w-full md:w-86 flex-shrink-0 pb-3">
                     <p className="text-sm md:text-xs pt-3">
@@ -163,7 +221,13 @@ export default function Play() {
                     </p>
                 </Card>
                 <Card title="Controls" className="w-full md:w-86">
-                    <p className="text-sm md:text-xs pt-3">
+                    <Controls
+                        onControlsChange={onControlsChange}
+                        defaultPlayerControlIds={savedControlState.playerControlIds}
+                        defaultGamepadConfigs={savedControlState.gamepadConfigs}
+                        onStateChange={onControlsStateChange}
+                    />
+                    {/* <p className="text-sm md:text-xs pt-3">
                         <span className="font-bold">Dott:</span> Use the arrow keys to move around.
                     </p>
                     <p className="text-sm md:text-xs pt-3">
@@ -174,6 +238,10 @@ export default function Play() {
                     </p>
                     <p className="text-sm md:text-xs pt-3">
                         <span className="font-bold">Mijji:</span> Use the numpad arrow keys to move around.
+                    </p> */}
+                    <p className="text-sm md:text-xs pt-3">
+                        Connect a gamepad via USB or Bluetooth, press a button on it, and it will appear in the
+                        dropdowns above.
                     </p>
                     <p className="text-sm md:text-xs pt-3">Additional controls:</p>
                     <ul className="list-disc list-inside text-sm md:text-xs">
@@ -192,8 +260,9 @@ export default function Play() {
             <div className="flex flex-col w-full gap-2 pt-2 md:pt-0">
                 <Card title="Play">
                     <button
-                        className="w-full mt-2 mx-auto block bg-brainchild-tertiary hover:bg-brainchild-tertiary-hover border-1 border-black p-1 text-md md:text-sm font-bold uppercase cursor-pointer focus:outline-none focus:ring-2 focus:ring-brainchild-tertiary focus:ring-offset-2"
+                        className="w-full mt-2 mx-auto block bg-brainchild-tertiary hover:bg-brainchild-tertiary-hover border-1 border-black p-1 text-md md:text-sm font-bold uppercase cursor-pointer focus:outline-none focus:ring-2 focus:ring-brainchild-tertiary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         onClick={() => setIsGameRunning(true)}
+                        disabled={hasControlsError}
                     >
                         Start Game
                     </button>

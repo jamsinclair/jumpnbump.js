@@ -1,5 +1,6 @@
+import { GameInputDevice } from 'inputs';
 import { Pob } from './assets';
-import { JNB_MAX_PLAYERS, NUM } from './constants';
+import { DEFAULT_CONTROLS, JNB_MAX_PLAYERS, NUM } from './constants';
 
 class Player {
     action_left: boolean;
@@ -60,6 +61,7 @@ type GameContext = {
     player: Player[];
     ai: (0 | 1)[];
     objects: GameObject[];
+    controls: GameInputDevice[];
 };
 
 const fillArray = <Value>(array: Value[], getValue: () => Value) => {
@@ -86,6 +88,7 @@ const getDefaultContext: () => GameContext = () => ({
     player: fillArray(new Array(JNB_MAX_PLAYERS), () => new Player()),
     ai: fillArray(new Array(JNB_MAX_PLAYERS), () => 0),
     objects: fillArray(new Array(NUM.OBJECTS), () => new GameObject()),
+    controls: DEFAULT_CONTROLS,
 });
 
 const context = getDefaultContext();
@@ -97,6 +100,7 @@ export const resetContext = () => {
     context.player = newContext.player;
     context.ai = newContext.ai;
     context.objects = newContext.objects;
+    // Note: controls are NOT reset here — they are set from gameOptions each time main() is called
 };
 
 export default context;
