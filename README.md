@@ -8,7 +8,7 @@
 
 A JavaScript port of the original Jump 'n Bump game.
 
-Play the classic Jump 'n Bump game directly in your browser! Choose from 200+ levels, customize game options, and enjoy the original multiplayer bunny action with friends around one keyboard.
+Play the classic Jump 'n Bump game directly in your browser! Choose from 200+ levels, customize game options, and enjoy the original multiplayer bunny action with friends around one keyboard or with game controllers.
 
 Jump 'n Bump was originally a DOS game by Brainchild Design, which was open sourced under the GPL license and ported to SDL, and then SDL2, and now JavaScript!
 
@@ -28,6 +28,12 @@ The controls on a **QWERTY** keyboard are:
 - ? (SHIFT + /) toggles the shortcut overlay
 - F (SHIFT + f) toggles fullscreen
 - ESC ends the current game. When pressed from the menu screen it will exit to the Web UI landing page.
+
+### Game Controllers
+
+Game controllers (gamepads) are supported via the Web Gamepad API. When a controller is connected, it will appear as an option in the player control dropdowns on the start screen.
+
+Some controllers have built-in default mappings (e.g. 8BitDo Micro, Nintendo Joy-Con). For other controllers, you can use the **Configure** button to map your own left, right, and jump inputs. Both buttons and analog stick axes are supported. If you would like to contribute mappings for your own controllers, please submit a PR with the details!
 
 ## Extra levels
 
