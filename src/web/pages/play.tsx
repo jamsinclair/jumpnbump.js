@@ -11,7 +11,7 @@ import { Controls } from '../components/controls';
 import { DEFAULT_CONTROLS } from '../../constants';
 import type { GameInputDevice } from '../../inputs';
 
-const DEBUG_GAMEPAD = new URLSearchParams(window.location.search).has('debug');
+const DEBUG_GAMEPAD = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('debug');
 const GamepadDebug: (() => JSX.Element) | null = DEBUG_GAMEPAD
     ? (lazy(() => import('../components/gamepad-debug').then((m) => ({ default: m.GamepadDebug }))) as unknown as () => JSX.Element)
     : null;
@@ -153,7 +153,7 @@ export default function Play() {
         setSavedControlState({ playerControlIds, gamepadConfigs });
     };
 
-    const [showBanner, setShowBanner] = useState(() => localStorage.getItem('hideBanner') !== 'true');
+    const [showBanner, setShowBanner] = useState(() => typeof window === 'undefined' || localStorage.getItem('hideBanner') !== 'true');
 
     const dismissBanner = () => {
         localStorage.setItem('hideBanner', 'true');
@@ -175,7 +175,7 @@ export default function Play() {
         );
     }
 
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const banner = showBanner ? (
         <div
             className="group relative w-full border-t-1 border-b-1 border-black bg-brainchild-secondary text-white font-bold text-sm overflow-hidden py-0.5 cursor-pointer select-none"

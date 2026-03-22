@@ -7,7 +7,9 @@ const getConnectedGamepads = () => {
 };
 
 export function useGamepads() {
-    const [gamepads, setGamepads] = useState<Gamepad[]>(getConnectedGamepads());
+    const [gamepads, setGamepads] = useState<Gamepad[]>(() =>
+        typeof window !== 'undefined' ? getConnectedGamepads() : []
+    );
 
     useEffect(() => {
         const handleGamepadConnected = () => {
