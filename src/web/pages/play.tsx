@@ -1,3 +1,4 @@
+import type { JSX } from 'preact';
 import { useState } from 'preact/hooks';
 import { Card } from '../components/card';
 import { Layout } from '../layout';
@@ -11,8 +12,8 @@ import { DEFAULT_CONTROLS } from '../../constants';
 import type { GameInputDevice } from '../../inputs';
 
 const DEBUG_GAMEPAD = new URLSearchParams(window.location.search).has('debug');
-const GamepadDebug = DEBUG_GAMEPAD
-    ? lazy(() => import('../components/gamepad-debug').then((m) => ({ default: m.GamepadDebug })))
+const GamepadDebug: (() => JSX.Element) | null = DEBUG_GAMEPAD
+    ? (lazy(() => import('../components/gamepad-debug').then((m) => ({ default: m.GamepadDebug }))) as unknown as () => JSX.Element)
     : null;
 
 const playPageMeta: PageMeta = {
