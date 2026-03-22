@@ -7,7 +7,7 @@ const secretsPageMeta: PageMeta = {
     description: "Shush. Don't tell anyone, but there are some hidden secrets in the Jump 'n Bump Video Game.",
     keywords: ["Jump 'n Bump", 'secrets', 'hidden', ' Easter eggs'],
     robots: 'noindex, nofollow',
-    ogImage: '/screenshot-large.jpg',
+    ogImage: 'https://jumpnbump.net/jump-og.jpg',
     ogDescription: "Shush. Don't tell anyone, but there are some hidden secrets in the Jump 'n Bump Video Game.",
     ogTitle: "Jump 'n Bump Secrets",
     ogType: 'website',

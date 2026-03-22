@@ -13,13 +13,15 @@ import type { GameInputDevice } from '../../inputs';
 
 const DEBUG_GAMEPAD = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('debug');
 const GamepadDebug: (() => JSX.Element) | null = DEBUG_GAMEPAD
-    ? (lazy(() => import('../components/gamepad-debug').then((m) => ({ default: m.GamepadDebug }))) as unknown as () => JSX.Element)
+    ? (lazy(() =>
+          import('../components/gamepad-debug').then((m) => ({ default: m.GamepadDebug }))
+      ) as unknown as () => JSX.Element)
     : null;
 
 const playPageMeta: PageMeta = {
     title: "Play Jump 'n Bump Online - Free Browser Game",
     description:
-        "Play the classic Jump 'n Bump game directly in your browser! Choose from 200+ levels, customize game options, and enjoy multiplayer bunny action with friends around one keyboard.",
+        "Play Jump 'n Bump in your browser with keyboard or gamepad! Choose from 200+ levels and enjoy multiplayer bunny action with controller support.",
     keywords: [
         "Jump 'n Bump",
         'browser game',
@@ -29,60 +31,74 @@ const playPageMeta: PageMeta = {
         'brainchild design',
         'bunny game',
         'custom levels',
+        'gamepad support',
+        'controller support',
     ],
-    ogImage: '/screenshot-large.jpg',
+    ogImage: 'https://jumpnbump.net/jump-og.jpg',
     ogDescription:
-        "Play the classic multiplayer bunny game Jump 'n Bump directly in your browser! Gather friends around one keyboard and choose from over 200 levels.",
+        "Play Jump 'n Bump in your browser with keyboard or gamepad! Gather friends and choose from over 200 levels. Full controller support.",
     ogTitle: "Play Jump 'n Bump Online - Free Browser Game",
     ogType: 'website',
     ogUrl: 'https://jumpnbump.net/',
+    canonical: 'https://jumpnbump.net/',
     structuredData: {
         '@context': 'https://schema.org',
-        '@type': 'VideoGame',
-        name: "Jump 'n Bump",
-        description:
-            "A classic multiplayer game where cute bunnies jump on each other's heads. Play directly in your browser with friends using one keyboard.",
-        playMode: 'MultiPlayer',
-        applicationCategory: 'Game',
-        genre: 'Platformer',
-        gamePlatform: 'Web Browser',
-        offers: {
-            '@type': 'Offer',
-            price: '0',
-            priceCurrency: 'USD',
-            availability: 'https://schema.org/InStock',
-        },
-        publisher: {
-            '@type': 'Organization',
-            name: 'Brainchild Design',
-        },
-        author: [
+        '@graph': [
             {
-                '@type': 'Person',
-                name: 'Mattias Brynervall',
-                description: 'Code',
+                '@type': 'VideoGame',
+                url: 'https://jumpnbump.net/',
+                name: "Jump 'n Bump",
+                description:
+                    "A classic multiplayer game where cute bunnies jump on each other's heads. Play in your browser with keyboard or gamepad controller support.",
+                playMode: 'MultiPlayer',
+                applicationCategory: 'Game',
+                genre: 'Platformer',
+                gamePlatform: 'Web Browser',
+                operatingSystem: ['Windows', 'macOS', 'Linux', 'Chrome OS', 'Android'],
+                accessibilityFeature: ['alternativeInput'],
+                offers: {
+                    '@type': 'Offer',
+                    price: '0',
+                    priceCurrency: 'USD',
+                    availability: 'https://schema.org/InStock',
+                },
+                publisher: {
+                    '@type': 'Organization',
+                    name: 'Brainchild Design',
+                },
+                author: [
+                    {
+                        '@type': 'Person',
+                        name: 'Mattias Brynervall',
+                        jobTitle: 'Programmer',
+                    },
+                    {
+                        '@type': 'Person',
+                        name: 'Andreas Brynervall',
+                        jobTitle: 'Graphic Designer',
+                    },
+                    {
+                        '@type': 'Person',
+                        name: 'Martin Magnusson',
+                        jobTitle: 'Graphic Designer',
+                    },
+                    {
+                        '@type': 'Person',
+                        name: 'Anders JG Nilsson',
+                        jobTitle: 'Composer & Sound Designer',
+                    },
+                ],
+                contributor: {
+                    '@type': 'Person',
+                    name: 'Jamie Sinclair',
+                    jobTitle: 'JavaScript Developer',
+                },
             },
             {
-                '@type': 'Person',
-                name: 'Andreas Brynervall',
-                description: 'Graphics',
-            },
-            {
-                '@type': 'Person',
-                name: 'Martin Magnusson',
-                description: 'Graphics',
-            },
-            {
-                '@type': 'Person',
-                name: 'Anders JG Nilsson',
-                description: 'Music and Sound Effects',
+                '@type': 'BreadcrumbList',
+                itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Play', item: 'https://jumpnbump.net/' }],
             },
         ],
-        contributor: {
-            '@type': 'Person',
-            name: 'Jamie Sinclair',
-            description: 'JavaScript port',
-        },
     },
 };
 
@@ -153,7 +169,9 @@ export default function Play() {
         setSavedControlState({ playerControlIds, gamepadConfigs });
     };
 
-    const [showBanner, setShowBanner] = useState(() => typeof window === 'undefined' || localStorage.getItem('hideBanner') !== 'true');
+    const [showBanner, setShowBanner] = useState(
+        () => typeof window === 'undefined' || localStorage.getItem('hideBanner') !== 'true'
+    );
 
     const dismissBanner = () => {
         localStorage.setItem('hideBanner', 'true');
@@ -175,7 +193,8 @@ export default function Play() {
         );
     }
 
-    const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const prefersReducedMotion =
+        typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const banner = showBanner ? (
         <div
             className="group relative w-full border-t-1 border-b-1 border-black bg-brainchild-secondary text-white font-bold text-sm overflow-hidden py-0.5 cursor-pointer select-none"
@@ -205,8 +224,12 @@ export default function Play() {
                 <Card title="Jump 'n Bump" className="w-full md:w-86 flex-shrink-0 pb-3">
                     <p className="text-sm md:text-xs pt-3">
                         Play <span className="italic">Jump 'n Bump</span> right here in your web browser! This is a
-                        loving port of the original game for the web. Gather your friends around the keyboard and let
-                        the lagomorphic playful violence begin!
+                        loving port of the{' '}
+                        <a className="text-brainchild-secondary font-bold" href="/about">
+                            original 1998 game by Brainchild Design
+                        </a>
+                        . Gather your friends around the keyboard or gamepad and let the lagomorphic playful violence
+                        begin!
                     </p>
                     <p className="text-sm md:text-xs pt-3">
                         Start with the original level, or choose from over 200 levels available in the{' '}
@@ -221,25 +244,17 @@ export default function Play() {
                         .
                     </p>
                 </Card>
-                <Card title="Controls" className="w-full md:w-86">
+                <Card title="How to Play" className="w-full md:w-86">
+                    <p className="text-sm md:text-xs pt-3">
+                        Jump on the other bunnies' heads to score points. Use left and right to move and up to jump.
+                        Assign each player a keyboard or gamepad below.
+                    </p>
                     <Controls
                         onControlsChange={onControlsChange}
                         defaultPlayerControlIds={savedControlState.playerControlIds}
                         defaultGamepadConfigs={savedControlState.gamepadConfigs}
                         onStateChange={onControlsStateChange}
                     />
-                    {/* <p className="text-sm md:text-xs pt-3">
-                        <span className="font-bold">Dott:</span> Use the arrow keys to move around.
-                    </p>
-                    <p className="text-sm md:text-xs pt-3">
-                        <span className="font-bold">Jiffy:</span> Use the A,W,D keys to move around.
-                    </p>
-                    <p className="text-sm md:text-xs pt-3">
-                        <span className="font-bold">Fizz:</span> Use the J,I,L keys to move around.
-                    </p>
-                    <p className="text-sm md:text-xs pt-3">
-                        <span className="font-bold">Mijji:</span> Use the numpad arrow keys to move around.
-                    </p> */}
                     <p className="text-sm md:text-xs pt-3">
                         Connect a gamepad via USB or Bluetooth, press a button on it, and it will appear in the
                         dropdowns above.
@@ -338,6 +353,28 @@ export default function Play() {
                             <span className="text-md md:text-sm">No Music and Sound</span>
                         </label>
                     </div>
+                </Card>
+                <Card title="Game Info">
+                    <ul className="text-sm md:text-xs pt-3 space-y-1">
+                        <li>
+                            <span className="font-bold">Year:</span> 1998
+                        </li>
+                        <li>
+                            <span className="font-bold">Developer:</span> Brainchild Design
+                        </li>
+                        <li>
+                            <span className="font-bold">Genre:</span> Platformer
+                        </li>
+                        <li>
+                            <span className="font-bold">Players:</span> 1–4
+                        </li>
+                        <li>
+                            <span className="font-bold">Input:</span> Keyboard, Gamepad
+                        </li>
+                        <li>
+                            <span className="font-bold">Platform:</span> Web Browser
+                        </li>
+                    </ul>
                 </Card>
             </div>
             {showLevelSelector ? (

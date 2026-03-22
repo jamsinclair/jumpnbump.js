@@ -16,21 +16,34 @@ const aboutPageMeta: PageMeta = {
         'game download',
         'open source game',
     ],
-    ogImage: '/screenshot-large.jpg',
+    ogImage: 'https://jumpnbump.net/jump-og.jpg',
     ogDescription:
         "Discover the history of Jump 'n Bump, the classic multiplayer game created in 1998 by four friends under Brainchild Design. Download the modern version and access source code.",
     ogTitle: "About Jump 'n Bump - Game History & Downloads",
     ogType: 'website',
     ogUrl: 'https://jumpnbump.net/about',
+    canonical: 'https://jumpnbump.net/about',
     structuredData: {
         '@context': 'https://schema.org',
-        '@type': 'WebPage',
-        name: "About Jump 'n Bump",
-        description: "History and download information for the classic game Jump 'n Bump",
-        author: {
-            '@type': 'Person',
-            name: 'Jamie Sinclair',
-        },
+        '@graph': [
+            {
+                '@type': 'WebPage',
+                name: "About Jump 'n Bump",
+                description: "History and download information for the classic game Jump 'n Bump",
+                url: 'https://jumpnbump.net/about',
+                author: {
+                    '@type': 'Person',
+                    name: 'Jamie Sinclair',
+                },
+            },
+            {
+                '@type': 'BreadcrumbList',
+                itemListElement: [
+                    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://jumpnbump.net/' },
+                    { '@type': 'ListItem', position: 2, name: 'About', item: 'https://jumpnbump.net/about' },
+                ],
+            },
+        ],
     },
 };
 
@@ -102,7 +115,7 @@ export default function About() {
                         </li>
                         <li>
                             <a
-                                href="https://gitlab.com/LibreGames/jumpnbump"
+                                href="https://github.com/jamsinclair/jumpnbump.js"
                                 target="_blank"
                                 className="text-brainchild-secondary font-bold"
                             >

@@ -111,7 +111,12 @@ export function Layout({
                             </ul>
                         </nav>
                         <div className="hidden md:block absolute top-34 -left-19 pointer-events-none">
-                            <img src="/sidebar.gif" alt="sidebar gif animation" className="[width:100px]" />
+                            <img
+                                src="/sidebar.gif"
+                                alt="sidebar gif animation"
+                                className="[width:100px]"
+                                loading="lazy"
+                            />
                         </div>
                         {children}
                     </div>

@@ -39,7 +39,19 @@ function getHeadElements(meta: PageMeta) {
         { type: 'meta', props: { property: 'og:description', content: meta.ogDescription } },
         { type: 'meta', props: { property: 'og:type', content: meta.ogType || 'website' } },
         { type: 'meta', props: { property: 'og:url', content: meta.ogUrl } },
-        { type: 'meta', props: { property: 'og:image', content: meta.ogImage || '/screenshot-large.jpg' } },
+        { type: 'meta', props: { property: 'og:image', content: meta.ogImage || 'https://jumpnbump.net/jump-og.jpg' } },
+
+        // Twitter Card tags
+        { type: 'meta', props: { name: 'twitter:card', content: 'summary_large_image' } },
+        { type: 'meta', props: { name: 'twitter:title', content: meta.ogTitle || meta.title } },
+        { type: 'meta', props: { name: 'twitter:description', content: meta.ogDescription } },
+        {
+            type: 'meta',
+            props: { name: 'twitter:image', content: meta.ogImage || 'https://jumpnbump.net/jump-og.jpg' },
+        },
+
+        // Canonical URL
+        ...(meta.canonical ? [{ type: 'link', props: { rel: 'canonical', href: meta.canonical } }] : []),
 
         // Optional robots meta
         ...(meta.robots ? [{ type: 'meta', props: { name: 'robots', content: meta.robots } }] : []),
