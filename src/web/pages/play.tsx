@@ -1,5 +1,5 @@
 import type { JSX } from 'preact';
-import { useState } from 'preact/hooks';
+import { useEffect, useState } from 'preact/hooks';
 import { Card } from '../components/card';
 import { Layout } from '../layout';
 import { Level, LevelSelector } from '../components/level-selector';
@@ -169,9 +169,13 @@ export default function Play() {
         setSavedControlState({ playerControlIds, gamepadConfigs });
     };
 
-    const [showBanner, setShowBanner] = useState(
-        () => typeof window === 'undefined' || localStorage.getItem('hideBanner') !== 'true'
-    );
+    const [showBanner, setShowBanner] = useState(false);
+
+    useEffect(() => {
+        if (localStorage.getItem('hideBanner') !== 'true') {
+            setShowBanner(true);
+        }
+    }, []);
 
     const dismissBanner = () => {
         localStorage.setItem('hideBanner', 'true');
